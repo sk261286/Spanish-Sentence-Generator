@@ -68,6 +68,7 @@ Use this JSON shape:
 
     if (!openAiResponse.ok) {
       const errorText = await openAiResponse.text();
+      console.error("OpenAI request failed:", errorText);
       return {
         statusCode: openAiResponse.status,
         body: JSON.stringify({ error: "OpenAI request failed.", details: errorText })
