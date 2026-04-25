@@ -1159,6 +1159,7 @@ let latestMicTranscript = "";
 let deferredInstallPrompt = null;
 let installHintShown = false;
 let aiModeEnabled = JSON.parse(localStorage.getItem("spanishSentenceAiMode")) || false;
+let aiCooldownUntil = 0;
 
 // We load saved data from localStorage when the page opens.
 let favourites = JSON.parse(localStorage.getItem("spanishSentenceFavourites")) || [];
@@ -1870,17 +1871,23 @@ function extractJsonText(rawText) {
 
 // This function asks the Netlify backend for a fresh AI sentence.
 async function generateAiSentence() {
-  const response = await fetch("/api/generate-sentence", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      difficulty: difficultySelect.value,
-      topic: topicSelect.value,
-      tone: toneSelect.value
-    })
-  });
+  let response;
+
+  try {
+    response = await fetch("/api/generate-sentence", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        difficulty: difficultySelect.value,
+        topic: topicSelect.value,
+        tone: toneSelect.value
+      })
+    });
+  } catch (error) {
+    throw new Error("Network error. The app could not reach the AI backend.");
+  }
 
   if (!response.ok) {
     let errorMessage = "The AI backend was not ready.";
@@ -1954,15 +1961,28 @@ async function generateSentence() {
   let nextSentence;
 
   if (aiModeEnabled && !favouritesOnlyCheckbox.checked) {
+    const remainingCooldown = Math.max(0, Math.ceil((aiCooldownUntil - Date.now()) / 1000));
+
+    if (remainingCooldown > 0) {
+      nextSentence = generateLocalSentence(filteredSentences);
+      setCurrentSentence(nextSentence, nextSentence.generated ? "Generated" : "Example");
+      if (nextSentence.generated) {
+        rememberGeneratedSentence(nextSentence.spanish);
+      }
+      showStatusMessage(`AI cooldown is active. Please wait ${remainingCooldown} seconds. The built-in generator was used for now.`);
+      return;
+    }
+
     generateBtn.disabled = true;
     generateBtn.textContent = "Generating...";
     showStatusMessage("Asking the AI sentence engine for a fresh sentence...");
+    aiCooldownUntil = Date.now() + 10000;
 
     try {
       nextSentence = await generateAiSentence();
     } catch (error) {
       nextSentence = generateLocalSentence(filteredSentences);
-      showStatusMessage(`AI was not available, so the app used the built-in generator instead. ${error.message}`);
+      showStatusMessage(`${formatAiErrorMessage(error.message)} The built-in generator was used instead.`);
     } finally {
       generateBtn.disabled = false;
       generateBtn.textContent = "Generate Sentence";
@@ -2071,6 +2091,32 @@ function updateQuizControls() {
 // This helper shows short status messages.
 function showStatusMessage(message) {
   statusMessage.textContent = message;
+}
+
+function formatAiErrorMessage(errorMessage) {
+  const lowerMessage = errorMessage.toLowerCase();
+
+  if (lowerMessage.includes("rate limit")) {
+    return "AI is temporarily rate limited.";
+  }
+
+  if (lowerMessage.includes("quota") || lowerMessage.includes("budget") || lowerMessage.includes("usage_exceeded")) {
+    return "AI is unavailable because the OpenAI project quota or budget was reached.";
+  }
+
+  if (lowerMessage.includes("missing") && lowerMessage.includes("api key")) {
+    return "AI is unavailable because the OpenAI API key is missing on the server.";
+  }
+
+  if (lowerMessage.includes("wrong api key") || lowerMessage.includes("invalid api key") || lowerMessage.includes("incorrect api key")) {
+    return "AI is unavailable because the OpenAI API key appears to be wrong.";
+  }
+
+  if (lowerMessage.includes("network")) {
+    return "AI is unavailable because the app could not reach the AI service.";
+  }
+
+  return `AI is unavailable right now. ${errorMessage}`;
 }
 
 // This function saves whether AI mode is turned on.
@@ -2636,7 +2682,7 @@ if ("speechSynthesis" in window) {
 }
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js?v=8").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=9").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
