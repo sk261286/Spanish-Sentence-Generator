@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spanish Sentence Generator</title>
+  <meta name="theme-color" content="#b45309">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Spanish Sentences">
+  <link rel="manifest" href="manifest.json?v=2">
+  <link rel="icon" href="icon-192.png?v=2" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <p class="eyebrow">Spanish Learning Tool</p>
+      <h1>Spanish Sentence Generator</h1>
+      <p class="intro">
+        Practise natural Spanish from Spain with random example sentences,
+        English translations, and speech buttons.
+      </p>
+    </section>
+
+    <section class="card controls-card">
+      <div id="install-banner" class="install-banner hidden">
+        <div>
+          <p class="section-label">Install App</p>
+          <p id="install-banner-text" class="install-banner-text">Open this site in Chrome on Android, then use the browser menu and tap "Add to Home screen".</p>
+        </div>
+        <div class="actions">
+          <button id="install-app-btn" class="secondary-btn">Install app</button>
+          <button id="dismiss-install-btn" class="secondary-btn">Hide</button>
+        </div>
+      </div>
+
+      <div class="controls-grid">
+        <div class="field">
+          <label for="difficulty">Difficulty</label>
+          <select id="difficulty">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="topic">Topic</label>
+          <select id="topic">
+            <option value="all">All topics</option>
+            <option value="daily life">Daily life</option>
+            <option value="gym/fitness">Gym / fitness</option>
+            <option value="food">Food</option>
+            <option value="travel">Travel</option>
+            <option value="work">Work</option>
+            <option value="sleep">Sleep</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="tone">Style</label>
+          <select id="tone">
+            <option value="all">All styles</option>
+            <option value="informal">Informal</option>
+            <option value="formal">Formal</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="extra-controls">
+        <label class="checkbox-row" for="favourites-only">
+          <input type="checkbox" id="favourites-only">
+          <span>Practise favourites only</span>
+        </label>
+      </div>
+
+      <button id="generate-btn" class="primary-btn">Generate Sentence</button>
+    </section>
+
+    <section class="card sentence-card">
+      <p class="section-label">Current sentence</p>
+      <div class="mode-row">
+        <div class="mode-toggle">
+          <input type="checkbox" id="quiz-mode">
+          <label for="quiz-mode">Quiz mode</label>
+        </div>
+        <p id="status-message" class="status-message" aria-live="polite"></p>
+      </div>
+      <h2 id="spanish-sentence">Pulsa "Generate Sentence" para empezar.</h2>
+      <p id="english-translation">Press "Generate Sentence" to begin.</p>
+      <p id="sentence-meta" class="sentence-meta">Choose a difficulty, topic, and style, then generate a sentence.</p>
+
+      <div class="quiz-panel">
+        <div class="score-box">
+          <p class="score-label">Quiz score</p>
+          <p id="score-summary" class="score-summary">Correct: 0 | Wrong: 0 | Total: 0</p>
+        </div>
+        <div id="quiz-actions" class="quiz-actions hidden">
+          <button id="mark-correct-btn" class="secondary-btn">I was right</button>
+          <button id="mark-wrong-btn" class="secondary-btn">I was wrong</button>
+          <button id="reset-score-btn" class="secondary-btn">Reset score</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="speak-spanish-btn" class="secondary-btn">Speak Spanish</button>
+        <button id="speak-english-btn" class="secondary-btn">Speak English</button>
+        <button id="copy-btn" class="secondary-btn">Copy sentence</button>
+        <button id="toggle-translation-btn" class="secondary-btn">Hide translation</button>
+        <button id="save-btn" class="secondary-btn">Save to favourites</button>
+      </div>
+    </section>
+
+    <section class="card custom-card">
+      <div class="favourites-header">
+        <div>
+          <p class="section-label">Add your own</p>
+          <h3>Custom sentence translator</h3>
+        </div>
+      </div>
+
+      <div class="field custom-field">
+        <label for="custom-english-input">Write a sentence in English</label>
+        <textarea id="custom-english-input" rows="4" placeholder="For example: I drink coffee in the morning."></textarea>
+      </div>
+
+      <div class="radio-grid">
+        <div class="field">
+          <label for="custom-tone">Spanish style</label>
+          <select id="custom-tone">
+            <option value="informal">Informal</option>
+            <option value="formal">Formal</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="custom-topic">Topic</label>
+          <select id="custom-topic">
+            <option value="daily life">Daily life</option>
+            <option value="gym/fitness">Gym / fitness</option>
+            <option value="food">Food</option>
+            <option value="travel">Travel</option>
+            <option value="work">Work</option>
+            <option value="sleep">Sleep</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="custom-difficulty">Difficulty label</label>
+          <select id="custom-difficulty">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="translate-custom-btn" class="secondary-btn">Translate to Spanish</button>
+        <button id="add-custom-to-playlist-btn" class="secondary-btn">Add translated sentence to playlist</button>
+      </div>
+
+      <p id="custom-status" class="sentence-meta">Best for short everyday sentences. The translation works offline inside the app.</p>
+    </section>
+
+    <section class="card chat-card">
+      <div class="favourites-header">
+        <div>
+          <p class="section-label">Conversation</p>
+          <h3>Spanish chat coach</h3>
+        </div>
+      </div>
+
+      <div class="radio-grid">
+        <div class="field">
+          <label for="chat-topic">Chat topic</label>
+          <select id="chat-topic">
+            <option value="daily life">Daily life</option>
+            <option value="gym/fitness">Gym / fitness</option>
+            <option value="food">Food</option>
+            <option value="travel">Travel</option>
+            <option value="work">Work</option>
+            <option value="sleep">Sleep</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="chat-tone">Coach style</label>
+          <select id="chat-tone">
+            <option value="informal">Informal</option>
+            <option value="formal">Formal</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button id="start-chat-btn" class="secondary-btn">Start chat</button>
+          <button id="speak-chat-reply-btn" class="secondary-btn">Speak last reply</button>
+          <button id="use-chat-reply-btn" class="secondary-btn">Use last reply as sentence</button>
+        </div>
+      </div>
+
+      <div class="extra-controls">
+        <label class="checkbox-row" for="chat-auto-speak">
+          <input type="checkbox" id="chat-auto-speak">
+          <span>Auto-speak coach replies</span>
+        </label>
+      </div>
+
+      <div id="chat-messages" class="chat-messages"></div>
+
+      <div class="field custom-field">
+        <label for="chat-input">Your message</label>
+        <textarea id="chat-input" rows="3" placeholder="Write in English or simple Spanish. For example: I am going to Madrid tomorrow."></textarea>
+      </div>
+
+      <div class="actions">
+        <button id="mic-chat-btn" class="secondary-btn">Speak with mic</button>
+        <button id="send-chat-btn" class="secondary-btn">Send message</button>
+        <button id="clear-chat-btn" class="secondary-btn">Clear chat</button>
+      </div>
+
+      <p id="chat-status" class="sentence-meta">Start a chat to practise a short Spanish conversation with the built-in coach.</p>
+    </section>
+
+    <section class="card favourites-card">
+      <div class="favourites-header">
+        <div>
+          <p class="section-label">Saved sentences</p>
+          <h3>Favourites</h3>
+        </div>
+      </div>
+
+      <div class="field favourites-search">
+        <label for="favourites-search">Search favourites</label>
+        <input id="favourites-search" type="text" placeholder="Search Spanish or English">
+      </div>
+
+      <ul id="favourites-list" class="favourites-list"></ul>
+      <p id="empty-message" class="empty-message">No favourites saved yet.</p>
+    </section>
+
+    <section class="card radio-card">
+      <div class="favourites-header">
+        <div>
+          <p class="section-label">Radio mode</p>
+          <h3>Sentence playlists</h3>
+        </div>
+      </div>
+
+      <div class="radio-grid">
+        <div class="field">
+          <label for="playlist-name">New playlist name</label>
+          <input id="playlist-name" type="text" placeholder="For example: Morning practice">
+        </div>
+
+        <div class="field">
+          <label for="playlist-select">Choose playlist</label>
+          <select id="playlist-select"></select>
+        </div>
+
+        <div class="field">
+          <label for="radio-mode">Playback mode</label>
+          <select id="radio-mode">
+            <option value="repeat-one">Repeat one sentence</option>
+            <option value="play-once">Play the playlist once</option>
+            <option value="loop-all">Loop the whole playlist</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="create-playlist-btn" class="secondary-btn">Create playlist</button>
+        <button id="add-current-to-playlist-btn" class="secondary-btn">Add current sentence</button>
+        <button id="play-radio-btn" class="secondary-btn">Play radio mode</button>
+        <button id="stop-radio-btn" class="secondary-btn">Stop radio mode</button>
+        <button id="delete-playlist-btn" class="secondary-btn">Delete playlist</button>
+      </div>
+
+      <p id="radio-status" class="sentence-meta">Create a playlist, add sentences, then press play.</p>
+      <ul id="playlist-sentences" class="favourites-list"></ul>
+      <p id="playlist-empty-message" class="empty-message">No playlists yet.</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
