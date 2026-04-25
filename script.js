@@ -1208,6 +1208,38 @@ function showAndroidInstallHelp() {
   showInstallBanner('On Android Chrome, tap the three-dot menu and choose "Add to Home screen" or "Install app". The direct install button does not always appear.', false);
 }
 
+// This helper checks whether the app is currently running in installed mode.
+function isStandaloneApp() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+// This helper explains microphone errors in plain English.
+function getMicErrorMessage(errorCode) {
+  const messages = {
+    "not-allowed": "Microphone permission was blocked. Please allow microphone access in Chrome and try again.",
+    "service-not-allowed": "Speech recognition is not allowed here. On Android, open the site in Chrome and try the mic there.",
+    "audio-capture": "Your device could not access the microphone. Check that no other app is using it.",
+    "network": "Speech recognition needs an internet connection on many phones. Please check your connection and try again.",
+    "no-speech": "No speech was heard. Try again and speak a little closer to the microphone.",
+    "aborted": "Microphone listening was stopped.",
+    "language-not-supported": "This recognition language is not supported on your device.",
+    "unsupported-browser": "This browser does not support speech recognition here. On Android, try opening the site in Chrome instead of the installed app."
+  };
+
+  return messages[errorCode] || "Microphone input did not work. You can still type your message.";
+}
+
+// This helper asks the browser for microphone permission before speech recognition starts.
+async function prepareMicrophoneAccess() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    return true;
+  }
+
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  stream.getTracks().forEach((track) => track.stop());
+  return true;
+}
+
 // This function prepares browser speech recognition for microphone chat input.
 function setupChatRecognition() {
   const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1218,6 +1250,7 @@ function setupChatRecognition() {
 
   chatRecognition = new SpeechRecognitionClass();
   chatRecognition.lang = "en-GB";
+  chatRecognition.continuous = false;
   chatRecognition.interimResults = true;
   chatRecognition.maxAlternatives = 1;
 
@@ -1238,11 +1271,11 @@ function setupChatRecognition() {
     chatInput.value = transcript.trim();
   };
 
-  chatRecognition.onerror = () => {
+  chatRecognition.onerror = (event) => {
     isListeningToChat = false;
     micChatBtn.textContent = "Speak with mic";
     micChatBtn.classList.remove("listening-btn");
-    chatStatus.textContent = "Microphone input did not work. You can still type your message.";
+    chatStatus.textContent = getMicErrorMessage(event.error);
   };
 
   chatRecognition.onend = () => {
@@ -1260,9 +1293,13 @@ function setupChatRecognition() {
 }
 
 // This function starts or stops microphone chat input.
-function toggleChatMic() {
+async function toggleChatMic() {
   if (!chatRecognition) {
-    alert("Sorry, your browser does not support microphone speech recognition here.");
+    const helpMessage = isStandaloneApp()
+      ? "This installed app does not support speech recognition on this device. Open the website in Chrome and try the mic there."
+      : getMicErrorMessage("unsupported-browser");
+    alert(helpMessage);
+    chatStatus.textContent = helpMessage;
     return;
   }
 
@@ -1272,8 +1309,15 @@ function toggleChatMic() {
     return;
   }
 
-  chatInput.value = "";
-  chatRecognition.start();
+  try {
+    await prepareMicrophoneAccess();
+    chatInput.value = "";
+    chatStatus.textContent = "Preparing microphone...";
+    chatRecognition.start();
+  } catch (error) {
+    const blockedMessage = getMicErrorMessage("not-allowed");
+    chatStatus.textContent = blockedMessage;
+  }
 }
 
 // This function tries to choose the most natural built-in voice available.
@@ -2375,7 +2419,7 @@ if ("speechSynthesis" in window) {
 }
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js?v=3").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=4").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
