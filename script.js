@@ -1883,7 +1883,16 @@ async function generateAiSentence() {
   });
 
   if (!response.ok) {
-    throw new Error("The AI backend was not ready.");
+    let errorMessage = "The AI backend was not ready.";
+
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.details || errorData.error || errorMessage;
+    } catch (error) {
+      errorMessage = "The AI backend returned an unexpected error.";
+    }
+
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
@@ -1953,7 +1962,7 @@ async function generateSentence() {
       nextSentence = await generateAiSentence();
     } catch (error) {
       nextSentence = generateLocalSentence(filteredSentences);
-      showStatusMessage("AI was not available, so the app used the built-in generator instead.");
+      showStatusMessage(`AI was not available, so the app used the built-in generator instead. ${error.message}`);
     } finally {
       generateBtn.disabled = false;
       generateBtn.textContent = "Generate Sentence";
@@ -2627,7 +2636,7 @@ if ("speechSynthesis" in window) {
 }
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js?v=7").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=8").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
