@@ -1,4 +1,4 @@
-const CACHE_NAME = "spanish-sentence-generator-v5";
+const CACHE_NAME = "spanish-sentence-generator-v6";
 const APP_FILES = [
   "./",
   "./index.html",

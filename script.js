@@ -1042,6 +1042,49 @@ const generatorTranslations = {
   }
 };
 
+// These extra pieces expand the number of possible generated sentences.
+const generatorExtras = {
+  middleAddons: [
+    "",
+    "con calma",
+    "sin prisas",
+    "cuando puedo",
+    "si tengo tiempo",
+    "con bastante cuidado",
+    "como parte de mi rutina"
+  ],
+  endAddons: [
+    "",
+    "casi todos los dias",
+    "si me da tiempo",
+    "cuando me viene bien",
+    "para estar mejor",
+    "como parte del dia",
+    "sin agobiarme"
+  ]
+};
+
+const generatorExtraTranslations = {
+  middleAddons: {
+    "": "",
+    "con calma": "calmly",
+    "sin prisas": "without rushing",
+    "cuando puedo": "when I can",
+    "si tengo tiempo": "if I have time",
+    "con bastante cuidado": "quite carefully",
+    "como parte de mi rutina": "as part of my routine"
+  },
+  endAddons: {
+    "": "",
+    "casi todos los dias": "almost every day",
+    "si me da tiempo": "if I have time",
+    "cuando me viene bien": "when it suits me",
+    "para estar mejor": "to feel better",
+    "como parte del dia": "as part of the day",
+    "sin agobiarme": "without stressing myself out"
+  }
+};
+
 // These variables connect JavaScript to the HTML elements on the page.
 const difficultySelect = document.getElementById("difficulty");
 const installBanner = document.getElementById("install-banner");
@@ -1106,6 +1149,7 @@ let currentSentence = null;
 let translationVisible = true;
 let answerMarked = false;
 let lastGeneratedSpanish = "";
+let recentGeneratedSentences = [];
 let availableVoices = [];
 let chatRecognition = null;
 let isListeningToChat = false;
@@ -1702,6 +1746,20 @@ function renderSpanishSentence(text) {
   spanishSentence.appendChild(buildHoverableFragment(text));
 }
 
+// This helper removes the final full stop so we can add more pieces.
+function removeFinalPeriod(text) {
+  return text.endsWith(".") ? text.slice(0, -1) : text;
+}
+
+// This helper remembers a small history of recent generated sentences.
+function rememberGeneratedSentence(spanishSentenceText) {
+  recentGeneratedSentences.push(spanishSentenceText);
+
+  if (recentGeneratedSentences.length > 40) {
+    recentGeneratedSentences.shift();
+  }
+}
+
 // This function creates a new sentence from pieces.
 function generateTemplateSentence() {
   const difficulty = difficultySelect.value;
@@ -1720,12 +1778,39 @@ function generateTemplateSentence() {
   const start = pickRandom(pattern.starts);
   const middle = pickRandom(pattern.middles);
   const end = pickRandom(pattern.ends);
+  const middleAddon = pickRandom(generatorExtras.middleAddons);
+  const endAddon = pickRandom(generatorExtras.endAddons);
+  const spanishParts = [start, middle];
 
-  const spanish = `${start} ${middle} ${end}`;
+  if (middleAddon) {
+    spanishParts.push(middleAddon);
+  }
+
+  spanishParts.push(removeFinalPeriod(end));
+
+  if (endAddon) {
+    spanishParts.push(endAddon);
+  }
+
+  const spanish = `${spanishParts.join(" ")}.`;
   const englishStart = generatorTranslations.starts[start] || start;
   const englishMiddle = generatorTranslations.middles[middle] || middle;
   const englishEnd = generatorTranslations.ends[end] || end;
-  const english = `${englishStart} ${englishMiddle} ${englishEnd}`;
+  const englishMiddleAddon = generatorExtraTranslations.middleAddons[middleAddon] || middleAddon;
+  const englishEndAddon = generatorExtraTranslations.endAddons[endAddon] || endAddon;
+  const englishParts = [englishStart, englishMiddle];
+
+  if (englishMiddleAddon) {
+    englishParts.push(englishMiddleAddon);
+  }
+
+  englishParts.push(removeFinalPeriod(englishEnd));
+
+  if (englishEndAddon) {
+    englishParts.push(englishEndAddon);
+  }
+
+  const english = `${englishParts.join(" ")}.`;
 
   return {
     difficulty,
@@ -1789,17 +1874,23 @@ function generateSentence() {
   if (favouritesOnlyCheckbox.checked) {
     nextSentence = pickRandom(filteredSentences);
   } else {
-    const useBaseSentence = Math.random() < 0.45 && filteredSentences.length > 0;
+    const useBaseSentence = Math.random() < 0.2 && filteredSentences.length > 0;
     nextSentence = useBaseSentence ? pickRandom(filteredSentences) : generateTemplateSentence();
 
     let safetyCount = 0;
-    while (nextSentence.spanish === lastGeneratedSpanish && safetyCount < 10) {
+    while (
+      (nextSentence.spanish === lastGeneratedSpanish || recentGeneratedSentences.includes(nextSentence.spanish)) &&
+      safetyCount < 60
+    ) {
       nextSentence = useBaseSentence ? pickRandom(filteredSentences) : generateTemplateSentence();
       safetyCount += 1;
     }
   }
 
   setCurrentSentence(nextSentence, nextSentence.generated ? "Generated" : "Example");
+  if (nextSentence.generated) {
+    rememberGeneratedSentence(nextSentence.spanish);
+  }
   showStatusMessage(
     quizModeCheckbox.checked
       ? "Quiz mode is on. Try to guess the meaning first."
@@ -2428,7 +2519,7 @@ if ("speechSynthesis" in window) {
 }
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js?v=5").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=6").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
