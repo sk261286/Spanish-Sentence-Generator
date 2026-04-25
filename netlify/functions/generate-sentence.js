@@ -1,3 +1,30 @@
+// This helper pulls plain text out of the Responses API shape.
+function extractResponseText(responseData) {
+  if (responseData.output_text && responseData.output_text.trim()) {
+    return responseData.output_text.trim();
+  }
+
+  if (!Array.isArray(responseData.output)) {
+    return "";
+  }
+
+  const textParts = [];
+
+  responseData.output.forEach((item) => {
+    if (!Array.isArray(item.content)) {
+      return;
+    }
+
+    item.content.forEach((contentItem) => {
+      if (contentItem.type === "output_text" && contentItem.text) {
+        textParts.push(contentItem.text);
+      }
+    });
+  });
+
+  return textParts.join("\n").trim();
+}
+
 // This Netlify function keeps the OpenAI API key on the server side,
 // so it does not get exposed in the browser.
 async function handler(event) {
@@ -76,7 +103,22 @@ Use this JSON shape:
     }
 
     const responseData = await openAiResponse.json();
-    const rawText = (responseData.output_text || "").trim();
+    const rawText = extractResponseText(responseData);
+
+    if (!rawText) {
+      console.error("OpenAI response did not contain text:", JSON.stringify(responseData));
+      return {
+        statusCode: 500,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          error: "OpenAI did not return any text.",
+          details: "The AI response was empty."
+        })
+      };
+    }
+
     const cleanedText = rawText.startsWith("```")
       ? rawText
           .split("\n")
