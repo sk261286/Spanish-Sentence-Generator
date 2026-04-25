@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Spanish Sentences">
-  <link rel="manifest" href="manifest.json?v=6">
-  <link rel="icon" href="icon-192.png?v=6" type="image/png">
-  <link rel="apple-touch-icon" href="icon-192.png?v=6">
+  <link rel="manifest" href="manifest.json?v=7">
+  <link rel="icon" href="icon-192.png?v=7" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png?v=7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -77,7 +77,15 @@
           <input type="checkbox" id="favourites-only">
           <span>Practise favourites only</span>
         </label>
+        <label class="checkbox-row" for="ai-mode">
+          <input type="checkbox" id="ai-mode">
+          <span>Use AI sentence engine</span>
+        </label>
       </div>
+
+      <p id="ai-mode-note" class="helper-note">
+        AI mode uses OpenAI through a small Netlify backend. If AI is not ready yet, the app will fall back to the built-in generator.
+      </p>
 
       <button id="generate-btn" class="primary-btn">Generate Sentence</button>
     </section>

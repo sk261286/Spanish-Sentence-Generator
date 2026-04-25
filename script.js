@@ -1094,6 +1094,8 @@ const dismissInstallBtn = document.getElementById("dismiss-install-btn");
 const topicSelect = document.getElementById("topic");
 const toneSelect = document.getElementById("tone");
 const favouritesOnlyCheckbox = document.getElementById("favourites-only");
+const aiModeCheckbox = document.getElementById("ai-mode");
+const aiModeNote = document.getElementById("ai-mode-note");
 const generateBtn = document.getElementById("generate-btn");
 const speakSpanishBtn = document.getElementById("speak-spanish-btn");
 const speakEnglishBtn = document.getElementById("speak-english-btn");
@@ -1156,6 +1158,7 @@ let isListeningToChat = false;
 let latestMicTranscript = "";
 let deferredInstallPrompt = null;
 let installHintShown = false;
+let aiModeEnabled = JSON.parse(localStorage.getItem("spanishSentenceAiMode")) || false;
 
 // We load saved data from localStorage when the page opens.
 let favourites = JSON.parse(localStorage.getItem("spanishSentenceFavourites")) || [];
@@ -1851,10 +1854,80 @@ function getFilteredSentences() {
   });
 }
 
+// This helper pulls JSON out of an AI response, even if the model wraps it
+// inside markdown code fences.
+function extractJsonText(rawText) {
+  const trimmedText = rawText.trim();
+
+  if (trimmedText.startsWith("```")) {
+    const lines = trimmedText.split("\n");
+    const cleanedLines = lines.filter((line) => !line.startsWith("```"));
+    return cleanedLines.join("\n").trim();
+  }
+
+  return trimmedText;
+}
+
+// This function asks the Netlify backend for a fresh AI sentence.
+async function generateAiSentence() {
+  const response = await fetch("/api/generate-sentence", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      difficulty: difficultySelect.value,
+      topic: topicSelect.value,
+      tone: toneSelect.value
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error("The AI backend was not ready.");
+  }
+
+  const data = await response.json();
+
+  if (!data || !data.sentence || !data.sentence.spanish || !data.sentence.english) {
+    throw new Error("The AI backend did not return a valid sentence.");
+  }
+
+  return {
+    difficulty: data.sentence.difficulty || difficultySelect.value,
+    topic: data.sentence.topic || topicSelect.value,
+    tone: data.sentence.tone || toneSelect.value,
+    spanish: data.sentence.spanish.trim(),
+    english: data.sentence.english.trim(),
+    generated: true,
+    ai: true
+  };
+}
+
+// This helper contains the built-in sentence generation path.
+function generateLocalSentence(filteredSentences) {
+  if (favouritesOnlyCheckbox.checked) {
+    return pickRandom(filteredSentences);
+  }
+
+  const useBaseSentence = Math.random() < 0.2 && filteredSentences.length > 0;
+  let nextSentence = useBaseSentence ? pickRandom(filteredSentences) : generateTemplateSentence();
+  let safetyCount = 0;
+
+  while (
+    (nextSentence.spanish === lastGeneratedSpanish || recentGeneratedSentences.includes(nextSentence.spanish)) &&
+    safetyCount < 60
+  ) {
+    nextSentence = useBaseSentence ? pickRandom(filteredSentences) : generateTemplateSentence();
+    safetyCount += 1;
+  }
+
+  return nextSentence;
+}
+
 // This function chooses the next sentence.
 // If "favourites only" is off, we can always fall back to a generated sentence,
 // which lets the app keep making new practice sentences indefinitely.
-function generateSentence() {
+async function generateSentence() {
   const filteredSentences = getFilteredSentences();
 
   if (filteredSentences.length === 0 && favouritesOnlyCheckbox.checked) {
@@ -1871,31 +1944,42 @@ function generateSentence() {
 
   let nextSentence;
 
-  if (favouritesOnlyCheckbox.checked) {
-    nextSentence = pickRandom(filteredSentences);
-  } else {
-    const useBaseSentence = Math.random() < 0.2 && filteredSentences.length > 0;
-    nextSentence = useBaseSentence ? pickRandom(filteredSentences) : generateTemplateSentence();
+  if (aiModeEnabled && !favouritesOnlyCheckbox.checked) {
+    generateBtn.disabled = true;
+    generateBtn.textContent = "Generating...";
+    showStatusMessage("Asking the AI sentence engine for a fresh sentence...");
 
-    let safetyCount = 0;
-    while (
-      (nextSentence.spanish === lastGeneratedSpanish || recentGeneratedSentences.includes(nextSentence.spanish)) &&
-      safetyCount < 60
-    ) {
-      nextSentence = useBaseSentence ? pickRandom(filteredSentences) : generateTemplateSentence();
-      safetyCount += 1;
+    try {
+      nextSentence = await generateAiSentence();
+    } catch (error) {
+      nextSentence = generateLocalSentence(filteredSentences);
+      showStatusMessage("AI was not available, so the app used the built-in generator instead.");
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.textContent = "Generate Sentence";
     }
+  } else {
+    nextSentence = generateLocalSentence(filteredSentences);
   }
 
-  setCurrentSentence(nextSentence, nextSentence.generated ? "Generated" : "Example");
+  const sourceLabel = nextSentence.ai
+    ? "AI generated"
+    : nextSentence.generated
+      ? "Generated"
+      : "Example";
+
+  setCurrentSentence(nextSentence, sourceLabel);
   if (nextSentence.generated) {
     rememberGeneratedSentence(nextSentence.spanish);
   }
-  showStatusMessage(
-    quizModeCheckbox.checked
-      ? "Quiz mode is on. Try to guess the meaning first."
-      : "Hover over a Spanish word to see an English hint."
-  );
+
+  if (!(aiModeEnabled && !favouritesOnlyCheckbox.checked && nextSentence.ai !== true)) {
+    showStatusMessage(
+      quizModeCheckbox.checked
+        ? "Quiz mode is on. Try to guess the meaning first."
+        : "Hover over a Spanish word to see an English hint."
+    );
+  }
 }
 
 // This function uses the browser's built-in speech system.
@@ -1978,6 +2062,23 @@ function updateQuizControls() {
 // This helper shows short status messages.
 function showStatusMessage(message) {
   statusMessage.textContent = message;
+}
+
+// This function saves whether AI mode is turned on.
+function saveAiModePreference() {
+  localStorage.setItem("spanishSentenceAiMode", JSON.stringify(aiModeEnabled));
+}
+
+// This helper updates the short AI note under the controls.
+function updateAiModeNote() {
+  if (favouritesOnlyCheckbox.checked) {
+    aiModeNote.textContent = "AI mode does not change favourite-only practice. That mode still uses your saved sentences.";
+    return;
+  }
+
+  aiModeNote.textContent = aiModeEnabled
+    ? "AI mode is on. The app will ask the Netlify backend for a fresh sentence, then fall back to the built-in generator if needed."
+    : "AI mode is off. The app is using the built-in sentence generator.";
 }
 
 // This function updates the score text.
@@ -2503,6 +2604,13 @@ favouritesSearchInput.addEventListener("input", renderFavourites);
 
 favouritesOnlyCheckbox.addEventListener("change", () => {
   showStatusMessage(favouritesOnlyCheckbox.checked ? "Now practising saved favourites only." : "Now practising from all sentences, including unlimited generated ones.");
+  updateAiModeNote();
+});
+aiModeCheckbox.addEventListener("change", () => {
+  aiModeEnabled = aiModeCheckbox.checked;
+  saveAiModePreference();
+  updateAiModeNote();
+  showStatusMessage(aiModeEnabled ? "AI sentence engine turned on." : "AI sentence engine turned off.");
 });
 chatInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && !event.shiftKey) {
@@ -2519,7 +2627,7 @@ if ("speechSynthesis" in window) {
 }
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js?v=6").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=7").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
@@ -2543,3 +2651,5 @@ renderPlaylists();
 renderChatMessages();
 renderQuizScore();
 updateQuizControls();
+aiModeCheckbox.checked = aiModeEnabled;
+updateAiModeNote();

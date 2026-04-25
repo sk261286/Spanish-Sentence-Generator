@@ -128,6 +128,15 @@ body {
 
 .extra-controls {
   margin-bottom: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.helper-note {
+  margin: -6px 0 18px;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .install-banner {
