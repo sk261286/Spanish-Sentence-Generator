@@ -1109,6 +1109,7 @@ let lastGeneratedSpanish = "";
 let availableVoices = [];
 let chatRecognition = null;
 let isListeningToChat = false;
+let latestMicTranscript = "";
 let deferredInstallPrompt = null;
 let installHintShown = false;
 
@@ -1256,6 +1257,7 @@ function setupChatRecognition() {
 
   chatRecognition.onstart = () => {
     isListeningToChat = true;
+    latestMicTranscript = "";
     micChatBtn.textContent = "Stop mic";
     micChatBtn.classList.add("listening-btn");
     chatStatus.textContent = "Listening... speak your message now.";
@@ -1264,11 +1266,15 @@ function setupChatRecognition() {
   chatRecognition.onresult = (event) => {
     let transcript = "";
 
-    for (let index = event.resultIndex; index < event.results.length; index += 1) {
+    for (let index = 0; index < event.results.length; index += 1) {
       transcript += event.results[index][0].transcript;
     }
 
-    chatInput.value = transcript.trim();
+    latestMicTranscript = transcript.trim();
+    chatInput.value = latestMicTranscript;
+    chatStatus.textContent = latestMicTranscript
+      ? `Heard: ${latestMicTranscript}`
+      : "Listening... speak your message now.";
   };
 
   chatRecognition.onerror = (event) => {
@@ -1279,15 +1285,17 @@ function setupChatRecognition() {
   };
 
   chatRecognition.onend = () => {
-    const shouldSend = isListeningToChat && chatInput.value.trim();
+    const spokenMessage = latestMicTranscript.trim() || chatInput.value.trim();
+    const shouldSend = isListeningToChat && spokenMessage;
     isListeningToChat = false;
     micChatBtn.textContent = "Speak with mic";
     micChatBtn.classList.remove("listening-btn");
 
     if (shouldSend) {
+      chatInput.value = spokenMessage;
       sendChatMessage();
     } else {
-      chatStatus.textContent = "Microphone stopped.";
+      chatStatus.textContent = "Microphone stopped without hearing any words.";
     }
   };
 }
@@ -1312,6 +1320,7 @@ async function toggleChatMic() {
   try {
     await prepareMicrophoneAccess();
     chatInput.value = "";
+    latestMicTranscript = "";
     chatStatus.textContent = "Preparing microphone...";
     chatRecognition.start();
   } catch (error) {
@@ -2419,7 +2428,7 @@ if ("speechSynthesis" in window) {
 }
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js?v=4").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=5").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
