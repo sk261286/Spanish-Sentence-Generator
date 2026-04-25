@@ -35,6 +35,52 @@ Rules:
 - The final sentence must sound like something a native Spanish speaker from Spain would naturally say.
 - If the first version sounds unnatural, rewrite it before returning it.`;
 
+function classifyOpenAiError(statusCode, errorPayload) {
+  const detailsText = JSON.stringify(errorPayload || {}).toLowerCase();
+  const errorCode = errorPayload?.error?.code || errorPayload?.code || "";
+  const errorType = errorPayload?.error?.type || errorPayload?.type || "";
+  const errorMessage = errorPayload?.error?.message || errorPayload?.message || "";
+
+  if (statusCode === 401 || detailsText.includes("incorrect api key") || detailsText.includes("invalid_api_key")) {
+    return {
+      error: "Wrong API key.",
+      details: "The OpenAI API key looks invalid. Please replace OPENAI_API_KEY in Netlify."
+    };
+  }
+
+  if (statusCode === 429 && (detailsText.includes("rate limit") || errorType === "rate_limit_error")) {
+    return {
+      error: "Rate limit reached.",
+      details: "Too many AI requests were sent too quickly. Please wait a moment and try again."
+    };
+  }
+
+  if (
+    detailsText.includes("usage_exceeded") ||
+    detailsText.includes("insufficient_quota") ||
+    detailsText.includes("billing") ||
+    detailsText.includes("quota") ||
+    detailsText.includes("budget")
+  ) {
+    return {
+      error: "Quota or project budget reached.",
+      details: "OpenAI rejected the request because the project budget, quota, or billing limit was reached."
+    };
+  }
+
+  if (statusCode === 429) {
+    return {
+      error: "Rate limit or quota issue.",
+      details: errorMessage || "The AI request was blocked by a usage limit."
+    };
+  }
+
+  return {
+    error: "OpenAI request failed.",
+    details: errorMessage || "The AI service returned an unexpected error."
+  };
+}
+
 function extractResponseText(responseData) {
   if (responseData.output_text && responseData.output_text.trim()) {
     return responseData.output_text.trim();
@@ -83,32 +129,59 @@ function hasBannedWords(spanishText) {
 }
 
 async function callOpenAi(apiKey, model, userPrompt) {
-  const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0.3,
-      input: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT
-        },
-        {
-          role: "user",
-          content: userPrompt
-        }
-      ]
-    })
-  });
+  let openAiResponse;
+
+  try {
+    openAiResponse = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.3,
+        input: [
+          {
+            role: "system",
+            content: SYSTEM_PROMPT
+          },
+          {
+            role: "user",
+            content: userPrompt
+          }
+        ]
+      })
+    });
+  } catch (networkError) {
+    console.error("OpenAI network request failed:", networkError.message);
+    const error = new Error("Network error.");
+    error.publicMessage = "The app could not reach OpenAI. Please check your connection and try again.";
+    throw error;
+  }
 
   if (!openAiResponse.ok) {
     const errorText = await openAiResponse.text();
-    console.error("OpenAI request failed:", errorText);
-    throw new Error(errorText);
+    let errorPayload = {};
+
+    try {
+      errorPayload = JSON.parse(errorText);
+    } catch (parseError) {
+      errorPayload = { message: errorText };
+    }
+
+    const classifiedError = classifyOpenAiError(openAiResponse.status, errorPayload);
+    console.error("OpenAI request failed safely:", {
+      statusCode: openAiResponse.status,
+      error: classifiedError.error,
+      details: classifiedError.details,
+      upstreamCode: errorPayload?.error?.code || errorPayload?.code || "",
+      upstreamType: errorPayload?.error?.type || errorPayload?.type || ""
+    });
+
+    const error = new Error(classifiedError.error);
+    error.publicMessage = classifiedError.details;
+    throw error;
   }
 
   const responseData = await openAiResponse.json();
@@ -116,7 +189,9 @@ async function callOpenAi(apiKey, model, userPrompt) {
 
   if (!rawText) {
     console.error("OpenAI response did not contain text:", JSON.stringify(responseData));
-    throw new Error("The AI response was empty.");
+    const error = new Error("OpenAI did not return any text.");
+    error.publicMessage = "The AI response was empty, so the app could not build a sentence.";
+    throw error;
   }
 
   return JSON.parse(stripCodeFences(rawText));
@@ -191,7 +266,9 @@ Quality rules:
   }
 
   if (hasBannedWords(sentence.spanish || "")) {
-    throw new Error("The AI sentence still contained banned words after rewriting.");
+    const error = new Error("The AI sentence still contained banned words after rewriting.");
+    error.publicMessage = "The AI returned wording that did not pass the Spain-Spanish quality check.";
+    throw error;
   }
 
   return {
@@ -243,6 +320,8 @@ async function handler(event) {
       body: JSON.stringify({ sentence })
     };
   } catch (error) {
+    const safeDetails = error.publicMessage || error.message || "Unknown error.";
+    console.error("Sentence generation failed safely:", safeDetails);
     return {
       statusCode: 500,
       headers: {
@@ -250,7 +329,7 @@ async function handler(event) {
       },
       body: JSON.stringify({
         error: "Could not generate a sentence.",
-        details: error.message
+        details: safeDetails
       })
     };
   }
