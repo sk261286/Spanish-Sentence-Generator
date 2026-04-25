@@ -1110,6 +1110,7 @@ let availableVoices = [];
 let chatRecognition = null;
 let isListeningToChat = false;
 let deferredInstallPrompt = null;
+let installHintShown = false;
 
 // We load saved data from localStorage when the page opens.
 let favourites = JSON.parse(localStorage.getItem("spanishSentenceFavourites")) || [];
@@ -1166,6 +1167,11 @@ function loadVoices() {
   availableVoices = window.speechSynthesis.getVoices();
 }
 
+// This helper checks whether the app is running on an Android device.
+function isAndroidDevice() {
+  return /android/i.test(navigator.userAgent);
+}
+
 // This function shows the install help banner.
 function showInstallBanner(message, canInstallDirectly) {
   installBanner.classList.remove("hidden");
@@ -1176,6 +1182,7 @@ function showInstallBanner(message, canInstallDirectly) {
 // This function hides the install help banner.
 function hideInstallBanner() {
   installBanner.classList.add("hidden");
+  installHintShown = true;
 }
 
 // This function tries to open the browser install prompt when available.
@@ -1189,6 +1196,16 @@ async function promptInstall() {
   await deferredInstallPrompt.userChoice;
   deferredInstallPrompt = null;
   hideInstallBanner();
+}
+
+// This helper shows manual install instructions on Android even when Chrome
+// does not offer a direct prompt button.
+function showAndroidInstallHelp() {
+  if (installHintShown || deferredInstallPrompt || !isAndroidDevice()) {
+    return;
+  }
+
+  showInstallBanner('On Android Chrome, tap the three-dot menu and choose "Add to Home screen" or "Install app". The direct install button does not always appear.', false);
 }
 
 // This function prepares browser speech recognition for microphone chat input.
@@ -1309,6 +1326,23 @@ function getBestVoice(languageCode) {
 
   scoredVoices.sort((a, b) => b.score - a.score);
   return scoredVoices[0].voice;
+}
+
+// This helper builds a speech utterance after choosing the best voice.
+function createSpeechUtterance(text, languageCode) {
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = languageCode;
+  utterance.rate = languageCode === "es-ES" ? 0.9 : 0.93;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  const bestVoice = getBestVoice(languageCode);
+
+  if (bestVoice) {
+    utterance.voice = bestVoice;
+  }
+
+  return utterance;
 }
 
 // This helper creates a simple id for new playlists.
@@ -1722,50 +1756,51 @@ function generateSentence() {
 
 // This function uses the browser's built-in speech system.
 function speakText(text, languageCode) {
-  if (!("speechSynthesis" in window)) {
+  if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
     alert("Sorry, your browser does not support text-to-speech.");
     return;
   }
 
+  loadVoices();
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = languageCode;
-  utterance.rate = languageCode === "es-ES" ? 0.9 : 0.93;
-  utterance.pitch = 1;
-  utterance.volume = 1;
+  window.speechSynthesis.resume();
 
-  const bestVoice = getBestVoice(languageCode);
+  const speakNow = () => {
+    const utterance = createSpeechUtterance(text, languageCode);
+    window.speechSynthesis.speak(utterance);
+  };
 
-  if (bestVoice) {
-    utterance.voice = bestVoice;
+  if (availableVoices.length) {
+    speakNow();
+    return;
   }
 
-  window.speechSynthesis.speak(utterance);
+  setTimeout(speakNow, 250);
 }
 
 // This version lets us know when speech has finished.
 function speakTextWithCallback(text, languageCode, callback) {
-  if (!("speechSynthesis" in window)) {
+  if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
     alert("Sorry, your browser does not support text-to-speech.");
     return;
   }
 
+  loadVoices();
   window.speechSynthesis.cancel();
+  window.speechSynthesis.resume();
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = languageCode;
-  utterance.rate = languageCode === "es-ES" ? 0.9 : 0.93;
-  utterance.pitch = 1;
-  utterance.volume = 1;
+  const speakNow = () => {
+    const utterance = createSpeechUtterance(text, languageCode);
+    utterance.onend = callback;
+    window.speechSynthesis.speak(utterance);
+  };
 
-  const bestVoice = getBestVoice(languageCode);
-
-  if (bestVoice) {
-    utterance.voice = bestVoice;
+  if (availableVoices.length) {
+    speakNow();
+    return;
   }
 
-  utterance.onend = callback;
-  window.speechSynthesis.speak(utterance);
+  setTimeout(speakNow, 250);
 }
 
 // This function updates whether the English translation is visible.
@@ -2340,7 +2375,7 @@ if ("speechSynthesis" in window) {
 }
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("service-worker.js?v=2").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=3").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
@@ -2356,6 +2391,9 @@ window.addEventListener("appinstalled", () => {
 });
 installAppBtn.addEventListener("click", promptInstall);
 dismissInstallBtn.addEventListener("click", hideInstallBanner);
+window.addEventListener("load", () => {
+  setTimeout(showAndroidInstallHelp, 1500);
+});
 renderFavourites();
 renderPlaylists();
 renderChatMessages();
