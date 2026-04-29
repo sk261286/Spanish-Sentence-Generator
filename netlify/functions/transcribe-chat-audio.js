@@ -67,6 +67,11 @@ async function handler(event) {
     const audioBlob = new Blob([audioBuffer], { type: mimeType });
 
     formData.append("model_id", modelId);
+    formData.append("language_code", "en");
+    formData.append("num_speakers", "1");
+    formData.append("tag_audio_events", "false");
+    formData.append("no_verbatim", "true");
+    formData.append("temperature", "0");
     formData.append("file", audioBlob, fileName);
 
     let elevenResponse;

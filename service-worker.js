@@ -1,4 +1,4 @@
-const CACHE_NAME = "spanish-sentence-generator-v10";
+const CACHE_NAME = "spanish-sentence-generator-v11";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -41,21 +41,26 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  const requestUrl = new URL(event.request.url);
+  const isSameOrigin = requestUrl.origin === self.location.origin;
+  const shouldPreferNetwork =
+    event.request.mode === "navigate" ||
+    (isSameOrigin && APP_FILES.some((filePath) => requestUrl.pathname.endsWith(filePath.replace("./", "/"))));
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
+    caches.open(CACHE_NAME).then((cache) => {
+      const networkFetch = fetch(event.request).then((networkResponse) => {
+        if (networkResponse.ok) {
+          cache.put(event.request, networkResponse.clone());
+        }
+        return networkResponse;
+      });
+
+      if (shouldPreferNetwork) {
+        return networkFetch.catch(() => caches.match(event.request).then((cachedResponse) => cachedResponse || caches.match("./index.html")));
       }
 
-      return fetch(event.request)
-        .then((networkResponse) => {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-          return networkResponse;
-        })
-        .catch(() => caches.match("./index.html"));
+      return caches.match(event.request).then((cachedResponse) => cachedResponse || networkFetch.catch(() => caches.match("./index.html")));
     })
   );
 });

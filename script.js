@@ -2543,7 +2543,13 @@ function stopCallAudioResources() {
 
 // This helper starts browser audio recording for the higher-quality chat microphone flow.
 async function startRecordedChatMic() {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true
+    }
+  });
   const preferredMimeType = getPreferredChatAudioMimeType();
 
   chatMediaStream = stream;
@@ -6177,7 +6183,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=10").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=11").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
