@@ -140,7 +140,7 @@ async function callOpenAi(apiKey, model, userPrompt) {
       },
       body: JSON.stringify({
         model,
-        temperature: 0.3,
+        temperature: 0.7,
         input: [
           {
             role: "system",
@@ -197,7 +197,7 @@ async function callOpenAi(apiKey, model, userPrompt) {
   return JSON.parse(stripCodeFences(rawText));
 }
 
-async function generateSentenceWithQualityCheck(apiKey, model, difficulty, topic, tone) {
+async function generateSentenceWithQualityCheck(apiKey, model, difficulty, topic, tone, focus = "mixed", recentSentences = []) {
   const topicInstruction = topic === "all"
     ? "Choose one topic from: daily life, gym/fitness, food, travel, work, sleep."
     : `Use this topic: ${topic}.`;
@@ -205,6 +205,19 @@ async function generateSentenceWithQualityCheck(apiKey, model, difficulty, topic
   const toneInstruction = tone === "all"
     ? "Choose either formal or informal, then return the chosen tone in the JSON."
     : `Use this tone: ${tone}.`;
+  const focusInstructions = {
+    mixed: "Use any natural grammar pattern that suits the sentence.",
+    past: "Focus on past-tense practice. Use preterite or present perfect naturally.",
+    future: "Focus on future plans. Use ir a + infinitive, querer + infinitive, or a natural future expression.",
+    questions: "Generate a natural question a person might actually ask.",
+    opinions: "Focus on opinions. Use phrases such as creo que, me parece que, prefiero, or para mí.",
+    subjunctive: "Focus on subjunctive practice. Use a natural trigger such as espero que, es importante que, aunque, or para que.",
+    idioms: "Use one natural Spain-Spanish idiomatic expression, but keep it learner-friendly."
+  };
+  const focusInstruction = focusInstructions[focus] || focusInstructions.mixed;
+  const recentSentenceText = Array.isArray(recentSentences) && recentSentences.length
+    ? recentSentences.slice(-12).map((sentence) => `- ${sentence}`).join("\n")
+    : "None.";
 
   const generationPrompt = `
 Generate exactly one natural Spanish sentence from Spain for a language learner.
@@ -213,7 +226,15 @@ Rules:
 - Difficulty: ${difficulty}
 - ${topicInstruction}
 - ${toneInstruction}
+- Focus: ${focusInstruction}
 - Return one English translation.
+- Return 1 to 3 grammarTags explaining the main skill being practised, such as "Past tense", "Question", "Opinion", "Subjunctive", "Idiom", "Connector", "Reflexive verb", or "Future plans".
+- Avoid repeating these recent sentences, their wording, and their grammar pattern:
+${recentSentenceText}
+- Vary the scene, verbs, sentence structure, and time expression from the recent examples.
+- Do not make a tiny variation of a recent sentence by only adding or removing a final phrase.
+- If a recent sentence mentions a similar situation, choose a completely different situation within the same topic.
+- Prefer a different opening word and a different main verb from the most recent examples.
 - Perform a quality-check step after generating:
   Check the Spanish sentence for Spanglish, invented words, Latin American vocabulary, or unnatural phrasing.
   If found, rewrite it into natural Spanish from Spain before returning it.
@@ -226,7 +247,9 @@ Use this JSON shape:
   "english": "string",
   "difficulty": "string",
   "topic": "string",
-  "tone": "string"
+  "tone": "string",
+  "focus": "string",
+  "grammarTags": ["short skill tag", "short skill tag"]
 }
 `.trim();
 
@@ -258,7 +281,9 @@ Quality rules:
   "english": "string",
   "difficulty": "${sentence.difficulty || difficulty}",
   "topic": "${sentence.topic || topic}",
-  "tone": "${sentence.tone || tone}"
+  "tone": "${sentence.tone || tone}",
+  "focus": "${sentence.focus || focus}",
+  "grammarTags": ["short skill tag", "short skill tag"]
 }
 `.trim();
 
@@ -276,7 +301,9 @@ Quality rules:
     english: sentence.english.trim(),
     difficulty: sentence.difficulty || difficulty,
     topic: sentence.topic || topic,
-    tone: sentence.tone || tone
+    tone: sentence.tone || tone,
+    focus: sentence.focus || focus,
+    grammarTags: Array.isArray(sentence.grammarTags) ? sentence.grammarTags.slice(0, 3) : []
   };
 }
 
@@ -289,7 +316,7 @@ async function handler(event) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = "gpt-4o-mini";
+  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
   if (!apiKey) {
     return {
@@ -303,13 +330,19 @@ async function handler(event) {
     const difficulty = requestBody.difficulty || "beginner";
     const topic = requestBody.topic || "daily life";
     const tone = requestBody.tone || "informal";
+    const focus = requestBody.focus || "mixed";
+    const recentSentences = Array.isArray(requestBody.recentSentences)
+      ? requestBody.recentSentences.filter((sentence) => typeof sentence === "string")
+      : [];
 
     const sentence = await generateSentenceWithQualityCheck(
       apiKey,
       model,
       difficulty,
       topic,
-      tone
+      tone,
+      focus,
+      recentSentences
     );
 
     return {

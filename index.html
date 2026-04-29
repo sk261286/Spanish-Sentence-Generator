@@ -8,25 +8,36 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Spanish Sentences">
-  <link rel="manifest" href="manifest.json?v=9">
-  <link rel="icon" href="icon-192.png?v=9" type="image/png">
-  <link rel="apple-touch-icon" href="icon-192.png?v=9">
+  <link rel="manifest" href="manifest.json?v=10">
+  <link rel="icon" href="icon-192.png?v=10" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png?v=10">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=31">
 </head>
 <body>
   <main class="app">
     <section class="hero">
-      <p class="eyebrow">Spanish Learning Tool</p>
+      <p class="eyebrow hero-eyebrow"><span class="spanish-flag" aria-hidden="true"></span>Spanish Learning Tool</p>
       <h1>Spanish Sentence Generator</h1>
       <p class="intro">
         Practise natural Spanish from Spain with random example sentences,
         English translations, and speech buttons.
       </p>
+      <button id="theme-toggle-btn" class="theme-toggle-btn" type="button" aria-pressed="false">Dark mode</button>
     </section>
 
+    <nav class="page-nav" aria-label="App sections">
+      <button class="page-tab active" data-page-target="generator-page">Generator</button>
+      <button class="page-tab" data-page-target="recall-page">Recall</button>
+      <button class="page-tab" data-page-target="custom-page">Custom</button>
+      <button class="page-tab" data-page-target="chat-page">Chat</button>
+      <button class="page-tab" data-page-target="favourites-page">Favourites</button>
+      <button class="page-tab" data-page-target="radio-page">Playlists</button>
+    </nav>
+
+    <section id="generator-page" class="app-page active-page">
     <section class="card controls-card">
       <div id="install-banner" class="install-banner hidden">
         <div>
@@ -70,6 +81,30 @@
             <option value="formal">Formal</option>
           </select>
         </div>
+
+        <div class="field">
+          <label for="grammar-focus">Focus</label>
+          <select id="grammar-focus">
+            <option value="mixed">Mixed practice</option>
+            <option value="past">Past tense</option>
+            <option value="future">Future plans</option>
+            <option value="questions">Questions</option>
+            <option value="opinions">Opinions</option>
+            <option value="subjunctive">Subjunctive</option>
+            <option value="idioms">Natural idioms</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="custom-topic-manager">
+        <div class="field custom-topic-input">
+          <label for="custom-generator-topic-input">Custom generator topic</label>
+          <input id="custom-generator-topic-input" type="text" placeholder="For example: football, dating, shopping">
+        </div>
+        <div class="actions custom-topic-actions">
+          <button id="add-custom-generator-topic-btn" class="secondary-btn">Add topic</button>
+        </div>
+        <ul id="custom-generator-topics-list" class="custom-topic-list"></ul>
       </div>
 
       <div class="extra-controls">
@@ -83,11 +118,41 @@
         </label>
       </div>
 
+      <div class="field generator-setting-field">
+        <label for="sentence-display-mode">New sentence display</label>
+        <select id="sentence-display-mode">
+          <option value="show-translation">Show English translation</option>
+          <option value="hide-translation">Hide English translation</option>
+          <option value="quiz-mode">Start in quiz mode</option>
+        </select>
+      </div>
+
       <p id="ai-mode-note" class="helper-note">
         AI mode uses OpenAI through a small Netlify backend. If AI is not ready yet, the app will fall back to the built-in generator.
       </p>
 
       <button id="generate-btn" class="primary-btn">Generate Sentence</button>
+    </section>
+
+    <section class="card practice-stats-card" aria-label="Today's practice progress">
+      <div>
+        <p class="section-label">Today's practice</p>
+        <p class="practice-stats-note">Your daily counters reset automatically tomorrow.</p>
+      </div>
+      <div class="practice-stats-grid">
+        <div class="practice-stat">
+          <span id="practice-generated-count">0</span>
+          <p>Generated</p>
+        </div>
+        <div class="practice-stat">
+          <span id="practice-spoken-count">0</span>
+          <p>Spoken</p>
+        </div>
+        <div class="practice-stat">
+          <span id="practice-saved-count">0</span>
+          <p>Saved</p>
+        </div>
+      </div>
     </section>
 
     <section class="card sentence-card">
@@ -118,12 +183,35 @@
       <div class="actions">
         <button id="speak-spanish-btn" class="secondary-btn">Speak Spanish</button>
         <button id="speak-english-btn" class="secondary-btn">Speak English</button>
-        <button id="copy-btn" class="secondary-btn">Copy sentence</button>
         <button id="toggle-translation-btn" class="secondary-btn">Hide translation</button>
+        <button id="copy-sentence-btn" class="secondary-btn">Copy Spanish</button>
         <button id="save-btn" class="secondary-btn">Save to favourites</button>
+        <button id="add-generator-to-playlist-btn" class="secondary-btn">Add to playlist</button>
       </div>
     </section>
+    </section>
 
+    <section id="recall-page" class="app-page">
+    <section class="card favourites-card">
+      <div class="favourites-header">
+        <div>
+          <p class="section-label">Active recall</p>
+          <h3>Recall practice</h3>
+        </div>
+      </div>
+
+      <p class="sentence-meta">
+        Add sentences here from Favourites. This page shows the English first, hides the Spanish,
+        and schedules reviews based on whether you remembered the answer.
+      </p>
+      <p id="recall-summary" class="sentence-meta">No recall reviews due yet.</p>
+
+      <ul id="recall-list" class="favourites-list"></ul>
+      <p id="recall-empty-message" class="empty-message">No recall sentences yet. Add some from Favourites.</p>
+    </section>
+    </section>
+
+    <section id="custom-page" class="app-page">
     <section class="card custom-card">
       <div class="favourites-header">
         <div>
@@ -170,12 +258,22 @@
 
       <div class="actions">
         <button id="translate-custom-btn" class="secondary-btn">Translate to Spanish</button>
+        <button id="save-custom-btn" class="secondary-btn">Save translated sentence</button>
         <button id="add-custom-to-playlist-btn" class="secondary-btn">Add translated sentence to playlist</button>
+      </div>
+
+      <div id="custom-result-card" class="custom-result-card hidden">
+        <p class="section-label">Translated sentence</p>
+        <h4 id="custom-spanish-output">Tu frase en español aparecerá aquí.</h4>
+        <p id="custom-english-output" class="custom-english-output">Your English sentence will stay visible here too.</p>
+        <p id="custom-ai-note" class="custom-english-output hidden">AI helped make this sound more natural in Spain Spanish.</p>
       </div>
 
       <p id="custom-status" class="sentence-meta">Best for short everyday sentences. The translation works offline inside the app.</p>
     </section>
+    </section>
 
+    <section id="chat-page" class="app-page">
     <section class="card chat-card">
       <div class="favourites-header">
         <div>
@@ -205,10 +303,53 @@
           </select>
         </div>
 
+        <div class="field">
+          <label for="chat-scenario">Conversation style</label>
+          <select id="chat-scenario">
+            <option value="casual">Casual conversation</option>
+            <option value="catch-up">Catching up with a friend</option>
+            <option value="roleplay">Real-life roleplay</option>
+            <option value="opinions">Opinions and preferences</option>
+            <option value="story">Tell me about your day</option>
+            <option value="quick-fire">Quick questions</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="chat-personality">AI personality</label>
+          <select id="chat-personality">
+            <option value="friendly-local">Friendly local</option>
+            <option value="patient-tutor">Patient tutor</option>
+            <option value="funny-mate">Funny mate</option>
+            <option value="direct-corrector">Direct corrector</option>
+            <option value="curious-friend">Curious friend</option>
+            <option value="roleplay-partner">Roleplay partner</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="chat-goal">Practice goal</label>
+          <select id="chat-goal">
+            <option value="natural-flow">Natural flow</option>
+            <option value="past-tense">Past tense</option>
+            <option value="future-plans">Future plans</option>
+            <option value="questions">Asking questions</option>
+            <option value="opinions">Giving opinions</option>
+            <option value="ordering">Ordering food/drinks</option>
+            <option value="small-talk">Small talk</option>
+            <option value="slang">Natural slang</option>
+          </select>
+        </div>
+
         <div class="actions">
           <button id="start-chat-btn" class="secondary-btn">Start chat</button>
+          <button id="start-call-btn" class="secondary-btn">Start call</button>
+          <button id="end-call-btn" class="secondary-btn hidden">End call</button>
+          <button id="interrupt-call-btn" class="secondary-btn hidden">Interrupt</button>
           <button id="speak-chat-reply-btn" class="secondary-btn">Speak last reply</button>
-          <button id="use-chat-reply-btn" class="secondary-btn">Use last reply as sentence</button>
+          <button id="use-chat-reply-btn" class="secondary-btn">Use best version as sentence</button>
+          <button id="save-chat-reply-btn" class="secondary-btn">Save best version</button>
+          <button id="add-chat-reply-to-playlist-btn" class="secondary-btn">Add best version to playlist</button>
         </div>
       </div>
 
@@ -217,6 +358,23 @@
           <input type="checkbox" id="chat-auto-speak">
           <span>Auto-speak coach replies</span>
         </label>
+        <span id="chat-timer" class="chat-timer">Chat timer: 00:00</span>
+      </div>
+
+      <div class="actions chat-save-actions">
+        <button id="save-conversation-btn" class="secondary-btn">Save conversation</button>
+        <button id="download-chat-pdf-btn" class="secondary-btn">Download corrected PDF</button>
+        <button id="download-chat-mp3s-btn" class="secondary-btn">Download full conversation MP3</button>
+        <button id="play-full-chat-btn" class="secondary-btn">Play full conversation</button>
+        <button id="stop-full-chat-btn" class="secondary-btn hidden">Stop full conversation</button>
+        <button id="add-full-chat-to-playlist-btn" class="secondary-btn">Add to conversation playlist</button>
+      </div>
+      <div id="conversation-playback-controls" class="actions conversation-playback-controls hidden">
+        <button id="previous-conversation-turn-btn" class="secondary-btn">Back 15s</button>
+        <button id="pause-conversation-btn" class="secondary-btn">Pause</button>
+        <button id="next-conversation-turn-btn" class="secondary-btn">Forward 15s</button>
+        <span id="conversation-playback-progress" class="conversation-playback-progress">Not playing</span>
+        <audio id="full-conversation-audio-player" class="full-conversation-audio-player" controls preload="metadata"></audio>
       </div>
 
       <div id="chat-messages" class="chat-messages"></div>
@@ -233,8 +391,31 @@
       </div>
 
       <p id="chat-status" class="sentence-meta">Start a chat to practise a short Spanish conversation with the built-in coach.</p>
+
+      <div class="saved-conversations-panel">
+        <p class="section-label">Saved conversations</p>
+        <ul id="saved-conversations-list" class="favourites-list"></ul>
+        <p id="saved-conversations-empty" class="empty-message">No saved conversations yet.</p>
+      </div>
+
+      <div class="saved-conversations-panel">
+        <div class="favourites-header">
+          <div>
+            <p class="section-label">Conversation playlist</p>
+            <h3>Full conversations</h3>
+          </div>
+        </div>
+        <div class="actions chat-save-actions">
+          <button id="play-conversation-playlist-btn" class="secondary-btn">Play conversation playlist</button>
+          <button id="stop-conversation-playlist-btn" class="secondary-btn hidden">Stop conversation playlist</button>
+        </div>
+        <ul id="conversation-playlist-list" class="favourites-list"></ul>
+        <p id="conversation-playlist-empty" class="empty-message">No full conversations added yet.</p>
+      </div>
+    </section>
     </section>
 
+    <section id="favourites-page" class="app-page">
     <section class="card favourites-card">
       <div class="favourites-header">
         <div>
@@ -251,7 +432,9 @@
       <ul id="favourites-list" class="favourites-list"></ul>
       <p id="empty-message" class="empty-message">No favourites saved yet.</p>
     </section>
+    </section>
 
+    <section id="radio-page" class="app-page">
     <section class="card radio-card">
       <div class="favourites-header">
         <div>
@@ -287,14 +470,16 @@
         <button id="play-radio-btn" class="secondary-btn">Play radio mode</button>
         <button id="stop-radio-btn" class="secondary-btn">Stop radio mode</button>
         <button id="delete-playlist-btn" class="secondary-btn">Delete playlist</button>
+        <button id="export-practice-btn" class="secondary-btn">Export practice backup</button>
       </div>
 
       <p id="radio-status" class="sentence-meta">Create a playlist, add sentences, then press play.</p>
       <ul id="playlist-sentences" class="favourites-list"></ul>
       <p id="playlist-empty-message" class="empty-message">No playlists yet.</p>
     </section>
+    </section>
   </main>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=40"></script>
 </body>
 </html>
