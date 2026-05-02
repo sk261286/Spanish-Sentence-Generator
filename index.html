@@ -8,20 +8,20 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Spanish Sentences">
-  <link rel="manifest" href="manifest.json?v=10">
-  <link rel="icon" href="icon-192.png?v=10" type="image/png">
-  <link rel="apple-touch-icon" href="icon-192.png?v=10">
+  <link rel="manifest" href="manifest.json?v=11">
+  <link rel="icon" href="icon-192.png?v=11" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png?v=11">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=31">
+  <link rel="stylesheet" href="style.css?v=37">
 </head>
 <body>
   <main class="app">
     <section class="hero">
-      <p class="eyebrow hero-eyebrow"><span class="spanish-flag" aria-hidden="true"></span>Spanish Learning Tool</p>
-      <h1>Spanish Sentence Generator</h1>
-      <p class="intro">
+      <p id="app-eyebrow" class="eyebrow hero-eyebrow"><span class="language-flag flag-spanish" aria-hidden="true"></span>Spanish Learning Tool</p>
+      <h1 id="app-title">Spanish Sentence Generator</h1>
+      <p id="app-intro" class="intro">
         Practise natural Spanish from Spain with random example sentences,
         English translations, and speech buttons.
       </p>
@@ -32,10 +32,27 @@
       <button class="page-tab active" data-page-target="generator-page">Generator</button>
       <button class="page-tab" data-page-target="recall-page">Recall</button>
       <button class="page-tab" data-page-target="custom-page">Custom</button>
+      <button class="page-tab" data-page-target="dialogue-page">Dialogue</button>
+      <button class="page-tab" data-page-target="video-page">Video</button>
       <button class="page-tab" data-page-target="chat-page">Chat</button>
       <button class="page-tab" data-page-target="favourites-page">Favourites</button>
       <button class="page-tab" data-page-target="radio-page">Playlists</button>
     </nav>
+
+    <section class="voice-bar" aria-label="Target language and voice settings">
+      <label for="target-language-select">Language</label>
+      <select id="target-language-select">
+        <option value="spanish">Spanish</option>
+        <option value="french">French</option>
+        <option value="italian">Italian</option>
+      </select>
+      <label for="spanish-voice-select">Spanish voice</label>
+      <select id="spanish-voice-select">
+        <option value="primary">Primary voice</option>
+        <option value="alternative">Alternative voice</option>
+      </select>
+      <button id="test-voice-btn" class="secondary-btn voice-test-btn" type="button">Test voice</button>
+    </section>
 
     <section id="generator-page" class="app-page active-page">
     <section class="card controls-card">
@@ -132,6 +149,25 @@
       </p>
 
       <button id="generate-btn" class="primary-btn">Generate Sentence</button>
+
+      <div class="batch-generator-panel">
+        <div class="field">
+          <label for="batch-count">Batch size</label>
+          <select id="batch-count">
+            <option value="5">5 sentences</option>
+            <option value="10">10 sentences</option>
+            <option value="15">15 sentences</option>
+            <option value="20">20 sentences</option>
+            <option value="25">25 sentences</option>
+            <option value="30">30 sentences</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button id="generate-batch-btn" class="secondary-btn">Generate batch</button>
+          <button id="download-batch-pdf-btn" class="secondary-btn">Download batch PDF</button>
+          <button id="download-batch-mp3-btn" class="secondary-btn">Download batch MP3</button>
+        </div>
+      </div>
     </section>
 
     <section class="card practice-stats-card" aria-label="Today's practice progress">
@@ -189,6 +225,17 @@
         <button id="add-generator-to-playlist-btn" class="secondary-btn">Add to playlist</button>
       </div>
     </section>
+
+    <section class="card batch-card">
+      <div class="favourites-header">
+        <div>
+          <p class="section-label">Generated batch</p>
+          <h3>Sentence set</h3>
+        </div>
+      </div>
+      <p id="batch-status" class="sentence-meta">Generate a batch to view Spanish and English side by side.</p>
+      <div id="batch-list" class="batch-list"></div>
+    </section>
     </section>
 
     <section id="recall-page" class="app-page">
@@ -227,7 +274,7 @@
 
       <div class="radio-grid">
         <div class="field">
-          <label for="custom-tone">Spanish style</label>
+          <label id="custom-tone-label" for="custom-tone">Spanish style</label>
           <select id="custom-tone">
             <option value="informal">Informal</option>
             <option value="formal">Formal</option>
@@ -273,12 +320,152 @@
     </section>
     </section>
 
+    <section id="dialogue-page" class="app-page">
+    <section class="card dialogue-card">
+      <div class="favourites-header">
+        <div>
+          <p class="section-label">Dialogue generator</p>
+          <h3 id="dialogue-title">AI Spanish dialogues</h3>
+        </div>
+      </div>
+
+      <div class="radio-grid">
+        <div class="field">
+          <label for="dialogue-topic">Topic</label>
+          <input id="dialogue-topic" type="text" placeholder="For example: ordering tapas, dating, the gym">
+        </div>
+
+        <div class="field">
+          <label for="dialogue-setting">Situation</label>
+          <select id="dialogue-setting">
+            <option value="casual">Casual chat</option>
+            <option value="cafe">Cafe or restaurant</option>
+            <option value="travel">Travel situation</option>
+            <option value="friends">Friends catching up</option>
+            <option value="shop">Shop or market</option>
+            <option value="work">Work conversation</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="dialogue-level">Level</label>
+          <select id="dialogue-level">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate" selected>Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="dialogue-tone">Style</label>
+          <select id="dialogue-tone">
+            <option value="informal">Informal</option>
+            <option value="formal">Formal</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="dialogue-turns">Length</label>
+          <select id="dialogue-turns">
+            <option value="6">Short - 6 lines</option>
+            <option value="8" selected>Medium - 8 lines</option>
+            <option value="10">Long - 10 lines</option>
+            <option value="15">Extended - 15 lines</option>
+            <option value="20">Full - 20 lines</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions chat-save-actions">
+        <button id="generate-dialogue-btn" class="secondary-btn">Generate dialogue</button>
+        <button id="save-dialogue-btn" class="secondary-btn">Save dialogue</button>
+        <button id="download-dialogue-pdf-btn" class="secondary-btn">Download PDF</button>
+        <button id="play-dialogue-btn" class="secondary-btn">Play dialogue</button>
+        <button id="stop-dialogue-btn" class="secondary-btn hidden">Stop dialogue</button>
+        <button id="download-dialogue-mp3-btn" class="secondary-btn">Download MP3</button>
+        <button id="clear-dialogue-btn" class="secondary-btn">Clear</button>
+      </div>
+
+      <div id="dialogue-playback-controls" class="actions conversation-playback-controls hidden">
+        <button id="previous-dialogue-btn" class="secondary-btn">Back 15s</button>
+        <button id="pause-dialogue-btn" class="secondary-btn">Pause</button>
+        <button id="next-dialogue-btn" class="secondary-btn">Forward 15s</button>
+        <span id="dialogue-playback-progress" class="conversation-playback-progress">Not playing</span>
+        <audio id="dialogue-audio-player" class="full-conversation-audio-player" controls preload="metadata"></audio>
+      </div>
+
+      <p id="dialogue-status" class="sentence-meta">Choose a topic and generate a natural Spain-Spanish dialogue.</p>
+
+      <div id="dialogue-result" class="dialogue-result"></div>
+
+      <div class="saved-conversations-panel">
+        <p class="section-label">Saved dialogues</p>
+        <ul id="saved-dialogues-list" class="favourites-list"></ul>
+        <p id="saved-dialogues-empty" class="empty-message">No saved dialogues yet.</p>
+      </div>
+    </section>
+    </section>
+
+    <section id="video-page" class="app-page">
+    <section class="card video-card">
+      <div class="favourites-header">
+        <div>
+          <p class="section-label">Video transcriber</p>
+          <h3 id="video-title">YouTube synced transcript</h3>
+        </div>
+      </div>
+
+      <div class="radio-grid">
+        <div class="field">
+          <label for="youtube-url-input">YouTube link</label>
+          <input id="youtube-url-input" type="url" placeholder="Paste a YouTube video link">
+        </div>
+        <div class="field">
+          <label for="video-transcript-language">Transcript language</label>
+          <select id="video-transcript-language">
+            <option value="current">Current app language</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="it">Italian</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions chat-save-actions">
+        <button id="load-youtube-video-btn" class="secondary-btn">Load video</button>
+        <button id="import-youtube-captions-btn" class="secondary-btn">Import captions</button>
+        <button id="use-pasted-transcript-btn" class="secondary-btn">Use pasted transcript</button>
+      </div>
+
+      <div class="video-layout">
+        <div class="video-player-shell">
+          <div id="youtube-player" class="youtube-player"></div>
+        </div>
+        <div class="video-translation-panel">
+          <p class="section-label">Translation</p>
+          <p id="video-selected-line" class="video-selected-line">Select a transcript line.</p>
+          <p id="video-line-translation" class="chat-text chat-english">Line translation will appear here.</p>
+          <p id="video-word-hint" class="sentence-meta">Click a word for a quick hint.</p>
+        </div>
+      </div>
+
+      <div class="field custom-field">
+        <label for="manual-transcript-input">Paste timestamped transcript</label>
+        <textarea id="manual-transcript-input" rows="5" placeholder="[00:03] Hola, bienvenidos.\n00:07 Aujourd'hui on va parler..."></textarea>
+      </div>
+
+      <p id="video-status" class="sentence-meta">Load a YouTube video, then import available captions or paste a timestamped transcript.</p>
+      <div id="video-transcript-list" class="video-transcript-list"></div>
+    </section>
+    </section>
+
     <section id="chat-page" class="app-page">
     <section class="card chat-card">
       <div class="favourites-header">
         <div>
           <p class="section-label">Conversation</p>
-          <h3>Spanish chat coach</h3>
+          <h3 id="chat-title">Spanish chat coach</h3>
         </div>
       </div>
 
@@ -341,6 +528,15 @@
           </select>
         </div>
 
+        <div class="field">
+          <label for="call-pause-mode">Call pause</label>
+          <select id="call-pause-mode">
+            <option value="normal">Normal pause</option>
+            <option value="fast">Fast replies</option>
+            <option value="thinking">Thinking pause</option>
+          </select>
+        </div>
+
         <div class="actions">
           <button id="start-chat-btn" class="secondary-btn">Start chat</button>
           <button id="start-call-btn" class="secondary-btn">Start call</button>
@@ -358,7 +554,20 @@
           <input type="checkbox" id="chat-auto-speak">
           <span>Auto-speak coach replies</span>
         </label>
+        <span id="chat-language-badge" class="chat-language-badge">Spanish chat</span>
         <span id="chat-timer" class="chat-timer">Chat timer: 00:00</span>
+      </div>
+
+      <div id="call-focus-panel" class="call-focus-panel hidden" aria-live="polite">
+        <p class="section-label">Call mode</p>
+        <div class="call-orb" aria-hidden="true"></div>
+        <h3 id="call-focus-title">Listening</h3>
+        <span id="call-focus-timer" class="call-focus-timer">Call time: 00:00</span>
+        <p id="call-focus-status">Speak naturally, then pause.</p>
+        <div class="call-focus-actions">
+          <button id="focus-end-call-btn" class="secondary-btn">End call</button>
+          <button id="focus-interrupt-call-btn" class="secondary-btn">Interrupt</button>
+        </div>
       </div>
 
       <div class="actions chat-save-actions">
@@ -367,6 +576,7 @@
         <button id="download-chat-mp3s-btn" class="secondary-btn">Download full conversation MP3</button>
         <button id="play-full-chat-btn" class="secondary-btn">Play full conversation</button>
         <button id="stop-full-chat-btn" class="secondary-btn hidden">Stop full conversation</button>
+        <button id="review-conversation-btn" class="secondary-btn">Review conversation</button>
         <button id="add-full-chat-to-playlist-btn" class="secondary-btn">Add to conversation playlist</button>
       </div>
       <div id="conversation-playback-controls" class="actions conversation-playback-controls hidden">
@@ -391,6 +601,18 @@
       </div>
 
       <p id="chat-status" class="sentence-meta">Start a chat to practise a short Spanish conversation with the built-in coach.</p>
+
+      <div id="conversation-review-panel" class="conversation-review-panel hidden">
+        <div class="favourites-header">
+          <div>
+            <p class="section-label">Conversation review</p>
+            <h3>Corrected conversation</h3>
+          </div>
+          <button id="hide-conversation-review-btn" class="secondary-btn" type="button">Hide review</button>
+        </div>
+        <p id="conversation-review-summary" class="sentence-meta">Review your corrected conversation here.</p>
+        <div id="conversation-review-list" class="conversation-review-list"></div>
+      </div>
 
       <div class="saved-conversations-panel">
         <p class="section-label">Saved conversations</p>
@@ -462,6 +684,17 @@
             <option value="loop-all">Loop the whole playlist</option>
           </select>
         </div>
+
+        <div class="field">
+          <label for="shadow-gap">Shadowing gap</label>
+          <select id="shadow-gap">
+            <option value="0">Off</option>
+            <option value="3">3 seconds</option>
+            <option value="5">5 seconds</option>
+            <option value="8">8 seconds</option>
+            <option value="10">10 seconds</option>
+          </select>
+        </div>
       </div>
 
       <div class="actions">
@@ -480,6 +713,6 @@
     </section>
   </main>
 
-  <script src="script.js?v=40"></script>
+  <script src="script.js?v=49"></script>
 </body>
 </html>

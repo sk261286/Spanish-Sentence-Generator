@@ -18,22 +18,25 @@ const QUALITY_WARNING_WORDS = [
   "celular"
 ];
 
-const SYSTEM_PROMPT = `You are a native Spanish teacher from Spain.
+const SYSTEM_PROMPT = `You are a native European language teacher.
 
-Generate natural, idiomatic Spanish from Spain for language learners.
+Generate natural, idiomatic learner-friendly language in the requested target language and region.
 
 Rules:
-- Use Spanish from Spain only.
-- Do not use Spanglish.
-- Do not invent hybrid verbs such as "workar".
-- Do not use Latin American vocabulary unless the user specifically asks for it.
-- For "to work", use "trabajar" or informal Spain Spanish "currar".
-- For "car", use "coche", not "carro".
-- For "to drive", use "conducir", not "manejar".
-- For "computer", use "ordenador", not "computadora".
-- For "to park", use "aparcar", not "parquear".
-- The final sentence must sound like something a native Spanish speaker from Spain would naturally say.
+- Follow the requested target language exactly.
+- Avoid Spanglish, Franglais, Itanglish, invented hybrid verbs, and wrong-region vocabulary.
+- The final sentence must sound like something a native speaker from the requested region would naturally say.
 - If the first version sounds unnatural, rewrite it before returning it.`;
+
+const LANGUAGE_PROFILES = {
+  spanish: { label: "Spanish", natural: "natural Spanish from Spain", bannedCheck: true },
+  french: { label: "French", natural: "natural French from France", bannedCheck: false },
+  italian: { label: "Italian", natural: "natural Italian from Italy", bannedCheck: false }
+};
+
+function getLanguageProfile(targetLanguage) {
+  return LANGUAGE_PROFILES[targetLanguage] || LANGUAGE_PROFILES.spanish;
+}
 
 function classifyOpenAiError(statusCode, errorPayload) {
   const detailsText = JSON.stringify(errorPayload || {}).toLowerCase();
@@ -197,7 +200,8 @@ async function callOpenAi(apiKey, model, userPrompt) {
   return JSON.parse(stripCodeFences(rawText));
 }
 
-async function generateSentenceWithQualityCheck(apiKey, model, difficulty, topic, tone, focus = "mixed", recentSentences = []) {
+async function generateSentenceWithQualityCheck(apiKey, model, difficulty, topic, tone, focus = "mixed", recentSentences = [], targetLanguage = "spanish") {
+  const language = getLanguageProfile(targetLanguage);
   const topicInstruction = topic === "all"
     ? "Choose one topic from: daily life, gym/fitness, food, travel, work, sleep."
     : `Use this topic: ${topic}.`;
@@ -220,7 +224,7 @@ async function generateSentenceWithQualityCheck(apiKey, model, difficulty, topic
     : "None.";
 
   const generationPrompt = `
-Generate exactly one natural Spanish sentence from Spain for a language learner.
+Generate exactly one ${language.natural} sentence for a language learner.
 
 Rules:
 - Difficulty: ${difficulty}
@@ -236,8 +240,8 @@ ${recentSentenceText}
 - If a recent sentence mentions a similar situation, choose a completely different situation within the same topic.
 - Prefer a different opening word and a different main verb from the most recent examples.
 - Perform a quality-check step after generating:
-  Check the Spanish sentence for Spanglish, invented words, Latin American vocabulary, or unnatural phrasing.
-  If found, rewrite it into natural Spanish from Spain before returning it.
+  Check the ${language.label} sentence for invented words, unnatural phrasing, or wrong-region vocabulary.
+  If found, rewrite it into ${language.natural} before returning it.
 - Do not include any explanation.
 - Reply with JSON only.
 
@@ -254,11 +258,11 @@ Use this JSON shape:
 `.trim();
 
   let sentence = await callOpenAi(apiKey, model, generationPrompt);
-  const problems = findQualityProblems(sentence.spanish || "");
+  const problems = language.bannedCheck ? findQualityProblems(sentence.spanish || "") : [];
 
-  if (problems.length || hasBannedWords(sentence.spanish || "")) {
+  if (language.bannedCheck && (problems.length || hasBannedWords(sentence.spanish || ""))) {
     const rewritePrompt = `
-Rewrite this into fully natural Spanish from Spain.
+Rewrite this into fully ${language.natural}.
 
 Original Spanish:
 ${sentence.spanish}
@@ -290,7 +294,7 @@ Quality rules:
     sentence = await callOpenAi(apiKey, model, rewritePrompt);
   }
 
-  if (hasBannedWords(sentence.spanish || "")) {
+  if (language.bannedCheck && hasBannedWords(sentence.spanish || "")) {
     const error = new Error("The AI sentence still contained banned words after rewriting.");
     error.publicMessage = "The AI returned wording that did not pass the Spain-Spanish quality check.";
     throw error;
@@ -316,7 +320,7 @@ async function handler(event) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+  const model = process.env.OPENAI_GENERATION_MODEL || "gpt-5.4-mini";
 
   if (!apiKey) {
     return {
@@ -331,6 +335,7 @@ async function handler(event) {
     const topic = requestBody.topic || "daily life";
     const tone = requestBody.tone || "informal";
     const focus = requestBody.focus || "mixed";
+    const targetLanguage = requestBody.targetLanguage || "spanish";
     const recentSentences = Array.isArray(requestBody.recentSentences)
       ? requestBody.recentSentences.filter((sentence) => typeof sentence === "string")
       : [];
@@ -342,7 +347,8 @@ async function handler(event) {
       topic,
       tone,
       focus,
-      recentSentences
+      recentSentences,
+      targetLanguage
     );
 
     return {

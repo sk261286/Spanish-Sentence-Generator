@@ -35,6 +35,26 @@ function buildConversationText(turns) {
     .join("\n\n");
 }
 
+function getVoiceId(voiceChoice, targetLanguage = "spanish") {
+  if (targetLanguage === "french") {
+    return voiceChoice === "alternative"
+      ? process.env.ELEVENLABS_FRENCH_ALT_VOICE_ID || process.env.ELEVENLABS_FRENCH_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
+      : process.env.ELEVENLABS_FRENCH_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
+  }
+
+  if (targetLanguage === "italian") {
+    return voiceChoice === "alternative"
+      ? process.env.ELEVENLABS_ITALIAN_ALT_VOICE_ID || process.env.ELEVENLABS_ITALIAN_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
+      : process.env.ELEVENLABS_ITALIAN_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
+  }
+
+  if (voiceChoice === "alternative") {
+    return process.env.ELEVENLABS_ALT_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL";
+  }
+
+  return process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
+}
+
 async function handler(event) {
   if (event.httpMethod !== "POST") {
     return {
@@ -44,7 +64,6 @@ async function handler(event) {
   }
 
   const apiKey = process.env.ELEVENLABS_API_KEY;
-  const voiceId = process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
   const modelId = process.env.ELEVENLABS_MODEL_ID || "eleven_multilingual_v2";
 
   if (!apiKey) {
@@ -61,6 +80,7 @@ async function handler(event) {
     const requestBody = JSON.parse(event.body || "{}");
     const turns = Array.isArray(requestBody.turns) ? requestBody.turns.slice(0, 80) : [];
     const text = buildConversationText(turns);
+    const voiceId = getVoiceId(requestBody.voice, requestBody.targetLanguage);
 
     if (!text) {
       return {
@@ -82,7 +102,10 @@ async function handler(event) {
     let elevenResponse;
 
     try {
-      elevenResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      const streamingUrl = new URL(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`);
+      streamingUrl.searchParams.set("output_format", "mp3_44100_128");
+
+      elevenResponse = await fetch(streamingUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +114,6 @@ async function handler(event) {
         body: JSON.stringify({
           text,
           model_id: modelId,
-          output_format: "mp3_44100_128",
           voice_settings: {
             stability: 0.45,
             similarity_boost: 0.8

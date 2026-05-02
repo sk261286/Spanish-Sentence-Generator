@@ -1506,11 +1506,17 @@ function getFocusedSlotsForTopic(baseSlots, topic) {
 
 // These variables connect JavaScript to the HTML elements on the page.
 const difficultySelect = document.getElementById("difficulty");
+const appEyebrow = document.getElementById("app-eyebrow");
+const appTitle = document.getElementById("app-title");
+const appIntro = document.getElementById("app-intro");
 const installBanner = document.getElementById("install-banner");
 const installBannerText = document.getElementById("install-banner-text");
 const installAppBtn = document.getElementById("install-app-btn");
 const dismissInstallBtn = document.getElementById("dismiss-install-btn");
 const themeToggleBtn = document.getElementById("theme-toggle-btn");
+const targetLanguageSelect = document.getElementById("target-language-select");
+const spanishVoiceSelect = document.getElementById("spanish-voice-select");
+const testVoiceBtn = document.getElementById("test-voice-btn");
 const topicSelect = document.getElementById("topic");
 const customGeneratorTopicInput = document.getElementById("custom-generator-topic-input");
 const addCustomGeneratorTopicBtn = document.getElementById("add-custom-generator-topic-btn");
@@ -1522,6 +1528,12 @@ const aiModeCheckbox = document.getElementById("ai-mode");
 const sentenceDisplayModeSelect = document.getElementById("sentence-display-mode");
 const aiModeNote = document.getElementById("ai-mode-note");
 const generateBtn = document.getElementById("generate-btn");
+const batchCountSelect = document.getElementById("batch-count");
+const generateBatchBtn = document.getElementById("generate-batch-btn");
+const downloadBatchPdfBtn = document.getElementById("download-batch-pdf-btn");
+const downloadBatchMp3Btn = document.getElementById("download-batch-mp3-btn");
+const batchStatus = document.getElementById("batch-status");
+const batchList = document.getElementById("batch-list");
 const speakSpanishBtn = document.getElementById("speak-spanish-btn");
 const speakEnglishBtn = document.getElementById("speak-english-btn");
 const addGeneratorToPlaylistBtn = document.getElementById("add-generator-to-playlist-btn");
@@ -1550,6 +1562,7 @@ const recallEmptyMessage = document.getElementById("recall-empty-message");
 const playlistNameInput = document.getElementById("playlist-name");
 const playlistSelect = document.getElementById("playlist-select");
 const radioModeSelect = document.getElementById("radio-mode");
+const shadowGapSelect = document.getElementById("shadow-gap");
 const createPlaylistBtn = document.getElementById("create-playlist-btn");
 const addCurrentToPlaylistBtn = document.getElementById("add-current-to-playlist-btn");
 const playRadioBtn = document.getElementById("play-radio-btn");
@@ -1560,6 +1573,7 @@ const radioStatus = document.getElementById("radio-status");
 const playlistSentences = document.getElementById("playlist-sentences");
 const playlistEmptyMessage = document.getElementById("playlist-empty-message");
 const customEnglishInput = document.getElementById("custom-english-input");
+const customToneLabel = document.getElementById("custom-tone-label");
 const customToneSelect = document.getElementById("custom-tone");
 const customTopicSelect = document.getElementById("custom-topic");
 const customDifficultySelect = document.getElementById("custom-difficulty");
@@ -1571,26 +1585,71 @@ const customSpanishOutput = document.getElementById("custom-spanish-output");
 const customEnglishOutput = document.getElementById("custom-english-output");
 const customAiNote = document.getElementById("custom-ai-note");
 const customStatus = document.getElementById("custom-status");
+const dialogueTopicInput = document.getElementById("dialogue-topic");
+const dialogueSettingSelect = document.getElementById("dialogue-setting");
+const dialogueLevelSelect = document.getElementById("dialogue-level");
+const dialogueToneSelect = document.getElementById("dialogue-tone");
+const dialogueTurnsSelect = document.getElementById("dialogue-turns");
+const generateDialogueBtn = document.getElementById("generate-dialogue-btn");
+const saveDialogueBtn = document.getElementById("save-dialogue-btn");
+const downloadDialoguePdfBtn = document.getElementById("download-dialogue-pdf-btn");
+const playDialogueBtn = document.getElementById("play-dialogue-btn");
+const stopDialogueBtn = document.getElementById("stop-dialogue-btn");
+const downloadDialogueMp3Btn = document.getElementById("download-dialogue-mp3-btn");
+const clearDialogueBtn = document.getElementById("clear-dialogue-btn");
+const dialoguePlaybackControls = document.getElementById("dialogue-playback-controls");
+const previousDialogueBtn = document.getElementById("previous-dialogue-btn");
+const pauseDialogueBtn = document.getElementById("pause-dialogue-btn");
+const nextDialogueBtn = document.getElementById("next-dialogue-btn");
+const dialoguePlaybackProgress = document.getElementById("dialogue-playback-progress");
+const dialogueAudioPlayer = document.getElementById("dialogue-audio-player");
+const dialogueStatus = document.getElementById("dialogue-status");
+const dialogueResult = document.getElementById("dialogue-result");
+const dialogueTitle = document.getElementById("dialogue-title");
+const savedDialoguesList = document.getElementById("saved-dialogues-list");
+const savedDialoguesEmpty = document.getElementById("saved-dialogues-empty");
+const youtubeUrlInput = document.getElementById("youtube-url-input");
+const videoTranscriptLanguageSelect = document.getElementById("video-transcript-language");
+const loadYoutubeVideoBtn = document.getElementById("load-youtube-video-btn");
+const importYoutubeCaptionsBtn = document.getElementById("import-youtube-captions-btn");
+const usePastedTranscriptBtn = document.getElementById("use-pasted-transcript-btn");
+const youtubePlayerElement = document.getElementById("youtube-player");
+const manualTranscriptInput = document.getElementById("manual-transcript-input");
+const videoStatus = document.getElementById("video-status");
+const videoTranscriptList = document.getElementById("video-transcript-list");
+const videoSelectedLine = document.getElementById("video-selected-line");
+const videoLineTranslation = document.getElementById("video-line-translation");
+const videoWordHint = document.getElementById("video-word-hint");
+const chatTitle = document.getElementById("chat-title");
 const chatTopicSelect = document.getElementById("chat-topic");
 const chatToneSelect = document.getElementById("chat-tone");
 const chatScenarioSelect = document.getElementById("chat-scenario");
 const chatPersonalitySelect = document.getElementById("chat-personality");
 const chatGoalSelect = document.getElementById("chat-goal");
+const callPauseModeSelect = document.getElementById("call-pause-mode");
 const startChatBtn = document.getElementById("start-chat-btn");
 const startCallBtn = document.getElementById("start-call-btn");
 const endCallBtn = document.getElementById("end-call-btn");
 const interruptCallBtn = document.getElementById("interrupt-call-btn");
+const callFocusPanel = document.getElementById("call-focus-panel");
+const callFocusTitle = document.getElementById("call-focus-title");
+const callFocusTimer = document.getElementById("call-focus-timer");
+const callFocusStatus = document.getElementById("call-focus-status");
+const focusEndCallBtn = document.getElementById("focus-end-call-btn");
+const focusInterruptCallBtn = document.getElementById("focus-interrupt-call-btn");
 const speakChatReplyBtn = document.getElementById("speak-chat-reply-btn");
 const useChatReplyBtn = document.getElementById("use-chat-reply-btn");
 const saveChatReplyBtn = document.getElementById("save-chat-reply-btn");
 const addChatReplyToPlaylistBtn = document.getElementById("add-chat-reply-to-playlist-btn");
 const chatAutoSpeakCheckbox = document.getElementById("chat-auto-speak");
+const chatLanguageBadge = document.getElementById("chat-language-badge");
 const chatTimer = document.getElementById("chat-timer");
 const saveConversationBtn = document.getElementById("save-conversation-btn");
 const downloadChatPdfBtn = document.getElementById("download-chat-pdf-btn");
 const downloadChatMp3sBtn = document.getElementById("download-chat-mp3s-btn");
 const playFullChatBtn = document.getElementById("play-full-chat-btn");
 const stopFullChatBtn = document.getElementById("stop-full-chat-btn");
+const reviewConversationBtn = document.getElementById("review-conversation-btn");
 const addFullChatToPlaylistBtn = document.getElementById("add-full-chat-to-playlist-btn");
 const conversationPlaybackControls = document.getElementById("conversation-playback-controls");
 const previousConversationTurnBtn = document.getElementById("previous-conversation-turn-btn");
@@ -1604,12 +1663,17 @@ const conversationPlaylistList = document.getElementById("conversation-playlist-
 const conversationPlaylistEmpty = document.getElementById("conversation-playlist-empty");
 const savedConversationsList = document.getElementById("saved-conversations-list");
 const savedConversationsEmpty = document.getElementById("saved-conversations-empty");
+const conversationReviewPanel = document.getElementById("conversation-review-panel");
+const hideConversationReviewBtn = document.getElementById("hide-conversation-review-btn");
+const conversationReviewSummary = document.getElementById("conversation-review-summary");
+const conversationReviewList = document.getElementById("conversation-review-list");
 const chatMessages = document.getElementById("chat-messages");
 const chatInput = document.getElementById("chat-input");
 const micChatBtn = document.getElementById("mic-chat-btn");
 const sendChatBtn = document.getElementById("send-chat-btn");
 const clearChatBtn = document.getElementById("clear-chat-btn");
 const chatStatus = document.getElementById("chat-status");
+const chatCard = document.querySelector(".chat-card");
 const pageTabs = document.querySelectorAll(".page-tab");
 const appPages = document.querySelectorAll(".app-page");
 
@@ -1628,6 +1692,7 @@ if (addChatReplyToPlaylistBtn) {
 
 // These variables keep track of the app's current state.
 let currentSentence = null;
+let currentBatchSentences = [];
 let translationVisible = true;
 let answerMarked = false;
 let lastGeneratedSpanish = "";
@@ -1640,6 +1705,10 @@ let isCallModeActive = false;
 let isCallListening = false;
 let isCallReplying = false;
 let callReplyPlaybackId = 0;
+let callTurnRequestId = 0;
+let callStartedAt = 0;
+let callElapsedSeconds = 0;
+let callTimerInterval = null;
 let latestCallTranscript = "";
 let callMediaRecorder = null;
 let callMediaStream = null;
@@ -1649,6 +1718,12 @@ let callAnalyser = null;
 let callSilenceFrame = null;
 let callHeardSpeech = false;
 let callListenStartedAt = 0;
+let callBargeStream = null;
+let callBargeAudioContext = null;
+let callBargeAnalyser = null;
+let callBargeFrame = null;
+let callBargeStartedAt = 0;
+let callBargeSpeechStartedAt = 0;
 let latestMicTranscript = "";
 let chatMediaRecorder = null;
 let chatMediaStream = null;
@@ -1658,11 +1733,17 @@ let installHintShown = false;
 let aiModeEnabled = JSON.parse(localStorage.getItem("spanishSentenceAiMode")) || false;
 let darkModeEnabled = JSON.parse(localStorage.getItem("spanishSentenceDarkMode")) || false;
 let sentenceDisplayMode = localStorage.getItem("spanishSentenceDisplayMode") || "show-translation";
+let targetLanguage = localStorage.getItem("spanishSentenceTargetLanguage") || "spanish";
+let spanishVoiceChoice = localStorage.getItem("spanishSentenceVoiceChoice") || "primary";
+let callPauseMode = localStorage.getItem("spanishSentenceCallPauseMode") || "normal";
 let aiCooldownUntil = 0;
 let activePageId = localStorage.getItem("spanishSentenceActivePage") || "generator-page";
 let spanishAudioPlayer = null;
 let currentSpanishAudioUrl = "";
+let currentSpanishMediaSource = null;
+let currentSpanishStreamReader = null;
 let spanishAudioEndedCallback = null;
+let spanishAudioPlaybackId = 0;
 let wordHintRequestId = 0;
 let aiWordHintCache = JSON.parse(localStorage.getItem("spanishSentenceAiWordHints")) || {};
 let chatTimerInterval = null;
@@ -1674,7 +1755,34 @@ let fullConversationPlayback = {
   playbackId: 0,
   audioUrl: ""
 };
-const SPANISH_AUDIO_CACHE_VERSION = "v2";
+const SPANISH_AUDIO_CACHE_VERSION = "v3";
+
+const targetLanguageProfiles = {
+  spanish: {
+    label: "Spanish",
+    flagClass: "flag-spanish",
+    phrase: "natural Spanish from Spain",
+    speechCode: "es-ES",
+    example: "I am going to Madrid tomorrow.",
+    voiceTest: "Hola, esta es la voz que usaré para practicar contigo."
+  },
+  french: {
+    label: "French",
+    flagClass: "flag-french",
+    phrase: "natural French from France",
+    speechCode: "fr-FR",
+    example: "I am going to Paris tomorrow.",
+    voiceTest: "Bonjour, c'est la voix que j'utiliserai pour pratiquer avec toi."
+  },
+  italian: {
+    label: "Italian",
+    flagClass: "flag-italian",
+    phrase: "natural Italian from Italy",
+    speechCode: "it-IT",
+    example: "I am going to Rome tomorrow.",
+    voiceTest: "Ciao, questa è la voce che userò per fare pratica con te."
+  }
+};
 
 // We load saved data from localStorage when the page opens.
 let favourites = JSON.parse(localStorage.getItem("spanishSentenceFavourites")) || [];
@@ -1688,16 +1796,31 @@ let radioState = {
   isPlaying: false,
   playlistId: "",
   mode: "repeat-one",
-  index: 0
+  index: 0,
+  shadowTimeoutId: null
 };
 let latestCustomSentence = null;
+let currentDialogue = JSON.parse(localStorage.getItem("spanishSentenceCurrentDialogue")) || null;
+let savedDialogues = JSON.parse(localStorage.getItem("spanishSentenceSavedDialogues")) || [];
+let dialoguePlayback = {
+  isPlaying: false,
+  audioUrl: ""
+};
+let youtubePlayer = null;
+let youtubeApiReadyPromise = null;
+let currentVideoId = "";
+let videoTranscriptLines = [];
+let activeVideoLineIndex = -1;
+let videoSyncInterval = null;
+let videoLineTranslationCache = {};
+let videoWordHintCache = {};
 let lastCoachReply = null;
-let chatHistory = JSON.parse(localStorage.getItem("spanishSentenceChatHistory")) || [];
+let chatHistory = loadStoredChatHistory(targetLanguage);
 let savedConversations = JSON.parse(localStorage.getItem("spanishSentenceSavedConversations")) || [];
 let conversationPlaylist = JSON.parse(localStorage.getItem("spanishSentenceConversationPlaylist")) || [];
-let activeConversationId = localStorage.getItem("spanishSentenceActiveConversationId") || "";
-let chatStartedAt = Number(localStorage.getItem("spanishSentenceChatStartedAt")) || 0;
-let chatAccumulatedSeconds = Number(localStorage.getItem("spanishSentenceChatAccumulatedSeconds")) || 0;
+let activeConversationId = localStorage.getItem(getChatStorageKey("spanishSentenceActiveConversationId")) || "";
+let chatStartedAt = Number(localStorage.getItem(getChatStorageKey("spanishSentenceChatStartedAt"))) || 0;
+let chatAccumulatedSeconds = Number(localStorage.getItem(getChatStorageKey("spanishSentenceChatAccumulatedSeconds"))) || 0;
 let customGeneratorTopics = JSON.parse(localStorage.getItem("spanishSentenceCustomGeneratorTopics")) || [];
 let practiceStats = JSON.parse(localStorage.getItem("spanishSentencePracticeStats")) || null;
 
@@ -1900,14 +2023,14 @@ function renderPracticeStats() {
 }
 
 // This helper increments one daily practice counter.
-function incrementPracticeStat(statName) {
+function incrementPracticeStat(statName, amount = 1) {
   const stats = getCurrentPracticeStats();
 
   if (stats[statName] === undefined) {
     return;
   }
 
-  stats[statName] += 1;
+  stats[statName] += amount;
   savePracticeStats();
   renderPracticeStats();
 }
@@ -2079,6 +2202,39 @@ function createConversationId() {
   return `chat-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function getChatStorageKey(baseKey, language = targetLanguage) {
+  return `${baseKey}_${language}`;
+}
+
+function getStoredChatValue(baseKey, language = targetLanguage) {
+  const languageValue = localStorage.getItem(getChatStorageKey(baseKey, language));
+  if (languageValue !== null) {
+    return languageValue;
+  }
+
+  return language === targetLanguage ? localStorage.getItem(baseKey) : null;
+}
+
+function removeStoredChatValue(baseKey, language = targetLanguage) {
+  localStorage.removeItem(getChatStorageKey(baseKey, language));
+}
+
+function loadStoredChatHistory(language = targetLanguage) {
+  const languageHistory = getStoredChatValue("spanishSentenceChatHistory", language);
+  const legacyHistory = localStorage.getItem("spanishSentenceChatHistory");
+  const rawHistory = languageHistory || (language === targetLanguage ? legacyHistory : null);
+
+  if (!rawHistory) {
+    return [];
+  }
+
+  try {
+    return JSON.parse(rawHistory) || [];
+  } catch (error) {
+    return [];
+  }
+}
+
 // This helper formats a chat timer as mm:ss or hh:mm:ss.
 function formatChatDuration(totalSeconds) {
   const safeSeconds = Math.max(0, Math.floor(totalSeconds || 0));
@@ -2103,15 +2259,49 @@ function getCurrentChatDurationSeconds() {
 
 // This helper keeps the current chat metadata in localStorage.
 function saveCurrentChatMeta() {
-  localStorage.setItem("spanishSentenceActiveConversationId", activeConversationId);
-  localStorage.setItem("spanishSentenceChatStartedAt", String(chatStartedAt));
-  localStorage.setItem("spanishSentenceChatAccumulatedSeconds", String(chatAccumulatedSeconds));
+  localStorage.setItem(getChatStorageKey("spanishSentenceActiveConversationId"), activeConversationId);
+  localStorage.setItem(getChatStorageKey("spanishSentenceChatStartedAt"), String(chatStartedAt));
+  localStorage.setItem(getChatStorageKey("spanishSentenceChatAccumulatedSeconds"), String(chatAccumulatedSeconds));
 }
 
 // This helper saves the current chat log and timer together.
 function saveCurrentChatState() {
-  localStorage.setItem("spanishSentenceChatHistory", JSON.stringify(chatHistory));
+  localStorage.setItem(getChatStorageKey("spanishSentenceChatHistory"), JSON.stringify(chatHistory));
+  if (chatInput) {
+    localStorage.setItem(getChatStorageKey("spanishSentenceChatDraft"), chatInput.value || "");
+  }
   saveCurrentChatMeta();
+}
+
+function loadActiveChatStateForLanguage(language = targetLanguage) {
+  chatHistory = loadStoredChatHistory(language);
+  activeConversationId = getStoredChatValue("spanishSentenceActiveConversationId", language) || "";
+  chatStartedAt = Number(getStoredChatValue("spanishSentenceChatStartedAt", language)) || 0;
+  chatAccumulatedSeconds = Number(getStoredChatValue("spanishSentenceChatAccumulatedSeconds", language)) || 0;
+  lastCoachReply = getLastCoachReplyFromHistory(chatHistory);
+
+  if (chatInput) {
+    chatInput.value = getStoredChatValue("spanishSentenceChatDraft", language) || "";
+  }
+
+  renderChatMessages();
+  updateChatTimerDisplay();
+}
+
+function buildLanguageChatBackup() {
+  return Object.keys(targetLanguageProfiles).reduce((backup, language) => {
+    backup[language] = {
+      activeConversationId: getStoredChatValue("spanishSentenceActiveConversationId", language) || "",
+      chatStartedAt: Number(getStoredChatValue("spanishSentenceChatStartedAt", language)) || 0,
+      chatAccumulatedSeconds: language === targetLanguage
+        ? getCurrentChatDurationSeconds()
+        : Number(getStoredChatValue("spanishSentenceChatAccumulatedSeconds", language)) || 0,
+      draft: getStoredChatValue("spanishSentenceChatDraft", language) || "",
+      chatHistory: language === targetLanguage ? chatHistory : loadStoredChatHistory(language)
+    };
+
+    return backup;
+  }, {});
 }
 
 // This helper updates the visible chat timer.
@@ -2152,6 +2342,48 @@ function pauseChatTimer() {
 
   saveCurrentChatMeta();
   updateChatTimerDisplay();
+}
+
+function getCurrentCallDurationSeconds() {
+  if (!callStartedAt) {
+    return callElapsedSeconds;
+  }
+
+  return callElapsedSeconds + Math.floor((Date.now() - callStartedAt) / 1000);
+}
+
+function updateCallTimerDisplay() {
+  if (!callFocusTimer) {
+    return;
+  }
+
+  callFocusTimer.textContent = `Call time: ${formatChatDuration(getCurrentCallDurationSeconds())}`;
+}
+
+function startCallTimer() {
+  callElapsedSeconds = 0;
+  callStartedAt = Date.now();
+  updateCallTimerDisplay();
+
+  if (callTimerInterval) {
+    clearInterval(callTimerInterval);
+  }
+
+  callTimerInterval = setInterval(updateCallTimerDisplay, 1000);
+}
+
+function stopCallTimer() {
+  const durationSeconds = getCurrentCallDurationSeconds();
+  callElapsedSeconds = durationSeconds;
+  callStartedAt = 0;
+
+  if (callTimerInterval) {
+    clearInterval(callTimerInterval);
+    callTimerInterval = null;
+  }
+
+  updateCallTimerDisplay();
+  return durationSeconds;
 }
 
 // This helper finds the last coach reply from a conversation.
@@ -2196,6 +2428,189 @@ function slugifyFilename(text) {
     .slice(0, 48) || "conversation";
 }
 
+// This helper turns a generated dialogue into the same turn shape used by MP3 export.
+function getDialogueAudioTurns(dialogue = currentDialogue) {
+  if (!dialogue || !Array.isArray(dialogue.lines)) {
+    return [];
+  }
+
+  return dialogue.lines
+    .map((line) => ({
+      role: line.speaker || "Speaker",
+      spanish: line.spanish || "",
+      english: line.english || ""
+    }))
+    .filter((turn) => turn.spanish);
+}
+
+// This helper saves the current dialogue so refreshes do not lose it.
+function saveCurrentDialogueState() {
+  if (currentDialogue) {
+    localStorage.setItem("spanishSentenceCurrentDialogue", JSON.stringify(currentDialogue));
+  } else {
+    localStorage.removeItem("spanishSentenceCurrentDialogue");
+  }
+}
+
+// This helper saves generated dialogues.
+function saveDialogues() {
+  localStorage.setItem("spanishSentenceSavedDialogues", JSON.stringify(savedDialogues));
+}
+
+// This function redraws the current generated dialogue.
+function renderDialogue() {
+  if (!dialogueResult) {
+    return;
+  }
+
+  dialogueResult.innerHTML = "";
+
+  if (!currentDialogue || !Array.isArray(currentDialogue.lines) || !currentDialogue.lines.length) {
+    dialogueResult.innerHTML = '<p class="empty-message">No dialogue generated yet.</p>';
+    return;
+  }
+
+  const title = document.createElement("h4");
+  const meta = document.createElement("p");
+  const list = document.createElement("div");
+
+  title.className = "dialogue-title";
+  title.textContent = currentDialogue.title || "Generated dialogue";
+  meta.className = "sentence-meta";
+  meta.textContent = `${capitalize(currentDialogue.level || "intermediate")} | ${capitalize(currentDialogue.tone || "informal")} | ${currentDialogue.lines.length} lines`;
+  list.className = "dialogue-lines";
+
+  currentDialogue.lines.forEach((line, index) => {
+    const row = document.createElement("article");
+    const textWrapper = document.createElement("div");
+    const speaker = document.createElement("p");
+    const spanish = document.createElement("p");
+    const english = document.createElement("p");
+    const actionRow = document.createElement("div");
+    const speakButton = document.createElement("button");
+    const saveButton = document.createElement("button");
+
+    row.className = "dialogue-line";
+    speaker.className = "chat-role";
+    spanish.className = "chat-text";
+    english.className = "chat-text chat-english";
+    actionRow.className = "actions";
+    speaker.textContent = line.speaker || `Speaker ${index + 1}`;
+    spanish.textContent = line.spanish;
+    english.textContent = line.english || "";
+    speakButton.className = "secondary-btn chat-audio-btn";
+    speakButton.type = "button";
+    speakButton.textContent = "Speak";
+    speakButton.addEventListener("click", () => playSpanishAudio(line.spanish, `${currentDialogue.title || "Dialogue"} line ${index + 1}`));
+    saveButton.className = "secondary-btn chat-audio-btn";
+    saveButton.type = "button";
+    saveButton.textContent = "Save line";
+    saveButton.addEventListener("click", () => {
+    const saved = saveSentenceToFavourites({
+        targetLanguage,
+        spanish: line.spanish,
+        english: line.english || "",
+        difficulty: currentDialogue.level || "intermediate",
+        topic: currentDialogue.topic || "dialogue",
+        tone: currentDialogue.tone || "informal",
+        source: "dialogue",
+        generated: true,
+        ai: true
+      }, "Generate a dialogue first.");
+
+      if (saved) {
+        dialogueStatus.textContent = "Dialogue line saved to favourites.";
+      }
+    });
+
+    textWrapper.appendChild(speaker);
+    textWrapper.appendChild(spanish);
+    if (line.english) {
+      textWrapper.appendChild(english);
+    }
+    actionRow.appendChild(speakButton);
+    actionRow.appendChild(saveButton);
+    row.appendChild(textWrapper);
+    row.appendChild(actionRow);
+    list.appendChild(row);
+  });
+
+  dialogueResult.appendChild(title);
+  dialogueResult.appendChild(meta);
+  dialogueResult.appendChild(list);
+
+  if (Array.isArray(currentDialogue.usefulPhrases) && currentDialogue.usefulPhrases.length) {
+    const phrasePanel = document.createElement("div");
+    const phraseTitle = document.createElement("p");
+
+    phrasePanel.className = "dialogue-phrases";
+    phraseTitle.className = "section-label";
+    phraseTitle.textContent = "Useful phrases";
+    phrasePanel.appendChild(phraseTitle);
+
+    currentDialogue.usefulPhrases.forEach((phrase) => {
+      const phraseText = document.createElement("p");
+      phraseText.className = "chat-text";
+      phraseText.textContent = `${phrase.spanish}${phrase.english ? ` - ${phrase.english}` : ""}${phrase.note ? ` (${phrase.note})` : ""}`;
+      phrasePanel.appendChild(phraseText);
+    });
+
+    dialogueResult.appendChild(phrasePanel);
+  }
+}
+
+// This function redraws saved generated dialogues.
+function renderSavedDialogues() {
+  if (!savedDialoguesList || !savedDialoguesEmpty) {
+    return;
+  }
+
+  const languageDialogues = getCurrentLanguageItems(savedDialogues);
+  savedDialoguesList.innerHTML = "";
+  savedDialoguesEmpty.style.display = languageDialogues.length ? "none" : "block";
+
+  languageDialogues.forEach((dialogue) => {
+    const listItem = document.createElement("li");
+    const textWrapper = document.createElement("div");
+    const title = document.createElement("h4");
+    const meta = document.createElement("p");
+    const actionRow = document.createElement("div");
+    const loadButton = document.createElement("button");
+    const removeButton = document.createElement("button");
+
+    listItem.className = "favourite-item saved-conversation-item";
+    actionRow.className = "actions";
+    title.textContent = dialogue.title || "Saved dialogue";
+    meta.textContent = `${dialogue.lines?.length || 0} lines | ${capitalize(dialogue.level || "intermediate")} | ${new Date(dialogue.savedAt || Date.now()).toLocaleString()}`;
+    loadButton.className = "secondary-btn";
+    loadButton.type = "button";
+    loadButton.textContent = "Load";
+    loadButton.addEventListener("click", () => {
+      currentDialogue = { ...dialogue, lines: dialogue.lines.map((line) => ({ ...line })) };
+      saveCurrentDialogueState();
+      renderDialogue();
+      dialogueStatus.textContent = "Saved dialogue loaded.";
+    });
+    removeButton.className = "delete-btn";
+    removeButton.type = "button";
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", () => {
+      savedDialogues = savedDialogues.filter((item) => item.id !== dialogue.id);
+      saveDialogues();
+      renderSavedDialogues();
+      dialogueStatus.textContent = "Saved dialogue removed.";
+    });
+
+    actionRow.appendChild(loadButton);
+    actionRow.appendChild(removeButton);
+    textWrapper.appendChild(title);
+    textWrapper.appendChild(meta);
+    textWrapper.appendChild(actionRow);
+    listItem.appendChild(textWrapper);
+    savedDialoguesList.appendChild(listItem);
+  });
+}
+
 // This helper returns the corrected version of the conversation.
 function getCorrectedConversationTurns() {
   return chatHistory
@@ -2219,6 +2634,108 @@ function getCorrectedConversationTurns() {
     .filter((turn) => turn.spanish);
 }
 
+function buildConversationReviewItems() {
+  return chatHistory
+    .map((message) => {
+      const isUser = message.role === "user";
+      const original = message.spanish || message.text || "";
+      const corrected = isUser
+        ? message.correctionSpanish || original
+        : original;
+      const english = isUser
+        ? message.correctionEnglish || message.english || ""
+        : message.english || "";
+
+      return {
+        role: isUser ? "You" : "AI",
+        original,
+        corrected,
+        english,
+        note: message.feedback || "",
+        changed: Boolean(isUser && message.correctionSpanish && message.correctionSpanish !== original)
+      };
+    })
+    .filter((item) => item.original || item.corrected);
+}
+
+function renderConversationReview() {
+  if (!conversationReviewPanel || !conversationReviewList || !conversationReviewSummary) {
+    return;
+  }
+
+  const reviewItems = buildConversationReviewItems();
+  conversationReviewList.innerHTML = "";
+
+  if (!reviewItems.length) {
+    conversationReviewSummary.textContent = "Start a chat first, then come back here to review it.";
+    conversationReviewList.innerHTML = '<p class="empty-message">No conversation to review yet.</p>';
+    return;
+  }
+
+  const correctionCount = reviewItems.filter((item) => item.changed).length;
+  conversationReviewSummary.textContent = `${reviewItems.length} turns | ${correctionCount} more-native user version${correctionCount === 1 ? "" : "s"} | ${getTargetLanguageProfile().label}`;
+
+  reviewItems.forEach((item, index) => {
+    const row = document.createElement("div");
+    const label = document.createElement("p");
+    const corrected = document.createElement("p");
+
+    row.className = `conversation-review-item ${item.role === "You" ? "user" : "coach"}`;
+    label.className = "section-label";
+    label.textContent = `${index + 1}. ${item.role}${item.changed ? " - native version" : ""}`;
+    corrected.className = "conversation-review-main";
+    corrected.textContent = item.corrected;
+
+    row.appendChild(label);
+
+    if (item.changed) {
+      const original = document.createElement("p");
+      original.className = "conversation-review-original";
+      original.textContent = `You said: ${item.original}`;
+      row.appendChild(original);
+    }
+
+    row.appendChild(corrected);
+
+    if (item.english) {
+      const english = document.createElement("p");
+      english.className = "chat-text chat-english";
+      english.textContent = item.english;
+      row.appendChild(english);
+    }
+
+    if (item.note) {
+      const noteLabel = document.createElement("p");
+      const note = document.createElement("p");
+      noteLabel.className = "chat-role";
+      noteLabel.textContent = "Quick note";
+      note.className = "chat-text chat-english";
+      note.textContent = item.note;
+      row.appendChild(noteLabel);
+      row.appendChild(note);
+    }
+
+    conversationReviewList.appendChild(row);
+  });
+}
+
+function showConversationReview() {
+  if (!conversationReviewPanel) {
+    return;
+  }
+
+  renderConversationReview();
+  conversationReviewPanel.classList.remove("hidden");
+  chatStatus.textContent = "Conversation review opened.";
+  conversationReviewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function hideConversationReview() {
+  if (conversationReviewPanel) {
+    conversationReviewPanel.classList.add("hidden");
+  }
+}
+
 // This helper saves full-conversation playlist data.
 function saveConversationPlaylist() {
   localStorage.setItem("spanishSentenceConversationPlaylist", JSON.stringify(conversationPlaylist));
@@ -2236,6 +2753,7 @@ function buildConversationPlaylistItem() {
 
   return {
     id: createConversationId(),
+    targetLanguage,
     title: `${capitalize(chatTopicSelect.value)} conversation - ${new Date(savedAt).toLocaleString([], {
       month: "short",
       day: "numeric",
@@ -2259,10 +2777,11 @@ function renderConversationPlaylist() {
     return;
   }
 
+  const languageConversationPlaylist = getCurrentLanguageItems(conversationPlaylist);
   conversationPlaylistList.innerHTML = "";
-  conversationPlaylistEmpty.style.display = conversationPlaylist.length ? "none" : "block";
+  conversationPlaylistEmpty.style.display = languageConversationPlaylist.length ? "none" : "block";
 
-  conversationPlaylist.forEach((conversation) => {
+  languageConversationPlaylist.forEach((conversation) => {
     const listItem = document.createElement("li");
     const textWrapper = document.createElement("div");
     const title = document.createElement("h4");
@@ -2300,10 +2819,11 @@ function renderSavedConversations() {
     return;
   }
 
+  const languageConversations = getCurrentLanguageItems(savedConversations);
   savedConversationsList.innerHTML = "";
-  savedConversationsEmpty.style.display = savedConversations.length ? "none" : "block";
+  savedConversationsEmpty.style.display = languageConversations.length ? "none" : "block";
 
-  savedConversations
+  languageConversations
     .slice()
     .sort((first, second) => new Date(second.savedAt) - new Date(first.savedAt))
     .forEach((conversation) => {
@@ -2387,6 +2907,297 @@ function applyThemePreference() {
 function toggleThemeMode() {
   darkModeEnabled = !darkModeEnabled;
   applyThemePreference();
+}
+
+function getTargetLanguageProfile() {
+  return targetLanguageProfiles[targetLanguage] || targetLanguageProfiles.spanish;
+}
+
+function getSavedItemLanguage(item) {
+  return item?.targetLanguage || item?.language || "spanish";
+}
+
+function isCurrentLanguageItem(item) {
+  return getSavedItemLanguage(item) === targetLanguage;
+}
+
+function withCurrentLanguage(item) {
+  return {
+    ...item,
+    targetLanguage: item?.targetLanguage || targetLanguage
+  };
+}
+
+function getCurrentLanguageItems(items) {
+  return items.filter(isCurrentLanguageItem);
+}
+
+function chatHasMixedLanguageHistory() {
+  return chatHistory.some((message) => getSavedItemLanguage(message) !== targetLanguage);
+}
+
+function getDominantChatLanguage() {
+  const counts = chatHistory.reduce((languageCounts, message) => {
+    const messageLanguage = getSavedItemLanguage(message);
+    languageCounts[messageLanguage] = (languageCounts[messageLanguage] || 0) + 1;
+    return languageCounts;
+  }, {});
+
+  const sortedLanguages = Object.entries(counts).sort((first, second) => second[1] - first[1]);
+  return sortedLanguages[0]?.[0] || targetLanguage;
+}
+
+function updateChatLanguageBadge() {
+  const profile = getTargetLanguageProfile();
+  const hasMessages = chatHistory.length > 0;
+  const mixedHistory = hasMessages && chatHasMixedLanguageHistory();
+
+  if (chatTitle) {
+    chatTitle.textContent = `${profile.label} chat coach`;
+  }
+
+  if (chatLanguageBadge) {
+    chatLanguageBadge.textContent = mixedHistory
+      ? `Mixed chat - start a new ${profile.label} chat`
+      : `${profile.label} chat`;
+    chatLanguageBadge.classList.toggle("warning", mixedHistory);
+  }
+}
+
+function clearMixedLanguageChatIfNeeded() {
+  if (!chatHasMixedLanguageHistory()) {
+    return false;
+  }
+
+  saveCurrentConversation({ silent: true, targetLanguage: getDominantChatLanguage() });
+  clearActiveChatState();
+  chatStatus.textContent = `Saved and cleared the mixed-language chat. New messages will stay in ${getTargetLanguageProfile().label}.`;
+  return true;
+}
+
+function refreshLanguageScopedViews() {
+  renderFavourites();
+  renderRecallSentences();
+  renderPlaylists();
+  renderSavedDialogues();
+  renderSavedConversations();
+  renderConversationPlaylist();
+}
+
+function clearActiveChatState() {
+  chatHistory = [];
+  lastCoachReply = null;
+  activeConversationId = "";
+  chatAccumulatedSeconds = 0;
+  chatStartedAt = 0;
+  pauseChatTimer();
+  removeStoredChatValue("spanishSentenceChatHistory");
+  removeStoredChatValue("spanishSentenceActiveConversationId");
+  removeStoredChatValue("spanishSentenceChatStartedAt");
+  removeStoredChatValue("spanishSentenceChatAccumulatedSeconds");
+  removeStoredChatValue("spanishSentenceChatDraft");
+  if (chatInput) {
+    chatInput.value = "";
+  }
+  renderChatMessages();
+  updateChatLanguageBadge();
+  updateChatTimerDisplay();
+}
+
+function applyTargetLanguagePreference() {
+  const profile = getTargetLanguageProfile();
+
+  if (targetLanguageSelect) {
+    targetLanguageSelect.value = targetLanguage;
+  }
+
+  if (appEyebrow) {
+    const flag = appEyebrow.querySelector(".language-flag");
+    appEyebrow.textContent = "";
+    if (flag) {
+      flag.className = `language-flag ${profile.flagClass}`;
+      appEyebrow.appendChild(flag);
+    }
+    appEyebrow.append(`${profile.label} Learning Tool`);
+  }
+
+  if (appTitle) {
+    appTitle.textContent = `${profile.label} Sentence Generator`;
+  }
+
+  if (appIntro) {
+    appIntro.textContent = `Practise ${profile.phrase} with random example sentences, English translations, and speech buttons.`;
+  }
+
+  document.title = `${profile.label} Sentence Generator`;
+
+  if (spanishVoiceSelect) {
+    const voiceLabel = document.querySelector('label[for="spanish-voice-select"]');
+    if (voiceLabel) {
+      voiceLabel.textContent = `${profile.label} voice`;
+    }
+  }
+
+  if (speakSpanishBtn) {
+    speakSpanishBtn.textContent = `Speak ${profile.label}`;
+  }
+
+  if (copySentenceBtn) {
+    copySentenceBtn.textContent = `Copy ${profile.label}`;
+  }
+
+  if (batchStatus && (!batchStatus.textContent.trim() || batchStatus.textContent.includes("Generate a batch to view"))) {
+    batchStatus.textContent = `Generate a batch to view ${profile.label} and English side by side.`;
+  }
+
+  if (favouritesSearchInput) {
+    favouritesSearchInput.placeholder = `Search ${profile.label} or English`;
+  }
+
+  if (customToneLabel) {
+    customToneLabel.textContent = `${profile.label} style`;
+  }
+
+  if (translateCustomBtn) {
+    translateCustomBtn.textContent = `Translate to ${profile.label}`;
+  }
+
+  if (customAiNote) {
+    customAiNote.textContent = `AI helped make this sound more natural in ${profile.label}.`;
+  }
+
+  if (customSpanishOutput && !latestCustomSentence) {
+    customSpanishOutput.textContent = `Your ${profile.label} sentence will appear here.`;
+  }
+
+  if (customStatus && (!customStatus.textContent.trim() || customStatus.textContent.includes("Best for short everyday sentences"))) {
+    customStatus.textContent = targetLanguage === "spanish"
+      ? "Best for short everyday sentences. Spanish can use the offline translator if AI is unavailable."
+      : `Best for short everyday sentences. ${profile.label} custom translations use AI to stay in the right language.`;
+  }
+
+  if (dialogueTitle) {
+    dialogueTitle.textContent = `AI ${profile.label} dialogues`;
+  }
+
+  if (dialogueStatus && (!dialogueStatus.textContent.trim() || dialogueStatus.textContent.includes("Choose a topic and generate"))) {
+    dialogueStatus.textContent = `Choose a topic and generate a natural ${profile.label} dialogue.`;
+  }
+
+  if (chatInput) {
+    chatInput.placeholder = `Write in English or simple ${profile.label}. For example: ${profile.example}`;
+  }
+
+  if (chatStatus && (!chatStatus.textContent.trim() || chatStatus.textContent.includes("Start a chat to practise"))) {
+    chatStatus.textContent = `Start a chat to practise a short ${profile.label} conversation with the built-in coach.`;
+  }
+
+  localStorage.setItem("spanishSentenceTargetLanguage", targetLanguage);
+  updateChatLanguageBadge();
+  updateAiModeNote();
+}
+
+function saveTargetLanguagePreference() {
+  const nextLanguage = targetLanguageSelect?.value || "spanish";
+
+  if (nextLanguage === targetLanguage) {
+    return;
+  }
+
+  if (isCallModeActive) {
+    stopCallMode("Call mode ended because the language changed.", { autoSave: true });
+  } else {
+    pauseChatTimer();
+    saveCurrentChatState();
+  }
+
+  targetLanguage = nextLanguage;
+  loadActiveChatStateForLanguage(targetLanguage);
+  applyTargetLanguagePreference();
+  refreshLanguageScopedViews();
+
+  if (chatStatus) {
+    chatStatus.textContent = chatHistory.length
+      ? `${getTargetLanguageProfile().label} chat restored.`
+      : `${getTargetLanguageProfile().label} selected. Start a chat when you're ready.`;
+  }
+}
+
+function applyCallPausePreference() {
+  if (callPauseModeSelect) {
+    callPauseModeSelect.value = callPauseMode;
+  }
+
+  localStorage.setItem("spanishSentenceCallPauseMode", callPauseMode);
+}
+
+function saveCallPausePreference() {
+  callPauseMode = callPauseModeSelect?.value || "normal";
+  applyCallPausePreference();
+}
+
+function getCallPauseTiming() {
+  const timings = {
+    fast: {
+      silenceAfterSpeechMs: 1350,
+      recognitionSendDelayMs: 350
+    },
+    normal: {
+      silenceAfterSpeechMs: 1900,
+      recognitionSendDelayMs: 650
+    },
+    thinking: {
+      silenceAfterSpeechMs: 2700,
+      recognitionSendDelayMs: 1000
+    }
+  };
+
+  return timings[callPauseMode] || timings.normal;
+}
+
+// This helper keeps the selected ElevenLabs voice in sync with the page.
+function applySpanishVoicePreference() {
+  if (spanishVoiceSelect) {
+    spanishVoiceSelect.value = spanishVoiceChoice;
+  }
+
+  localStorage.setItem("spanishSentenceVoiceChoice", spanishVoiceChoice);
+}
+
+// This helper returns the voice option to send to the audio backend.
+function getSelectedSpanishVoice() {
+  if (!spanishVoiceSelect) {
+    return spanishVoiceChoice || "primary";
+  }
+
+  return spanishVoiceSelect.value || "primary";
+}
+
+// This function saves the selected ElevenLabs voice option.
+function saveSpanishVoicePreference() {
+  spanishVoiceChoice = getSelectedSpanishVoice();
+  applySpanishVoicePreference();
+}
+
+// This function plays a short sample with the current language and voice settings.
+function testSelectedVoice() {
+  const profile = getTargetLanguageProfile();
+  const voiceLabel = spanishVoiceSelect?.options[spanishVoiceSelect.selectedIndex]?.text || "selected voice";
+
+  if (testVoiceBtn) {
+    testVoiceBtn.disabled = true;
+    testVoiceBtn.textContent = "Testing...";
+  }
+
+  showStatusMessage(`Testing ${profile.label} ${voiceLabel.toLowerCase()}...`);
+
+  playSpanishAudio(profile.voiceTest, `${profile.label} voice test`, () => {
+    if (testVoiceBtn) {
+      testVoiceBtn.disabled = false;
+      testVoiceBtn.textContent = "Test voice";
+    }
+    showStatusMessage(`${profile.label} voice test finished.`);
+  }, { progressive: false });
 }
 
 // This function tries to open the browser install prompt when available.
@@ -2539,6 +3350,151 @@ function stopCallAudioResources() {
   }
 
   callAnalyser = null;
+}
+
+// This helper stops the lightweight mic monitor used for hands-free interruption.
+function stopCallBargeInMonitor() {
+  if (callBargeFrame) {
+    cancelAnimationFrame(callBargeFrame);
+    callBargeFrame = null;
+  }
+
+  if (callBargeStream) {
+    callBargeStream.getTracks().forEach((track) => track.stop());
+    callBargeStream = null;
+  }
+
+  if (callBargeAudioContext) {
+    callBargeAudioContext.close().catch(() => {
+      // Ignore audio-context cleanup errors.
+    });
+    callBargeAudioContext = null;
+  }
+
+  callBargeAnalyser = null;
+  callBargeStartedAt = 0;
+  callBargeSpeechStartedAt = 0;
+}
+
+// This helper keeps the call-mode panel focused on the current call state.
+function updateCallFocusLayout(statusText = "") {
+  if (!callFocusPanel || !chatCard) {
+    return;
+  }
+
+  const isActive = Boolean(isCallModeActive);
+
+  chatCard.classList.toggle("call-mode-active", isActive);
+  callFocusPanel.classList.toggle("hidden", !isActive);
+
+  if (!isActive) {
+    return;
+  }
+
+  const currentStatus = statusText || chatStatus.textContent || "Call mode is active.";
+  const lowerStatus = currentStatus.toLowerCase();
+  let title = "In call";
+
+  if (lowerStatus.includes("listening") || lowerStatus.includes("speak")) {
+    title = "Listening";
+  } else if (lowerStatus.includes("hearing")) {
+    title = "Hearing you";
+  } else if (lowerStatus.includes("transcribing") || lowerStatus.includes("processing")) {
+    title = "Transcribing";
+  } else if (lowerStatus.includes("thinking")) {
+    title = "Thinking";
+  } else if (lowerStatus.includes("replying") || lowerStatus.includes("speaking")) {
+    title = "Speaking";
+  } else if (lowerStatus.includes("interrupted")) {
+    title = "Interrupted";
+  }
+
+  callFocusTitle.textContent = title;
+  callFocusStatus.textContent = currentStatus;
+  focusInterruptCallBtn.classList.toggle("hidden", !isCallReplying);
+}
+
+// This helper updates chat status and mirrors it in the call-focus panel.
+function setChatStatus(text) {
+  chatStatus.textContent = text;
+  updateCallFocusLayout(text);
+}
+
+// This helper reads a quiet mic monitor while the AI is replying, so the user can interrupt by speaking.
+async function startCallBargeInMonitor() {
+  if (!isCallModeActive || !isCallReplying || callBargeStream) {
+    return;
+  }
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !AudioContextClass) {
+    return;
+  }
+
+  try {
+    callBargeStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
+    });
+    callBargeAudioContext = new AudioContextClass();
+    callBargeAnalyser = callBargeAudioContext.createAnalyser();
+    callBargeAnalyser.fftSize = 2048;
+    callBargeAudioContext.createMediaStreamSource(callBargeStream).connect(callBargeAnalyser);
+    callBargeStartedAt = Date.now();
+    callBargeSpeechStartedAt = 0;
+  } catch (error) {
+    stopCallBargeInMonitor();
+    return;
+  }
+
+  if (!isCallModeActive || !isCallReplying) {
+    stopCallBargeInMonitor();
+    return;
+  }
+
+  const samples = new Uint8Array(callBargeAnalyser.fftSize);
+  const graceMs = 650;
+  const speechThreshold = 0.052;
+  const sustainedSpeechMs = 260;
+
+  const monitor = () => {
+    if (!isCallModeActive || !isCallReplying || !callBargeAnalyser) {
+      stopCallBargeInMonitor();
+      return;
+    }
+
+    callBargeAnalyser.getByteTimeDomainData(samples);
+
+    let sum = 0;
+    samples.forEach((sample) => {
+      const centeredSample = (sample - 128) / 128;
+      sum += centeredSample * centeredSample;
+    });
+
+    const level = Math.sqrt(sum / samples.length);
+    const elapsedMs = Date.now() - callBargeStartedAt;
+
+    if (elapsedMs > graceMs && level > speechThreshold) {
+      if (!callBargeSpeechStartedAt) {
+        callBargeSpeechStartedAt = Date.now();
+      }
+
+      if (Date.now() - callBargeSpeechStartedAt > sustainedSpeechMs) {
+        interruptCallReply("Interrupted because you started speaking. Listening again...");
+        return;
+      }
+    } else {
+      callBargeSpeechStartedAt = 0;
+    }
+
+    callBargeFrame = requestAnimationFrame(monitor);
+  };
+
+  monitor();
 }
 
 // This helper starts browser audio recording for the higher-quality chat microphone flow.
@@ -2743,7 +3699,13 @@ function setupCallRecognition() {
     }
 
     if (spokenMessage) {
-      sendChatMessage({ fromCall: true, userMessage: spokenMessage });
+      const pauseTiming = getCallPauseTiming();
+      setChatStatus("Processing your call turn...");
+      setTimeout(() => {
+        if (isCallModeActive && !isCallReplying) {
+          sendChatMessage({ fromCall: true, userMessage: spokenMessage });
+        }
+      }, pauseTiming.recognitionSendDelayMs);
       return;
     }
 
@@ -2772,6 +3734,8 @@ function getCallAudioLevel() {
 
 // This helper records one call-mode turn, then sends it to the high-quality STT backend.
 async function startRecordedCallListening() {
+  stopCallBargeInMonitor();
+
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: {
       echoCancellation: true,
@@ -2782,9 +3746,10 @@ async function startRecordedCallListening() {
   const preferredMimeType = getPreferredChatAudioMimeType();
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const silenceStartedAt = { value: 0 };
+  const pauseTiming = getCallPauseTiming();
   const maxTurnLengthMs = 20000;
   const noSpeechTimeoutMs = 9000;
-  const silenceAfterSpeechMs = 1250;
+  const silenceAfterSpeechMs = pauseTiming.silenceAfterSpeechMs;
   const speechThreshold = 0.028;
 
   callMediaStream = stream;
@@ -2836,31 +3801,31 @@ async function startRecordedCallListening() {
     }
 
     if (!recordedAudioBlob.size || !callHeardSpeech) {
-      chatStatus.textContent = "Call mode is listening. Speak when you are ready.";
+      setChatStatus("Call mode is listening. Speak when you are ready.");
       restartCallListening(350);
       return;
     }
 
     try {
       isCallReplying = true;
-      chatStatus.textContent = "Transcribing your call audio...";
+      setChatStatus("Transcribing your call audio...");
       const transcript = await transcribeRecordedChatAudio(recordedAudioBlob);
 
       isCallReplying = false;
 
       if (!transcript) {
-        chatStatus.textContent = "The call audio was heard, but no words were returned.";
+        setChatStatus("The call audio was heard, but no words were returned.");
         restartCallListening(500);
         return;
       }
 
       latestCallTranscript = transcript;
       chatInput.value = transcript;
-      chatStatus.textContent = `Call heard: ${transcript}`;
+      setChatStatus("Call mode is thinking...");
       sendChatMessage({ fromCall: true, userMessage: transcript });
     } catch (error) {
       isCallReplying = false;
-      chatStatus.textContent = `High-quality call transcription failed. ${error.message}`;
+      setChatStatus(`High-quality call transcription failed. ${error.message}`);
       restartCallListening(900, true);
     }
   };
@@ -2882,14 +3847,14 @@ async function startRecordedCallListening() {
     if (level > speechThreshold) {
       callHeardSpeech = true;
       silenceStartedAt.value = 0;
-      chatStatus.textContent = "Call mode is hearing you...";
+      setChatStatus("Call mode is hearing you...");
     } else if (callHeardSpeech) {
       if (!silenceStartedAt.value) {
         silenceStartedAt.value = Date.now();
       }
 
       if (Date.now() - silenceStartedAt.value > silenceAfterSpeechMs) {
-        chatStatus.textContent = "Processing your call turn...";
+        setChatStatus("Processing your call turn...");
         stopRecorderIfActive();
         return;
       }
@@ -2906,7 +3871,7 @@ async function startRecordedCallListening() {
   isCallListening = true;
   latestCallTranscript = "";
   chatInput.value = "";
-  chatStatus.textContent = "Call mode is listening. Speak naturally, then pause.";
+  setChatStatus("Call mode is listening. Speak naturally, then pause.");
   callMediaRecorder.start();
   monitorSilence();
 }
@@ -2971,27 +3936,46 @@ async function startCallMode() {
     chatMediaRecorder.stop();
   }
 
+  clearMixedLanguageChatIfNeeded();
+
   if (chatHistory.length === 0) {
-    startChat();
+    await startChat({ fromCall: true });
   }
 
   isCallModeActive = true;
   isCallReplying = false;
+  startCallTimer();
   callReplyPlaybackId += 1;
+  callTurnRequestId += 1;
   startCallBtn.classList.add("hidden");
   endCallBtn.classList.remove("hidden");
   interruptCallBtn.classList.add("hidden");
   chatAutoSpeakCheckbox.checked = true;
-  chatStatus.textContent = "Call mode started. Speak naturally after the coach finishes.";
+  setChatStatus("Call mode started. Speak naturally after the coach finishes.");
+  updateCallFocusLayout();
   restartCallListening(200);
 }
 
+// This helper clears the active chat without trying to stop call mode again.
+function resetActiveChatAfterCall() {
+  clearActiveChatState();
+}
+
 // This function stops the hands-free voice chat loop.
-function stopCallMode(message = "Call mode ended.") {
+function stopCallMode(message = "Call mode ended.", options = {}) {
+  const shouldAutoSave = Boolean(options.autoSave);
+  const callDurationSeconds = stopCallTimer();
+  const callDurationText = formatChatDuration(callDurationSeconds);
+  const savedConversation = shouldAutoSave && chatHistory.length
+    ? saveCurrentConversation({ silent: true })
+    : null;
+
   isCallModeActive = false;
   isCallReplying = false;
   callReplyPlaybackId += 1;
+  callTurnRequestId += 1;
   latestCallTranscript = "";
+  stopCallBargeInMonitor();
 
   if (callRecognition && isCallListening) {
     try {
@@ -3022,18 +4006,30 @@ function stopCallMode(message = "Call mode ended.") {
   endCallBtn.classList.add("hidden");
   interruptCallBtn.classList.add("hidden");
   chatInput.value = "";
-  chatStatus.textContent = message;
+
+  if (shouldAutoSave) {
+    resetActiveChatAfterCall();
+    setChatStatus(savedConversation
+      ? `Call saved and chat cleared. Call length: ${callDurationText}. Ready for the next call.`
+      : `Call ended. Call length: ${callDurationText}. Ready for the next call.`);
+  } else {
+    setChatStatus(`${message} Call length: ${callDurationText}.`);
+  }
+
+  updateCallFocusLayout();
 }
 
 // This function lets call mode stop the current AI reply and listen again.
-function interruptCallReply() {
-  if (!isCallModeActive || !isCallReplying) {
+function interruptCallReply(message = "Interrupted. Listening again...") {
+  if (!isCallModeActive) {
     return;
   }
 
   callReplyPlaybackId += 1;
+  callTurnRequestId += 1;
   isCallReplying = false;
   spanishAudioEndedCallback = null;
+  stopCallBargeInMonitor();
 
   if (spanishAudioPlayer) {
     spanishAudioPlayer.pause();
@@ -3047,7 +4043,7 @@ function interruptCallReply() {
   }
 
   interruptCallBtn.classList.add("hidden");
-  chatStatus.textContent = "Interrupted. Listening again...";
+  setChatStatus(message);
   restartCallListening(150);
 }
 
@@ -3194,6 +4190,10 @@ function normaliseWord(word) {
 
 // This helper finds the English meaning for one Spanish word.
 function getWordTranslation(word) {
+  if (targetLanguage !== "spanish") {
+    return "Loading English hint";
+  }
+
   const cleanWord = normaliseWord(word);
 
   if (!cleanWord) {
@@ -3204,7 +4204,7 @@ function getWordTranslation(word) {
 }
 
 // This helper finds the words that still need better hover hints.
-function getMissingWordHints() {
+function getMissingWordHints(includeAllVisibleWords = false) {
   const missingWords = new Map();
 
   document.querySelectorAll(".spanish-word").forEach((wordSpan) => {
@@ -3215,7 +4215,7 @@ function getMissingWordHints() {
       return;
     }
 
-    if (hint === "Hint coming soon" || hint === "English hint not added yet") {
+    if (includeAllVisibleWords || hint === "Hint coming soon" || hint === "English hint not added yet" || hint === "Loading English hint") {
       missingWords.set(cleanWord, wordSpan.textContent.trim().replace(/[.,!?¿¡;:]+$/g, ""));
     }
   });
@@ -3224,22 +4224,27 @@ function getMissingWordHints() {
 }
 
 // This helper applies a sentence-specific set of hover hints to the visible words.
-function applyWordHints(hints) {
+function applyWordHints(hints, persistToLocalDictionary = true) {
   if (!hints || typeof hints !== "object") {
     return;
   }
+
+  const normalisedHints = {};
 
   Object.entries(hints).forEach(([word, hint]) => {
     const cleanWord = normaliseWord(word);
 
     if (cleanWord && hint) {
-      wordTranslations[cleanWord] = String(hint).trim();
+      normalisedHints[cleanWord] = String(hint).trim();
+      if (persistToLocalDictionary) {
+        wordTranslations[cleanWord] = normalisedHints[cleanWord];
+      }
     }
   });
 
   document.querySelectorAll(".spanish-word").forEach((wordSpan) => {
     const cleanWord = normaliseWord(wordSpan.textContent || "");
-    const hint = wordTranslations[cleanWord];
+    const hint = normalisedHints[cleanWord] || wordTranslations[cleanWord];
 
     if (hint) {
       wordSpan.setAttribute("data-translation", hint);
@@ -3256,16 +4261,16 @@ function saveAiWordHintCache() {
 
 // This helper creates a stable key for one sentence's contextual AI hints.
 function getWordHintCacheKey(sentence) {
-  return normaliseSentenceForSimilarity(sentence.spanish || "");
+  return `${targetLanguage}:${normaliseSentenceForSimilarity(sentence.spanish || "")}`;
 }
 
 // This helper asks AI for contextual word hints only when the local dictionary misses words.
 async function improveMissingWordHintsWithAi(sentence, requestId) {
-  if (!sentence || !aiModeEnabled) {
+  if (!sentence || !(aiModeEnabled || targetLanguage !== "spanish")) {
     return;
   }
 
-  const missingWords = getMissingWordHints();
+  const missingWords = getMissingWordHints(targetLanguage !== "spanish");
 
   if (!missingWords.length) {
     return;
@@ -3274,13 +4279,14 @@ async function improveMissingWordHintsWithAi(sentence, requestId) {
   const cacheKey = getWordHintCacheKey(sentence);
 
   if (aiWordHintCache[cacheKey]) {
-    applyWordHints(aiWordHintCache[cacheKey]);
+    applyWordHints(aiWordHintCache[cacheKey], targetLanguage === "spanish");
     return;
   }
 
   try {
     const responseData = await callAiLanguageCoach({
       mode: "word-hints",
+      targetLanguage,
       spanish: sentence.spanish,
       english: sentence.english,
       words: missingWords.map((item) => item.display)
@@ -3293,7 +4299,7 @@ async function improveMissingWordHintsWithAi(sentence, requestId) {
     const hints = responseData.hints || {};
     aiWordHintCache[cacheKey] = hints;
     saveAiWordHintCache();
-    applyWordHints(hints);
+    applyWordHints(hints, targetLanguage === "spanish");
   } catch (error) {
     // Keep the local hints if AI is unavailable; sentence generation should not be interrupted.
   }
@@ -3301,7 +4307,7 @@ async function improveMissingWordHintsWithAi(sentence, requestId) {
 
 // This helper loads one sentence into the main sentence viewer.
 function setCurrentSentence(sentence, sourceLabel) {
-  currentSentence = sentence;
+  currentSentence = withCurrentLanguage(sentence);
   lastGeneratedSpanish = currentSentence.spanish;
 
   renderSpanishSentence(currentSentence.spanish);
@@ -3337,6 +4343,11 @@ function translateEnglishRemainder(englishRemainder) {
 // This helper builds an offline custom translation.
 function buildOfflineCustomSentence() {
   const englishInput = customEnglishInput.value.trim();
+
+  if (targetLanguage !== "spanish") {
+    customStatus.textContent = `${getTargetLanguageProfile().label} custom translation needs the AI translator so it stays in the right language. Turn on the AI sentence engine and try again.`;
+    return null;
+  }
 
   if (!englishInput) {
     alert("Write an English sentence first.");
@@ -3399,6 +4410,7 @@ async function buildAiCustomSentence() {
 
   const responseData = await callAiLanguageCoach({
     mode: "custom",
+    targetLanguage,
     english: englishInput,
     difficulty: customDifficultySelect.value,
     topic: customTopicSelect.value,
@@ -3427,36 +4439,46 @@ async function buildAiCustomSentence() {
 // This function translates a sentence in the custom area.
 async function translateCustomSentence() {
   let translatedSentence = null;
+  const profile = getTargetLanguageProfile();
 
   if (customAiNote) {
     customAiNote.classList.add("hidden");
-    customAiNote.textContent = "AI helped make this sound more natural in Spain Spanish.";
+    customAiNote.textContent = `AI helped make this sound more natural in ${profile.label}.`;
   }
 
-  if (aiModeEnabled) {
+  if (aiModeEnabled || targetLanguage !== "spanish") {
     const remainingCooldown = Math.max(0, Math.ceil((aiCooldownUntil - Date.now()) / 1000));
 
     if (remainingCooldown > 0) {
-      customStatus.textContent = `AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)}. The offline translator was used for now.`;
-      translatedSentence = buildOfflineCustomSentence();
+      if (targetLanguage === "spanish") {
+        customStatus.textContent = `AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)}. The offline translator was used for now.`;
+        translatedSentence = buildOfflineCustomSentence();
+      } else {
+        customStatus.textContent = `AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)} before translating to ${profile.label}.`;
+        return;
+      }
     } else {
       translateCustomBtn.disabled = true;
       translateCustomBtn.textContent = "Translating...";
-      customStatus.textContent = "Asking AI to translate this into more natural Spain Spanish...";
+      customStatus.textContent = `Asking AI to translate this into more natural ${profile.label}...`;
       aiCooldownUntil = Date.now() + 10000;
 
       try {
         translatedSentence = await buildAiCustomSentence();
         if (customAiNote) {
-          customAiNote.textContent = translatedSentence.feedback || "AI helped make this sound more natural in Spain Spanish.";
+          customAiNote.textContent = translatedSentence.feedback || `AI helped make this sound more natural in ${profile.label}.`;
           customAiNote.classList.remove("hidden");
         }
       } catch (error) {
-        customStatus.textContent = `${formatAiErrorMessage(error.message)} The offline translator was used instead.`;
-        translatedSentence = buildOfflineCustomSentence();
+        if (targetLanguage === "spanish") {
+          customStatus.textContent = `${formatAiErrorMessage(error.message)} The offline translator was used instead.`;
+          translatedSentence = buildOfflineCustomSentence();
+        } else {
+          customStatus.textContent = `${formatAiErrorMessage(error.message)} ${profile.label} translation needs AI, so no offline fallback was used.`;
+        }
       } finally {
         translateCustomBtn.disabled = false;
-        translateCustomBtn.textContent = "Translate to Spanish";
+        translateCustomBtn.textContent = `Translate to ${profile.label}`;
       }
     }
   } else {
@@ -3479,14 +4501,14 @@ async function translateCustomSentence() {
 
   if (!(aiModeEnabled && latestCustomSentence.ai !== true)) {
     customStatus.textContent = latestCustomSentence.ai
-      ? "AI translated your sentence and made it sound more native in Spain Spanish."
+      ? `AI translated your sentence and made it sound more native in ${profile.label}.`
       : "Custom sentence translated and loaded into the main player. You can now speak it, save it, or add it to a playlist.";
   }
 }
 
 // This helper adds a message bubble to the chat log.
 function addChatMessage(role, spanish, english = "") {
-  chatHistory.push({ role, spanish, english });
+  chatHistory.push({ role, spanish, english, targetLanguage });
   saveCurrentChatState();
   renderChatMessages();
 }
@@ -3494,11 +4516,12 @@ function addChatMessage(role, spanish, english = "") {
 // This function redraws the chat panel.
 function renderChatMessages() {
   chatMessages.innerHTML = "";
+  updateChatLanguageBadge();
 
   if (chatHistory.length === 0) {
     const emptyBubble = document.createElement("div");
     emptyBubble.className = "chat-bubble coach";
-    emptyBubble.innerHTML = '<p class="chat-role">Coach</p><p class="chat-text">Start a chat to practise a conversation in Spanish.</p>';
+    emptyBubble.innerHTML = `<p class="chat-role">Coach</p><p class="chat-text">Start a chat to practise a conversation in ${getTargetLanguageProfile().label}.</p>`;
     chatMessages.appendChild(emptyBubble);
     return;
   }
@@ -3609,6 +4632,10 @@ function renderChatMessages() {
 
     chatMessages.appendChild(bubble);
   });
+
+  if (isCallModeActive) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 }
 
 // This helper builds a simple coach reply based on topic and keywords.
@@ -3692,9 +4719,12 @@ function buildLocalChatOpening() {
 }
 
 // This helper asks AI for a natural Spain-Spanish opening line.
-async function buildAiChatOpening() {
+async function buildAiChatOpening(options = {}) {
+  const fromCall = Boolean(options.fromCall);
   const responseData = await callAiLanguageCoach({
     mode: "chat-opening",
+    targetLanguage,
+    callMode: fromCall,
     topic: chatTopicSelect.value,
     tone: chatToneSelect.value,
     scenario: chatScenarioSelect.value,
@@ -3717,35 +4747,48 @@ async function buildAiChatOpening() {
 }
 
 // This function starts a fresh chat.
-async function startChat() {
+async function startChat(options = {}) {
+  const fromCall = Boolean(options.fromCall);
+
   if (isCallModeActive) {
     stopCallMode("Call mode ended. New chat started.");
   }
 
-  let opening = buildLocalChatOpening();
+  let opening = targetLanguage === "spanish" ? buildLocalChatOpening() : null;
 
   activeConversationId = createConversationId();
   startChatTimer(true);
   chatHistory = [];
 
-  if (aiModeEnabled) {
+  if (aiModeEnabled || targetLanguage !== "spanish") {
     const remainingCooldown = Math.max(0, Math.ceil((aiCooldownUntil - Date.now()) / 1000));
 
     if (remainingCooldown <= 0) {
       startChatBtn.disabled = true;
       startChatBtn.textContent = "Starting...";
-      chatStatus.textContent = "Starting a more natural Spain-Spanish conversation...";
+      chatStatus.textContent = fromCall
+        ? "Starting a quick call-mode conversation..."
+        : `Starting a more natural ${getTargetLanguageProfile().label} conversation...`;
       aiCooldownUntil = Date.now() + 10000;
 
       try {
-        opening = await buildAiChatOpening();
+        opening = await buildAiChatOpening({ fromCall });
       } catch (error) {
-        chatStatus.textContent = `${formatAiErrorMessage(error.message)} The built-in opening was used instead.`;
+        if (targetLanguage === "spanish") {
+          opening = buildLocalChatOpening();
+          chatStatus.textContent = `${formatAiErrorMessage(error.message)} The built-in opening was used instead.`;
+        } else {
+          chatStatus.textContent = `${formatAiErrorMessage(error.message)} Try again in a moment.`;
+        }
       } finally {
         startChatBtn.disabled = false;
         startChatBtn.textContent = "Start chat";
       }
     }
+  }
+
+  if (!opening) {
+    return;
   }
 
   lastCoachReply = opening;
@@ -3754,14 +4797,16 @@ async function startChat() {
     playSpanishAudio(opening.spanish, "Chat opening");
   }
   if (!chatStatus.textContent.includes("built-in opening")) {
-    chatStatus.textContent = `Chat started: ${getChatScenarioLabel()} | Goal: ${getChatGoalLabel()}. Reply in English or simple Spanish.`;
+    chatStatus.textContent = `Chat started: ${getChatScenarioLabel()} | Goal: ${getChatGoalLabel()}. Reply in English or simple ${getTargetLanguageProfile().label}.`;
   }
 }
 
 // This function saves the current conversation for later.
-function saveCurrentConversation() {
+function saveCurrentConversation(options = {}) {
   if (!chatHistory.length) {
-    alert("Start a chat first.");
+    if (!options.silent) {
+      alert("Start a chat first.");
+    }
     return;
   }
 
@@ -3770,8 +4815,10 @@ function saveCurrentConversation() {
   }
 
   const savedAt = new Date().toISOString();
+  const conversationLanguage = options.targetLanguage || targetLanguage;
   const conversation = {
     id: activeConversationId,
+    targetLanguage: conversationLanguage,
     title: `${capitalize(chatTopicSelect.value)} chat - ${new Date(savedAt).toLocaleString([], {
       month: "short",
       day: "numeric",
@@ -3785,7 +4832,10 @@ function saveCurrentConversation() {
     goal: chatGoalSelect.value,
     durationSeconds: getCurrentChatDurationSeconds(),
     savedAt,
-    messages: chatHistory.map((message) => ({ ...message }))
+    messages: chatHistory.map((message) => ({
+      ...message,
+      targetLanguage: message?.targetLanguage || conversationLanguage
+    }))
   };
   const existingIndex = savedConversations.findIndex((item) => item.id === activeConversationId);
 
@@ -3798,7 +4848,11 @@ function saveCurrentConversation() {
   localStorage.setItem("spanishSentenceSavedConversations", JSON.stringify(savedConversations));
   saveCurrentChatState();
   renderSavedConversations();
-  chatStatus.textContent = `Conversation saved at ${formatChatDuration(conversation.durationSeconds)}.`;
+  if (!options.silent) {
+    chatStatus.textContent = `Conversation saved at ${formatChatDuration(conversation.durationSeconds)}.`;
+  }
+
+  return conversation;
 }
 
 // This function loads a saved conversation into the chat panel.
@@ -3841,14 +4895,21 @@ function loadSavedConversation(conversationId) {
   }
 
   saveCurrentChatState();
+  if (chatInput) {
+    chatInput.value = "";
+    removeStoredChatValue("spanishSentenceChatDraft");
+  }
   renderChatMessages();
+  hideConversationReview();
   updateChatTimerDisplay();
   chatStatus.textContent = `Loaded saved conversation from ${new Date(conversation.savedAt).toLocaleString()}.`;
 }
 
 // This helper asks AI to correct a chat message and make it sound more native.
-async function buildAiChatReply(userMessage) {
-  const recentHistory = chatHistory.slice(-6).map((message) => ({
+async function buildAiChatReply(userMessage, options = {}) {
+  const fromCall = Boolean(options.fromCall);
+  const recentHistoryLimit = fromCall ? 4 : 6;
+  const recentHistory = chatHistory.slice(-recentHistoryLimit).map((message) => ({
     role: message.role,
     spanish: message.spanish || "",
     english: message.english || ""
@@ -3856,6 +4917,8 @@ async function buildAiChatReply(userMessage) {
 
   const responseData = await callAiLanguageCoach({
     mode: "chat",
+    targetLanguage,
+    callMode: fromCall,
     topic: chatTopicSelect.value,
     tone: chatToneSelect.value,
     scenario: chatScenarioSelect.value,
@@ -3886,6 +4949,7 @@ async function buildAiChatReply(userMessage) {
 async function sendChatMessage(options = {}) {
   const userMessage = (options.userMessage || chatInput.value).trim();
   const fromCall = Boolean(options.fromCall);
+  const callRequestId = fromCall ? callTurnRequestId + 1 : 0;
 
   if (!userMessage) {
     if (!fromCall) {
@@ -3894,34 +4958,63 @@ async function sendChatMessage(options = {}) {
     return;
   }
 
+  clearMixedLanguageChatIfNeeded();
+
   if (!activeConversationId) {
     activeConversationId = createConversationId();
   }
+
+  if (fromCall) {
+    callTurnRequestId = callRequestId;
+    isCallReplying = true;
+    interruptCallBtn.classList.remove("hidden");
+    updateCallFocusLayout("Call mode is thinking...");
+    startCallBargeInMonitor();
+  }
+
   startChatTimer(false);
   addChatMessage("user", userMessage);
   let coachReply;
 
-  if (aiModeEnabled || fromCall) {
+  if (aiModeEnabled || fromCall || targetLanguage !== "spanish") {
     const remainingCooldown = fromCall
       ? 0
       : Math.max(0, Math.ceil((aiCooldownUntil - Date.now()) / 1000));
 
     if (remainingCooldown > 0) {
-      coachReply = buildCoachReply(userMessage);
-      chatStatus.textContent = `AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)}. The built-in coach was used for now.`;
+      if (targetLanguage === "spanish") {
+        coachReply = buildCoachReply(userMessage);
+        chatStatus.textContent = `AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)}. The built-in coach was used for now.`;
+      } else {
+        chatStatus.textContent = `AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)} before sending another ${getTargetLanguageProfile().label} message.`;
+        return;
+      }
     } else {
       sendChatBtn.disabled = true;
       sendChatBtn.textContent = "Sending...";
-      chatStatus.textContent = fromCall
+      const thinkingStatus = fromCall
         ? "Call mode is thinking..."
-        : "Asking AI to reply naturally in Spain Spanish...";
+        : `Asking AI to reply naturally in ${getTargetLanguageProfile().label}...`;
+      if (fromCall) {
+        setChatStatus(thinkingStatus);
+      } else {
+        chatStatus.textContent = thinkingStatus;
+      }
       aiCooldownUntil = Date.now() + 10000;
 
       try {
-        coachReply = await buildAiChatReply(userMessage);
+        coachReply = await buildAiChatReply(userMessage, { fromCall });
       } catch (error) {
-        coachReply = buildCoachReply(userMessage);
-        chatStatus.textContent = `${formatAiErrorMessage(error.message)} The built-in coach was used instead.`;
+        if (targetLanguage === "spanish") {
+          coachReply = buildCoachReply(userMessage);
+          chatStatus.textContent = `${formatAiErrorMessage(error.message)} The built-in coach was used instead.`;
+        } else {
+          chatStatus.textContent = `${formatAiErrorMessage(error.message)} Try again in a moment.`;
+          isCallReplying = false;
+          stopCallBargeInMonitor();
+          interruptCallBtn.classList.add("hidden");
+          return;
+        }
       } finally {
         sendChatBtn.disabled = false;
         sendChatBtn.textContent = "Send message";
@@ -3929,6 +5022,10 @@ async function sendChatMessage(options = {}) {
     }
   } else {
     coachReply = buildCoachReply(userMessage);
+  }
+
+  if (fromCall && (!isCallModeActive || callRequestId !== callTurnRequestId)) {
+    return;
   }
 
   lastCoachReply = coachReply;
@@ -3945,6 +5042,7 @@ async function sendChatMessage(options = {}) {
 
   chatHistory.push({
     role: "coach",
+    targetLanguage,
     ...coachReply,
     correctionSpanish: "",
     correctionEnglish: "",
@@ -3952,35 +5050,39 @@ async function sendChatMessage(options = {}) {
   });
   saveCurrentChatState();
   renderChatMessages();
+  if (conversationReviewPanel && !conversationReviewPanel.classList.contains("hidden")) {
+    renderConversationReview();
+  }
   if (fromCall) {
-    isCallReplying = true;
     const playbackId = callReplyPlaybackId + 1;
     callReplyPlaybackId = playbackId;
     interruptCallBtn.classList.remove("hidden");
-    chatStatus.textContent = "Coach is replying. Call mode will listen again afterwards.";
+    setChatStatus("Coach is replying. Call mode will listen again afterwards.");
     playSpanishAudio(coachReply.spanish, "Call reply", () => {
       if (playbackId !== callReplyPlaybackId) {
         return;
       }
 
       isCallReplying = false;
+      stopCallBargeInMonitor();
       interruptCallBtn.classList.add("hidden");
       if (isCallModeActive) {
-        chatStatus.textContent = "Your turn. Speak naturally, then pause.";
+        setChatStatus("Your turn. Speak naturally, then pause.");
         restartCallListening(300);
       }
-    });
+    }, { progressive: false });
   } else if (chatAutoSpeakCheckbox.checked) {
     playSpanishAudio(coachReply.spanish, "Chat reply");
   }
   chatInput.value = "";
+  removeStoredChatValue("spanishSentenceChatDraft");
 
   if (!fromCall && !(aiModeEnabled && coachReply.ai !== true)) {
     chatStatus.textContent = coachReply.ai
       ? coachReply.correctionSpanish
-        ? "AI replied naturally and gave you a short more-native Spain-Spanish correction."
-        : "AI replied naturally in Spain Spanish and kept the conversation going."
-      : "The coach replied in Spanish. You can speak it or use it as a sentence.";
+        ? `AI replied naturally and gave you a short more-native ${getTargetLanguageProfile().label} correction.`
+        : `AI replied naturally in ${getTargetLanguageProfile().label} and kept the conversation going.`
+      : `The coach replied in ${getTargetLanguageProfile().label}. You can speak it or use it as a sentence.`;
   }
 }
 
@@ -3996,9 +5098,14 @@ function clearChat() {
   chatAccumulatedSeconds = 0;
   chatStartedAt = 0;
   pauseChatTimer();
-  localStorage.removeItem("spanishSentenceChatHistory");
-  localStorage.removeItem("spanishSentenceActiveConversationId");
+  removeStoredChatValue("spanishSentenceChatHistory");
+  removeStoredChatValue("spanishSentenceActiveConversationId");
+  removeStoredChatValue("spanishSentenceChatStartedAt");
+  removeStoredChatValue("spanishSentenceChatAccumulatedSeconds");
+  removeStoredChatValue("spanishSentenceChatDraft");
+  chatInput.value = "";
   renderChatMessages();
+  hideConversationReview();
   chatStatus.textContent = "Chat cleared.";
 }
 
@@ -4140,7 +5247,11 @@ async function fetchConversationAudioBlob(turns) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ turns })
+      body: JSON.stringify({
+        turns,
+        targetLanguage,
+        voice: getSelectedSpanishVoice()
+      })
     });
   } catch (error) {
     throw new Error("Network error. The app could not reach the conversation audio backend.");
@@ -4187,6 +5298,296 @@ async function downloadCorrectedConversationMp3s() {
     downloadChatMp3sBtn.disabled = false;
     downloadChatMp3sBtn.textContent = "Download full conversation MP3";
   }
+}
+
+// This function asks AI to create a full dialogue from the selected topic.
+async function generateDialogue() {
+  const topic = dialogueTopicInput.value.trim();
+
+  if (!topic) {
+    alert("Type a dialogue topic first.");
+    return;
+  }
+
+  generateDialogueBtn.disabled = true;
+  generateDialogueBtn.textContent = "Generating...";
+  dialogueStatus.textContent = `Generating a natural ${getTargetLanguageProfile().label} dialogue...`;
+
+  try {
+    const data = await callAiLanguageCoach({
+      mode: "dialogue",
+      targetLanguage,
+      topic,
+      setting: dialogueSettingSelect.value,
+      level: dialogueLevelSelect.value,
+      tone: dialogueToneSelect.value,
+      turnCount: Number(dialogueTurnsSelect.value) || 8
+    });
+
+    if (!data || !data.dialogue || !Array.isArray(data.dialogue.lines) || !data.dialogue.lines.length) {
+      throw new Error("The AI did not return a valid dialogue.");
+    }
+
+    currentDialogue = {
+      id: createConversationId(),
+      targetLanguage,
+      generatedAt: new Date().toISOString(),
+      ...data.dialogue
+    };
+    saveCurrentDialogueState();
+    renderDialogue();
+    dialogueStatus.textContent = "Dialogue generated. Save any lines you like, or download the full PDF/MP3.";
+  } catch (error) {
+    dialogueStatus.textContent = `Could not generate the dialogue. ${formatAiErrorMessage(error.message)}`;
+  } finally {
+    generateDialogueBtn.disabled = false;
+    generateDialogueBtn.textContent = "Generate dialogue";
+  }
+}
+
+// This function saves the full generated dialogue for later.
+function saveCurrentDialogue() {
+  if (!currentDialogue || !currentDialogue.lines?.length) {
+    alert("Generate a dialogue first.");
+    return;
+  }
+
+  const savedDialogue = {
+    ...currentDialogue,
+    id: currentDialogue.id || createConversationId(),
+    targetLanguage,
+    savedAt: new Date().toISOString()
+  };
+  const existingIndex = savedDialogues.findIndex((dialogue) => dialogue.id === savedDialogue.id);
+
+  if (existingIndex === -1) {
+    savedDialogues.push(savedDialogue);
+  } else {
+    savedDialogues[existingIndex] = savedDialogue;
+  }
+
+  currentDialogue = savedDialogue;
+  saveCurrentDialogueState();
+  saveDialogues();
+  renderSavedDialogues();
+  dialogueStatus.textContent = "Dialogue saved.";
+}
+
+// This function opens a print-ready dialogue document for saving as PDF.
+function downloadDialoguePdf() {
+  if (!currentDialogue || !currentDialogue.lines?.length) {
+    alert("Generate a dialogue first.");
+    return;
+  }
+
+  const title = currentDialogue.title || `${getTargetLanguageProfile().label} dialogue`;
+  const printableWindow = window.open("", "_blank");
+
+  if (!printableWindow) {
+    alert("Pop-up blocked. Please allow pop-ups, then try again.");
+    return;
+  }
+
+  const rows = currentDialogue.lines.map((line, index) => `
+    <section class="turn">
+      <p class="role">${index + 1}. ${escapeHtml(line.speaker || "Speaker")}</p>
+      <p class="spanish">${escapeHtml(line.spanish)}</p>
+      ${line.english ? `<p class="english">${escapeHtml(line.english)}</p>` : ""}
+    </section>
+  `).join("");
+  const phrases = Array.isArray(currentDialogue.usefulPhrases) && currentDialogue.usefulPhrases.length
+    ? `
+      <h2>Useful phrases</h2>
+      ${currentDialogue.usefulPhrases.map((phrase) => `
+        <section class="turn">
+          <p class="spanish">${escapeHtml(phrase.spanish)}</p>
+          ${phrase.english ? `<p class="english">${escapeHtml(phrase.english)}</p>` : ""}
+          ${phrase.note ? `<p class="original">${escapeHtml(phrase.note)}</p>` : ""}
+        </section>
+      `).join("")}
+    `
+    : "";
+
+  printableWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>${escapeHtml(title)}</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 32px; color: #1f2937; }
+        h1 { margin: 0 0 8px; font-size: 28px; }
+        h2 { margin: 28px 0 12px; font-size: 20px; }
+        .meta { margin: 0 0 24px; color: #6b7280; }
+        .turn { break-inside: avoid; margin: 0 0 18px; padding-bottom: 14px; border-bottom: 1px solid #e5e7eb; }
+        .role { margin: 0 0 6px; color: #b45309; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
+        .spanish { margin: 0 0 6px; font-size: 20px; font-weight: 700; line-height: 1.45; }
+        .english, .original { margin: 0; color: #6b7280; line-height: 1.5; }
+        .original { margin-top: 6px; font-size: 13px; font-style: italic; }
+      </style>
+    </head>
+    <body>
+      <h1>${escapeHtml(title)}</h1>
+      <p class="meta">${escapeHtml(capitalize(currentDialogue.level || "intermediate"))} | ${escapeHtml(capitalize(currentDialogue.tone || "informal"))} | ${escapeHtml(currentDialogue.topic || "dialogue")}</p>
+      ${rows}
+      ${phrases}
+      <script>
+        window.onload = () => {
+          window.focus();
+          window.print();
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printableWindow.document.close();
+  dialogueStatus.textContent = "Dialogue PDF opened. Choose Save as PDF in the print dialog.";
+}
+
+// This function downloads the generated dialogue as one MP3.
+async function downloadDialogueMp3() {
+  const turns = getDialogueAudioTurns();
+
+  if (!turns.length) {
+    alert("Generate a dialogue first.");
+    return;
+  }
+
+  downloadDialogueMp3Btn.disabled = true;
+  downloadDialogueMp3Btn.textContent = "Preparing MP3...";
+  dialogueStatus.textContent = "Preparing dialogue MP3...";
+
+  try {
+    const audioBlob = await fetchConversationAudioBlob(turns);
+    const filename = `${slugifyFilename(currentDialogue.title || currentDialogue.topic || "dialogue")}.mp3`;
+    downloadAudioBlob(audioBlob, filename);
+    dialogueStatus.textContent = "Dialogue MP3 downloaded.";
+  } catch (error) {
+    dialogueStatus.textContent = `Could not download the dialogue MP3. ${error.message}`;
+  } finally {
+    downloadDialogueMp3Btn.disabled = false;
+    downloadDialogueMp3Btn.textContent = "Download MP3";
+  }
+}
+
+// This helper updates the generated-dialogue media control row.
+function updateDialoguePlaybackControls() {
+  const isActive = dialoguePlayback.isPlaying;
+  const currentTime = dialogueAudioPlayer ? dialogueAudioPlayer.currentTime : 0;
+  const duration = dialogueAudioPlayer ? dialogueAudioPlayer.duration : 0;
+  const hasDuration = Number.isFinite(duration) && duration > 0;
+
+  dialoguePlaybackControls.classList.toggle("hidden", !isActive);
+  dialogueAudioPlayer.classList.toggle("hidden", !isActive);
+  previousDialogueBtn.disabled = !isActive || currentTime <= 0;
+  pauseDialogueBtn.disabled = !isActive;
+  nextDialogueBtn.disabled = !isActive || (hasDuration && currentTime >= duration);
+  pauseDialogueBtn.textContent = dialogueAudioPlayer && dialogueAudioPlayer.paused ? "Resume" : "Pause";
+  dialoguePlaybackProgress.textContent = isActive
+    ? `${dialogueAudioPlayer.paused ? "Paused" : "Playing"} ${formatMediaTime(currentTime)} / ${hasDuration ? formatMediaTime(duration) : "--:--"}`
+    : "Not playing";
+}
+
+// This helper stops the generated-dialogue media player.
+function stopDialoguePlayback(message = "Dialogue playback stopped.") {
+  dialoguePlayback.isPlaying = false;
+
+  if (dialogueAudioPlayer) {
+    dialogueAudioPlayer.pause();
+    dialogueAudioPlayer.removeAttribute("src");
+    dialogueAudioPlayer.load();
+  }
+
+  if (dialoguePlayback.audioUrl) {
+    URL.revokeObjectURL(dialoguePlayback.audioUrl);
+    dialoguePlayback.audioUrl = "";
+  }
+
+  playDialogueBtn.classList.remove("hidden");
+  stopDialogueBtn.classList.add("hidden");
+  updateDialoguePlaybackControls();
+
+  if (message) {
+    dialogueStatus.textContent = message;
+  }
+}
+
+// This function loads the generated dialogue into an on-page media player.
+async function playDialogueMedia() {
+  const turns = getDialogueAudioTurns();
+
+  if (!turns.length) {
+    alert("Generate a dialogue first.");
+    return;
+  }
+
+  stopDialoguePlayback("");
+  dialoguePlayback.isPlaying = true;
+  playDialogueBtn.classList.add("hidden");
+  stopDialogueBtn.classList.remove("hidden");
+  dialoguePlaybackProgress.textContent = "Preparing audio...";
+  dialoguePlaybackControls.classList.remove("hidden");
+  dialogueAudioPlayer.classList.remove("hidden");
+  pauseDialogueBtn.disabled = true;
+  previousDialogueBtn.disabled = true;
+  nextDialogueBtn.disabled = true;
+  dialogueStatus.textContent = "Preparing dialogue media player...";
+
+  try {
+    const audioBlob = await fetchConversationAudioBlob(turns);
+    dialoguePlayback.audioUrl = URL.createObjectURL(audioBlob);
+    dialogueAudioPlayer.src = dialoguePlayback.audioUrl;
+    dialogueAudioPlayer.load();
+    await dialogueAudioPlayer.play();
+    dialogueStatus.textContent = "Dialogue loaded in the media player.";
+  } catch (error) {
+    stopDialoguePlayback(`Could not load the dialogue player. ${error.message}`);
+    return;
+  }
+
+  updateDialoguePlaybackControls();
+}
+
+// This function pauses or resumes the generated-dialogue media player.
+function toggleDialoguePlaybackPause() {
+  if (!dialoguePlayback.isPlaying) {
+    return;
+  }
+
+  if (dialogueAudioPlayer.paused) {
+    dialogueAudioPlayer.play().catch(() => {
+      dialogueStatus.textContent = "Tap play in the media player to resume.";
+    });
+  } else {
+    dialogueAudioPlayer.pause();
+  }
+
+  updateDialoguePlaybackControls();
+}
+
+// This function jumps backward or forward inside the generated-dialogue track.
+function skipDialoguePlayback(direction) {
+  if (!dialoguePlayback.isPlaying) {
+    return;
+  }
+
+  const duration = Number.isFinite(dialogueAudioPlayer.duration)
+    ? dialogueAudioPlayer.duration
+    : Number.MAX_SAFE_INTEGER;
+  const offset = direction === "previous" ? -15 : 15;
+  dialogueAudioPlayer.currentTime = Math.max(
+    0,
+    Math.min(duration, dialogueAudioPlayer.currentTime + offset)
+  );
+  updateDialoguePlaybackControls();
+}
+
+// This function clears the generated dialogue panel.
+function clearDialogue() {
+  stopDialoguePlayback("");
+  currentDialogue = null;
+  saveCurrentDialogueState();
+  renderDialogue();
+  dialogueStatus.textContent = "Dialogue cleared.";
 }
 
 // This helper updates the full-conversation media control row.
@@ -4400,12 +5801,14 @@ function playConversationPlaylistItem(conversationId) {
 
 // This function plays every saved full conversation in order.
 function playConversationPlaylist() {
-  if (!conversationPlaylist.length) {
+  const languageConversationPlaylist = getCurrentLanguageItems(conversationPlaylist);
+
+  if (!languageConversationPlaylist.length) {
     alert("Add a conversation to the conversation playlist first.");
     return;
   }
 
-  const turns = conversationPlaylist.flatMap((conversation, conversationIndex) => {
+  const turns = languageConversationPlaylist.flatMap((conversation, conversationIndex) => {
     return conversation.turns.map((turn) => ({
       ...turn,
       role: `${conversationIndex + 1}. ${turn.role}`
@@ -4662,7 +6065,9 @@ function getFilteredSentences() {
   const selectedDifficulty = difficultySelect.value;
   const selectedTopic = topicSelect.value;
   const selectedTone = toneSelect.value;
-  const sourceSentences = favouritesOnlyCheckbox.checked ? favourites : baseSentences;
+  const sourceSentences = favouritesOnlyCheckbox.checked
+    ? getCurrentLanguageItems(favourites)
+    : baseSentences;
 
   return sourceSentences.filter((sentence) => {
     const difficultyMatches = sentence.difficulty === selectedDifficulty;
@@ -4687,15 +6092,16 @@ function extractJsonText(rawText) {
 }
 
 // This helper creates a small stable key for cached Spanish audio.
-function createSpanishAudioCacheKey(text) {
+function createSpanishAudioCacheKey(text, voiceChoice = getSelectedSpanishVoice()) {
+  const cacheText = `${targetLanguage}:${voiceChoice || "primary"}:${text}`;
   let hash = 0;
 
-  for (let index = 0; index < text.length; index += 1) {
-    hash = ((hash << 5) - hash) + text.charCodeAt(index);
+  for (let index = 0; index < cacheText.length; index += 1) {
+    hash = ((hash << 5) - hash) + cacheText.charCodeAt(index);
     hash |= 0;
   }
 
-  return `audio_${SPANISH_AUDIO_CACHE_VERSION}_${Math.abs(hash)}_${text.length}`;
+  return `audio_${SPANISH_AUDIO_CACHE_VERSION}_${Math.abs(hash)}_${cacheText.length}`;
 }
 
 // This helper opens a tiny browser database for saved Spanish audio files.
@@ -4790,22 +6196,54 @@ function ensureSpanishAudioPlayer() {
 
 // This helper cleans up the current object URL when a different audio clip is loaded.
 function clearCurrentSpanishAudioUrl() {
+  if (currentSpanishStreamReader) {
+    currentSpanishStreamReader.cancel().catch(() => {
+      // Ignore stream cancellation errors.
+    });
+    currentSpanishStreamReader = null;
+  }
+
   if (currentSpanishAudioUrl) {
     URL.revokeObjectURL(currentSpanishAudioUrl);
     currentSpanishAudioUrl = "";
+  }
+
+  currentSpanishMediaSource = null;
+}
+
+// This helper fully stops any Spanish audio path before another one starts.
+function stopSpanishAudioPlayback(clearCallback = true) {
+  spanishAudioPlaybackId += 1;
+
+  if (spanishAudioPlayer) {
+    spanishAudioPlayer.pause();
+    spanishAudioPlayer.removeAttribute("src");
+    spanishAudioPlayer.load();
+  }
+
+  clearCurrentSpanishAudioUrl();
+
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  if (clearCallback) {
+    spanishAudioEndedCallback = null;
   }
 }
 
 // This helper adds Android lock-screen media information when available.
 function updateSpanishMediaSession(titleText) {
+  const profile = getTargetLanguageProfile();
+
   if (!("mediaSession" in navigator)) {
     return;
   }
 
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: titleText || "Spanish sentence",
-    artist: "Spanish Sentence Generator",
-    album: "Spanish practice"
+    title: titleText || `${profile.label} sentence`,
+    artist: `${profile.label} Sentence Generator`,
+    album: `${profile.label} practice`
   });
 
   navigator.mediaSession.setActionHandler("play", async () => {
@@ -4831,7 +6269,11 @@ async function fetchSpanishAudioBlob(text) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ text })
+      body: JSON.stringify({
+        text,
+        targetLanguage,
+        voice: getSelectedSpanishVoice()
+      })
     });
   } catch (error) {
     throw new Error("Network error. The app could not reach the Spanish audio backend.");
@@ -4865,20 +6307,162 @@ async function getSpanishAudioBlob(text) {
   return audioBlob;
 }
 
+// This helper checks whether this browser can append streamed MP3 chunks to an audio player.
+function canUseProgressiveSpanishAudio() {
+  return Boolean(
+    window.MediaSource &&
+    typeof MediaSource.isTypeSupported === "function" &&
+    MediaSource.isTypeSupported("audio/mpeg")
+  );
+}
+
+// This helper streams ElevenLabs audio into the player as chunks arrive.
+async function playProgressiveSpanishAudio(text, titleText = "Spanish sentence", playbackId = spanishAudioPlaybackId) {
+  if (!canUseProgressiveSpanishAudio()) {
+    throw new Error("Progressive audio is not supported in this browser.");
+  }
+
+  const assertCurrentPlayback = () => {
+    if (playbackId !== spanishAudioPlaybackId) {
+      throw new Error("Audio playback was cancelled.");
+    }
+  };
+
+  const player = ensureSpanishAudioPlayer();
+  const mediaSource = new MediaSource();
+  const streamUrl = URL.createObjectURL(mediaSource);
+
+  assertCurrentPlayback();
+  currentSpanishAudioUrl = streamUrl;
+  currentSpanishMediaSource = mediaSource;
+  player.src = streamUrl;
+  updateSpanishMediaSession(titleText);
+
+  const sourceOpenPromise = new Promise((resolve, reject) => {
+    mediaSource.addEventListener("sourceopen", resolve, { once: true });
+    mediaSource.addEventListener("error", () => reject(new Error("The audio stream could not be opened.")), { once: true });
+  });
+
+  await sourceOpenPromise;
+  assertCurrentPlayback();
+
+  const response = await fetch("/api/stream-spanish-audio", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text,
+      targetLanguage,
+      voice: getSelectedSpanishVoice()
+    })
+  });
+
+  if (!response.ok || !response.body) {
+    let errorMessage = "The streaming audio backend was not ready.";
+
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.details || errorData.error || errorMessage;
+    } catch (error) {
+      errorMessage = "The streaming audio backend returned an unexpected error.";
+    }
+
+    throw new Error(errorMessage);
+  }
+
+  const sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
+  const reader = response.body.getReader();
+
+  currentSpanishStreamReader = reader;
+
+  const appendChunk = (chunk) => new Promise((resolve, reject) => {
+    const finish = () => {
+      sourceBuffer.removeEventListener("updateend", finish);
+      sourceBuffer.removeEventListener("error", fail);
+      resolve();
+    };
+    const fail = () => {
+      sourceBuffer.removeEventListener("updateend", finish);
+      sourceBuffer.removeEventListener("error", fail);
+      reject(new Error("The streamed audio chunk could not be added."));
+    };
+
+    sourceBuffer.addEventListener("updateend", finish);
+    sourceBuffer.addEventListener("error", fail);
+    sourceBuffer.appendBuffer(chunk);
+  });
+
+  let playPromise = null;
+  let playbackStarted = false;
+
+  while (true) {
+    assertCurrentPlayback();
+    const { done, value } = await reader.read();
+
+    if (done) {
+      break;
+    }
+
+    await appendChunk(value);
+
+    if (!playbackStarted) {
+      playbackStarted = true;
+      playPromise = player.play();
+      await playPromise;
+      assertCurrentPlayback();
+    }
+  }
+
+  currentSpanishStreamReader = null;
+
+  if (mediaSource.readyState === "open") {
+    mediaSource.endOfStream();
+  }
+}
+
 // This helper plays Spanish using cached/generated audio first, then falls back to browser TTS.
-async function playSpanishAudio(text, titleText = "Spanish sentence", callback = null) {
+async function playSpanishAudio(text, titleText = "Spanish sentence", callback = null, options = {}) {
   if (!text) {
     return;
   }
 
+  stopSpanishAudioPlayback(false);
+  const playbackId = spanishAudioPlaybackId;
   const player = ensureSpanishAudioPlayer();
-  spanishAudioEndedCallback = callback;
-  player.pause();
-  player.currentTime = 0;
-  clearCurrentSpanishAudioUrl();
+  spanishAudioEndedCallback = () => {
+    if (playbackId !== spanishAudioPlaybackId) {
+      return;
+    }
+
+    if (typeof callback === "function") {
+      callback();
+    }
+  };
 
   try {
+    const shouldUseProgressiveAudio = Boolean(callback) && options.progressive !== false;
+
+    if (shouldUseProgressiveAudio) {
+      try {
+        await playProgressiveSpanishAudio(text, titleText, playbackId);
+        return;
+      } catch (streamingError) {
+        if (playbackId !== spanishAudioPlaybackId) {
+          return;
+        }
+        player.pause();
+        player.removeAttribute("src");
+        player.load();
+        clearCurrentSpanishAudioUrl();
+      }
+    }
+
     const audioBlob = await getSpanishAudioBlob(text);
+
+    if (playbackId !== spanishAudioPlaybackId) {
+      return;
+    }
 
     currentSpanishAudioUrl = URL.createObjectURL(audioBlob);
     player.src = currentSpanishAudioUrl;
@@ -4886,13 +6470,19 @@ async function playSpanishAudio(text, titleText = "Spanish sentence", callback =
     await player.play();
     return;
   } catch (error) {
-    if (callback) {
-      speakTextWithCallback(text, "es-ES", callback);
-    } else {
-      speakText(text, "es-ES");
+    if (playbackId !== spanishAudioPlaybackId) {
+      return;
     }
 
-    showStatusMessage(`Spanish audio fallback used. ${error.message}`);
+    clearCurrentSpanishAudioUrl();
+
+    if (callback) {
+      speakTextWithCallback(text, getTargetLanguageProfile().speechCode, callback);
+    } else {
+      speakText(text, getTargetLanguageProfile().speechCode);
+    }
+
+    showStatusMessage(`${getTargetLanguageProfile().label} audio fallback used. ${error.message}`);
   }
 }
 
@@ -4928,6 +6518,492 @@ async function callAiLanguageCoach(payload) {
   return response.json();
 }
 
+function extractYouTubeVideoId(input) {
+  const text = String(input || "").trim();
+
+  if (/^[a-zA-Z0-9_-]{11}$/.test(text)) {
+    return text;
+  }
+
+  try {
+    const url = new URL(text);
+    if (url.hostname.includes("youtu.be")) {
+      return url.pathname.split("/").filter(Boolean)[0] || "";
+    }
+    if (url.searchParams.get("v")) {
+      return url.searchParams.get("v");
+    }
+    const shortsMatch = url.pathname.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+    return shortsMatch ? shortsMatch[1] : "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function loadYouTubeIframeApi() {
+  if (window.YT?.Player) {
+    return Promise.resolve();
+  }
+
+  if (youtubeApiReadyPromise) {
+    return youtubeApiReadyPromise;
+  }
+
+  youtubeApiReadyPromise = new Promise((resolve) => {
+    const previousReady = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      if (typeof previousReady === "function") {
+        previousReady();
+      }
+      resolve();
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(script);
+  });
+
+  return youtubeApiReadyPromise;
+}
+
+async function loadYouTubeVideo() {
+  const videoId = extractYouTubeVideoId(youtubeUrlInput.value);
+
+  if (!videoId) {
+    videoStatus.textContent = "Paste a valid YouTube link first.";
+    return;
+  }
+
+  currentVideoId = videoId;
+  videoStatus.textContent = "Loading YouTube video...";
+  await loadYouTubeIframeApi();
+
+  if (youtubePlayer) {
+    youtubePlayer.loadVideoById(videoId);
+  } else {
+    youtubePlayer = new YT.Player("youtube-player", {
+      videoId,
+      playerVars: {
+        playsinline: 1,
+        rel: 0
+      }
+    });
+  }
+
+  startVideoTranscriptSync();
+  videoStatus.textContent = "Video loaded. Import captions or paste a timestamped transcript.";
+}
+
+function getVideoTranscriptLanguage() {
+  const selected = videoTranscriptLanguageSelect?.value || "current";
+  if (selected !== "current") {
+    return selected;
+  }
+
+  return targetLanguage;
+}
+
+function formatVideoTime(seconds) {
+  const safeSeconds = Math.max(0, Math.floor(seconds || 0));
+  const minutes = Math.floor(safeSeconds / 60);
+  const secs = safeSeconds % 60;
+  return `${minutes}:${String(secs).padStart(2, "0")}`;
+}
+
+function parseVideoTimestamp(text) {
+  const parts = text.split(":").map((part) => Number(part));
+  if (parts.some((part) => Number.isNaN(part))) {
+    return 0;
+  }
+
+  if (parts.length === 3) {
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  }
+
+  return parts.length === 2 ? parts[0] * 60 + parts[1] : parts[0];
+}
+
+function parsePastedTranscript(text) {
+  const rawLines = String(text || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const parsedLines = [];
+  let pendingTime = null;
+  let pendingText = [];
+
+  const timestampOnlyPattern = /^\[?((?:\d{1,2}:)?\d{1,2}:\d{2}(?:\.\d+)?)\]?$/;
+  const timestampWithTextPattern = /^\[?((?:\d{1,2}:)?\d{1,2}:\d{2}(?:\.\d+)?)\]?\s*(?:[-–—]\s*)?(.+)$/;
+
+  const flushPending = () => {
+    if (pendingTime === null || !pendingText.length) {
+      return;
+    }
+
+    parsedLines.push({
+      start: pendingTime,
+      duration: 3,
+      text: pendingText.join(" ").replace(/\s+/g, " ").trim()
+    });
+    pendingText = [];
+  };
+
+  rawLines.forEach((line) => {
+    const timestampOnlyMatch = line.match(timestampOnlyPattern);
+    const timestampWithTextMatch = line.match(timestampWithTextPattern);
+
+    if (timestampOnlyMatch) {
+      flushPending();
+      pendingTime = parseVideoTimestamp(timestampOnlyMatch[1]);
+      return;
+    }
+
+    if (timestampWithTextMatch) {
+      flushPending();
+      pendingTime = parseVideoTimestamp(timestampWithTextMatch[1]);
+      pendingText = [timestampWithTextMatch[2].trim()];
+      return;
+    }
+
+    if (pendingTime !== null) {
+      pendingText.push(line);
+    }
+  });
+
+  flushPending();
+
+  if (!parsedLines.length && rawLines.length) {
+    return rawLines.map((line, index) => ({
+      start: index * 3,
+      duration: 3,
+      text: line
+    }));
+  }
+
+  return parsedLines.map((line, index) => ({
+    ...line,
+    duration: parsedLines[index + 1] ? Math.max(0.5, parsedLines[index + 1].start - line.start) : line.duration
+  }));
+}
+
+function setVideoTranscriptLines(lines, statusText) {
+  videoTranscriptLines = lines.map((line, index) => ({
+    id: `video-line-${index}`,
+    start: Number(line.start || 0),
+    duration: Number(line.duration || 3),
+    text: String(line.text || "").trim()
+  })).filter((line) => line.text);
+  activeVideoLineIndex = -1;
+  videoLineTranslationCache = {};
+  videoWordHintCache = {};
+  renderVideoTranscript();
+  startVideoTranscriptSync();
+  videoStatus.textContent = statusText || `${videoTranscriptLines.length} transcript lines loaded.`;
+}
+
+async function importYouTubeCaptions() {
+  const videoId = currentVideoId || extractYouTubeVideoId(youtubeUrlInput.value);
+
+  if (!videoId) {
+    videoStatus.textContent = "Load or paste a YouTube link first.";
+    return;
+  }
+
+  importYoutubeCaptionsBtn.disabled = true;
+  importYoutubeCaptionsBtn.textContent = "Importing...";
+  videoStatus.textContent = "Importing available YouTube captions...";
+
+  try {
+    const response = await fetch("/api/youtube-transcript", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        videoId,
+        language: getVideoTranscriptLanguage(),
+        targetLanguage
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.details || data.error || "Could not import captions.");
+    }
+
+    setVideoTranscriptLines(data.lines || [], `Imported ${data.lines?.length || 0} caption lines from ${data.trackName || "YouTube"}.`);
+  } catch (error) {
+    videoStatus.textContent = `${error.message} Paste a timestamped transcript if captions are unavailable.`;
+  } finally {
+    importYoutubeCaptionsBtn.disabled = false;
+    importYoutubeCaptionsBtn.textContent = "Import captions";
+  }
+}
+
+function usePastedTranscript() {
+  const lines = parsePastedTranscript(manualTranscriptInput.value);
+
+  if (!lines.length) {
+    videoStatus.textContent = "Paste transcript lines with timestamps, for example [00:03] Hola.";
+    return;
+  }
+
+  setVideoTranscriptLines(lines, `${lines.length} pasted transcript lines loaded.`);
+}
+
+function renderVideoTranscript() {
+  if (!videoTranscriptList) {
+    return;
+  }
+
+  videoTranscriptList.innerHTML = "";
+
+  if (!videoTranscriptLines.length) {
+    videoTranscriptList.innerHTML = '<p class="empty-message">No transcript loaded yet.</p>';
+    return;
+  }
+
+  videoTranscriptLines.forEach((line, index) => {
+    const row = document.createElement("div");
+    const playButton = document.createElement("button");
+    const time = document.createElement("button");
+    const text = document.createElement("p");
+    const translateButton = document.createElement("button");
+
+    row.className = "video-transcript-line";
+    row.dataset.index = String(index);
+    playButton.className = "secondary-btn video-line-play-btn";
+    playButton.type = "button";
+    playButton.textContent = "Play";
+    playButton.addEventListener("click", () => toggleVideoLinePlayback(index));
+    time.className = "secondary-btn video-time";
+    time.type = "button";
+    time.textContent = formatVideoTime(line.start);
+    time.addEventListener("click", () => seekVideoLine(index));
+    text.className = "video-line-text";
+    renderVideoLineWords(text, line, index);
+    translateButton.className = "secondary-btn";
+    translateButton.classList.add("video-line-translate-btn");
+    translateButton.type = "button";
+    translateButton.textContent = "Translate";
+    translateButton.addEventListener("click", () => translateVideoLine(index));
+
+    row.appendChild(playButton);
+    row.appendChild(time);
+    row.appendChild(text);
+    row.appendChild(translateButton);
+    row.addEventListener("click", (event) => {
+      if (event.target.closest("button") || event.target.closest(".video-word")) {
+        return;
+      }
+      selectVideoLine(index);
+    });
+    videoTranscriptList.appendChild(row);
+  });
+}
+
+function updateVideoLinePlaybackButtons(isPlaying = false) {
+  document.querySelectorAll(".video-line-play-btn").forEach((button) => {
+    const row = button.closest(".video-transcript-line");
+    const rowIndex = Number(row?.dataset.index || -1);
+    button.textContent = isPlaying && rowIndex === activeVideoLineIndex ? "Pause" : "Play";
+  });
+}
+
+function renderVideoLineWords(container, line, lineIndex) {
+  line.text.split(/(\s+)/).forEach((part) => {
+    if (!part.trim()) {
+      container.appendChild(document.createTextNode(part));
+      return;
+    }
+
+    const word = document.createElement("span");
+    word.className = "video-word";
+    word.tabIndex = 0;
+    word.textContent = part;
+    word.addEventListener("click", (event) => {
+      event.stopPropagation();
+      lookupVideoWord(lineIndex, part);
+    });
+    container.appendChild(word);
+  });
+}
+
+function selectVideoLine(index) {
+  const line = videoTranscriptLines[index];
+  if (!line) {
+    return;
+  }
+
+  activeVideoLineIndex = index;
+  videoSelectedLine.textContent = line.text;
+  videoLineTranslation.textContent = videoLineTranslationCache[index] || "Click Translate for the full English line.";
+  updateActiveVideoLine();
+}
+
+function seekVideoLine(index) {
+  selectVideoLine(index);
+  if (youtubePlayer?.seekTo) {
+    youtubePlayer.seekTo(videoTranscriptLines[index].start, true);
+    youtubePlayer.playVideo?.();
+    updateVideoLinePlaybackButtons(true);
+  }
+}
+
+function toggleVideoLinePlayback(index) {
+  const line = videoTranscriptLines[index];
+
+  if (!line) {
+    return;
+  }
+
+  const wasCurrentLine = activeVideoLineIndex === index;
+  const isPlaying = youtubePlayer?.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
+  selectVideoLine(index);
+
+  if (!youtubePlayer?.seekTo) {
+    videoStatus.textContent = "Load the YouTube video before using transcript play controls.";
+    return;
+  }
+
+  if (wasCurrentLine && isPlaying) {
+    youtubePlayer.pauseVideo?.();
+    updateVideoLinePlaybackButtons(false);
+    return;
+  }
+
+  youtubePlayer.seekTo(line.start, true);
+  youtubePlayer.playVideo?.();
+  updateVideoLinePlaybackButtons(true);
+}
+
+function updateActiveVideoLine() {
+  document.querySelectorAll(".video-transcript-line").forEach((row) => {
+    row.classList.toggle("active", Number(row.dataset.index) === activeVideoLineIndex);
+  });
+  updateVideoLinePlaybackButtons(youtubePlayer?.getPlayerState?.() === window.YT?.PlayerState?.PLAYING);
+
+  const activeRow = document.querySelector(`.video-transcript-line[data-index="${activeVideoLineIndex}"]`);
+  if (activeRow && videoTranscriptList) {
+    activeRow.scrollIntoView({ block: "nearest" });
+  }
+}
+
+function startVideoTranscriptSync() {
+  if (videoSyncInterval) {
+    clearInterval(videoSyncInterval);
+  }
+
+  videoSyncInterval = setInterval(() => {
+    if (!youtubePlayer?.getCurrentTime || !videoTranscriptLines.length) {
+      return;
+    }
+
+    const currentTime = youtubePlayer.getCurrentTime();
+    const index = videoTranscriptLines.findIndex((line, lineIndex) => {
+      const nextStart = videoTranscriptLines[lineIndex + 1]?.start ?? (line.start + line.duration);
+      return currentTime >= line.start && currentTime < nextStart;
+    });
+
+    if (index !== -1 && index !== activeVideoLineIndex) {
+      selectVideoLine(index);
+    }
+  }, 500);
+}
+
+async function translateVideoLine(index) {
+  const line = videoTranscriptLines[index];
+  if (!line) {
+    return;
+  }
+
+  selectVideoLine(index);
+  if (videoLineTranslationCache[index]) {
+    videoLineTranslation.textContent = videoLineTranslationCache[index];
+    return;
+  }
+
+  const row = document.querySelector(`.video-transcript-line[data-index="${index}"]`);
+  const translateButton = row?.querySelector(".video-line-translate-btn");
+  if (translateButton) {
+    translateButton.disabled = true;
+    translateButton.textContent = "Translating...";
+  }
+  videoLineTranslation.textContent = "Translating line...";
+  videoStatus.textContent = "Translating selected transcript line...";
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const response = await fetch("/api/language-coach", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        mode: "video-line",
+        targetLanguage,
+        line: line.text
+      })
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.details || errorData.error || "The line translation request failed.");
+    }
+
+    const data = await response.json();
+    videoLineTranslationCache[index] = data.translation || "No translation returned.";
+    videoLineTranslation.textContent = videoLineTranslationCache[index];
+    videoStatus.textContent = "Line translated.";
+  } catch (error) {
+    const message = error.name === "AbortError"
+      ? "Line translation timed out. Try again in a moment."
+      : formatAiErrorMessage(error.message);
+    videoLineTranslation.textContent = message;
+    videoStatus.textContent = message;
+  } finally {
+    if (translateButton) {
+      translateButton.disabled = false;
+      translateButton.textContent = "Translate";
+    }
+  }
+}
+
+async function lookupVideoWord(index, rawWord) {
+  const line = videoTranscriptLines[index];
+  const cleanWord = rawWord.replace(/[^\p{L}'-]/gu, "");
+
+  if (!line || !cleanWord) {
+    return;
+  }
+
+  selectVideoLine(index);
+  const cacheKey = `${index}:${cleanWord.toLowerCase()}`;
+  if (videoWordHintCache[cacheKey]) {
+    videoWordHint.textContent = `${cleanWord}: ${videoWordHintCache[cacheKey]}`;
+    return;
+  }
+
+  videoWordHint.textContent = `Looking up ${cleanWord}...`;
+
+  try {
+    const data = await callAiLanguageCoach({
+      mode: "word-hints",
+      targetLanguage,
+      spanish: line.text,
+      english: videoLineTranslationCache[index] || "",
+      words: [cleanWord]
+    });
+    const hint = data.hints?.[cleanWord] || Object.values(data.hints || {})[0] || "No hint returned.";
+    videoWordHintCache[cacheKey] = hint;
+    videoWordHint.textContent = `${cleanWord}: ${hint}`;
+  } catch (error) {
+    videoWordHint.textContent = formatAiErrorMessage(error.message);
+  }
+}
+
 // This function asks the Netlify backend for a fresh AI sentence.
 async function generateAiSentence() {
   let response;
@@ -4943,6 +7019,7 @@ async function generateAiSentence() {
         topic: topicSelect.value,
         tone: toneSelect.value,
         focus: grammarFocusSelect.value,
+        targetLanguage,
         recentSentences: [
           currentSentence?.spanish,
           ...recentGeneratedSentences
@@ -5032,10 +7109,15 @@ async function generateSentence() {
 
   let nextSentence;
 
-  if (aiModeEnabled && !favouritesOnlyCheckbox.checked) {
+  if ((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox.checked) {
     let remainingCooldown = Math.max(0, Math.ceil((aiCooldownUntil - Date.now()) / 1000));
 
     if (remainingCooldown > 2) {
+      if (targetLanguage !== "spanish") {
+        showStatusMessage(`AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)} before generating another ${getTargetLanguageProfile().label} sentence.`);
+        return;
+      }
+
       nextSentence = generateLocalSentence(filteredSentences);
       setCurrentSentence(nextSentence, nextSentence.generated ? "Generated" : "Example");
       if (nextSentence.generated) {
@@ -5054,6 +7136,13 @@ async function generateSentence() {
     }
 
     if (remainingCooldown > 0) {
+      if (targetLanguage !== "spanish") {
+        showStatusMessage(`AI cooldown is still active. Please try another ${getTargetLanguageProfile().label} sentence in a moment.`);
+        generateBtn.disabled = false;
+        generateBtn.textContent = "Generate Sentence";
+        return;
+      }
+
       nextSentence = generateLocalSentence(filteredSentences);
       setCurrentSentence(nextSentence, nextSentence.generated ? "Generated" : "Example");
       if (nextSentence.generated) {
@@ -5080,8 +7169,13 @@ async function generateSentence() {
         }
       }
     } catch (error) {
-      nextSentence = generateLocalSentence(filteredSentences);
-      showStatusMessage(`${formatAiErrorMessage(error.message)} The built-in generator was used instead.`);
+      if (targetLanguage === "spanish") {
+        nextSentence = generateLocalSentence(filteredSentences);
+        showStatusMessage(`${formatAiErrorMessage(error.message)} The built-in generator was used instead.`);
+      } else {
+        showStatusMessage(`${formatAiErrorMessage(error.message)} ${getTargetLanguageProfile().label} sentences need AI, so the Spanish built-in generator was not used.`);
+        return;
+      }
     } finally {
       generateBtn.disabled = false;
       generateBtn.textContent = "Generate Sentence";
@@ -5105,12 +7199,222 @@ async function generateSentence() {
 
   incrementPracticeStat("generated");
 
-  if (!(aiModeEnabled && !favouritesOnlyCheckbox.checked && nextSentence.ai !== true)) {
+  if (!((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox.checked && nextSentence.ai !== true)) {
     showStatusMessage(
       quizModeCheckbox.checked
         ? "Quiz mode is on. Try to guess the meaning first."
-        : "Hover over a Spanish word to see an English hint."
+        : `Hover over a ${getTargetLanguageProfile().label} word to see an English hint.`
     );
+  }
+}
+
+// This helper redraws the generated batch list.
+function renderBatchSentences() {
+  if (!batchList || !batchStatus) {
+    return;
+  }
+
+  batchList.innerHTML = "";
+
+  if (!currentBatchSentences.length) {
+    batchStatus.textContent = `Generate a batch to view ${getTargetLanguageProfile().label} and English side by side.`;
+    return;
+  }
+
+  batchStatus.textContent = `${currentBatchSentences.length} sentences ready. You can save them as a PDF or one MP3.`;
+
+  currentBatchSentences.forEach((sentence, index) => {
+    const row = document.createElement("div");
+    const number = document.createElement("span");
+    const spanish = document.createElement("p");
+    const english = document.createElement("p");
+    const actions = document.createElement("div");
+    const favouriteButton = document.createElement("button");
+    const playlistButton = document.createElement("button");
+
+    row.className = "batch-row";
+    number.className = "batch-number";
+    spanish.className = "batch-spanish";
+    english.className = "batch-english";
+    actions.className = "batch-actions";
+    favouriteButton.className = "secondary-btn batch-action-btn";
+    playlistButton.className = "secondary-btn batch-action-btn";
+
+    number.textContent = String(index + 1);
+    spanish.textContent = sentence.spanish;
+    english.textContent = sentence.english;
+    favouriteButton.textContent = "Save";
+    playlistButton.textContent = "Playlist";
+
+    favouriteButton.addEventListener("click", () => {
+      if (saveSentenceToFavourites(sentence, "Generate a batch first.")) {
+        batchStatus.textContent = `Sentence ${index + 1} saved to favourites.`;
+      }
+    });
+
+    playlistButton.addEventListener("click", () => {
+      if (addSentenceToSelectedPlaylist(sentence)) {
+        batchStatus.textContent = `Sentence ${index + 1} added to the selected playlist.`;
+      }
+    });
+
+    row.appendChild(number);
+    row.appendChild(spanish);
+    row.appendChild(english);
+    actions.appendChild(favouriteButton);
+    actions.appendChild(playlistButton);
+    row.appendChild(actions);
+    batchList.appendChild(row);
+  });
+}
+
+// This function creates a batch of generator sentences using the current filters.
+async function generateSentenceBatch() {
+  const filteredSentences = getFilteredSentences();
+  const requestedCount = Math.min(30, Math.max(1, Number(batchCountSelect.value) || 10));
+
+  if (filteredSentences.length === 0 && favouritesOnlyCheckbox.checked) {
+    currentBatchSentences = [];
+    renderBatchSentences();
+    batchStatus.textContent = "There are no favourite sentences for this combination.";
+    return;
+  }
+
+  generateBatchBtn.disabled = true;
+  generateBatchBtn.textContent = "Generating...";
+  currentBatchSentences = [];
+  renderBatchSentences();
+  batchStatus.textContent = `Generating ${requestedCount} sentences...`;
+
+  try {
+    for (let index = 0; index < requestedCount; index += 1) {
+      let nextSentence;
+
+      if ((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox.checked) {
+        try {
+          nextSentence = await generateAiSentence();
+        } catch (error) {
+          if (targetLanguage !== "spanish") {
+            throw new Error(`${formatAiErrorMessage(error.message)} ${getTargetLanguageProfile().label} batches need AI, so the Spanish built-in generator was not used.`);
+          }
+
+          nextSentence = generateLocalSentence(filteredSentences);
+        }
+      } else {
+        nextSentence = generateLocalSentence(filteredSentences);
+      }
+
+      const batchSentence = {
+        ...nextSentence,
+        grammarTags: inferGrammarTags(nextSentence)
+      };
+
+      currentBatchSentences.push(batchSentence);
+      if (batchSentence.generated || batchSentence.ai) {
+        rememberGeneratedSentence(batchSentence.spanish);
+      }
+      batchStatus.textContent = `Generated ${currentBatchSentences.length} of ${requestedCount} sentences...`;
+    }
+
+    const lastSentence = currentBatchSentences[currentBatchSentences.length - 1];
+    if (lastSentence) {
+      const sourceLabel = lastSentence.ai ? "AI generated" : lastSentence.generated ? "Generated" : "Example";
+      setCurrentSentence(lastSentence, sourceLabel);
+    }
+
+    incrementPracticeStat("generated", requestedCount);
+    renderBatchSentences();
+  } catch (error) {
+    batchStatus.textContent = `Could not finish the batch. ${error.message}`;
+  } finally {
+    generateBatchBtn.disabled = false;
+    generateBatchBtn.textContent = "Generate batch";
+  }
+}
+
+// This function opens a two-column batch document for saving as a PDF.
+function downloadBatchPdf() {
+  if (!currentBatchSentences.length) {
+    alert("Generate a batch first.");
+    return;
+  }
+
+  const printableWindow = window.open("", "_blank");
+
+  if (!printableWindow) {
+    alert("Pop-up blocked. Please allow pop-ups, then try again.");
+    return;
+  }
+
+  const title = `${capitalize(getTargetLanguageProfile().label)} ${capitalize(topicSelect.value)} sentence batch`;
+  const rows = currentBatchSentences.map((sentence, index) => `
+    <tr>
+      <td class="number">${index + 1}</td>
+      <td class="spanish">${escapeHtml(sentence.spanish)}</td>
+      <td>${escapeHtml(sentence.english)}</td>
+    </tr>
+  `).join("");
+
+  printableWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>${escapeHtml(title)}</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 28px; color: #1f2937; }
+        h1 { margin: 0 0 8px; font-size: 26px; }
+        .meta { margin: 0 0 22px; color: #6b7280; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { padding: 10px; color: #b45309; text-align: left; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; border-bottom: 2px solid #d9e0ea; }
+        td { padding: 11px 10px; vertical-align: top; line-height: 1.45; border-bottom: 1px solid #e5e7eb; }
+        .number { width: 34px; color: #6b7280; font-weight: 700; }
+        .spanish { font-weight: 700; }
+      </style>
+    </head>
+    <body>
+      <h1>${escapeHtml(title)}</h1>
+      <p class="meta">${currentBatchSentences.length} sentences | ${escapeHtml(getTargetLanguageProfile().label)} left, English right</p>
+      <table>
+        <thead>
+          <tr><th class="number">#</th><th>${escapeHtml(getTargetLanguageProfile().label)}</th><th>English</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <script>
+        window.onload = () => {
+          window.focus();
+          window.print();
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+  printableWindow.document.close();
+  batchStatus.textContent = "Batch PDF opened. Choose Save as PDF in the print dialog.";
+}
+
+// This function downloads the whole generated batch as one MP3.
+async function downloadBatchMp3() {
+  if (!currentBatchSentences.length) {
+    alert("Generate a batch first.");
+    return;
+  }
+
+  downloadBatchMp3Btn.disabled = true;
+  downloadBatchMp3Btn.textContent = "Preparing MP3...";
+  batchStatus.textContent = "Preparing one MP3 for the whole batch...";
+
+  try {
+    const turns = currentBatchSentences.map((sentence) => ({ spanish: sentence.spanish }));
+    const audioBlob = await fetchConversationAudioBlob(turns);
+    const title = slugifyFilename(`${difficultySelect.value}-${topicSelect.value}-sentence-batch`);
+    downloadAudioBlob(audioBlob, `${title}.mp3`);
+    batchStatus.textContent = "Batch MP3 downloaded.";
+  } catch (error) {
+    batchStatus.textContent = `Could not download the batch MP3. ${error.message}`;
+  } finally {
+    downloadBatchMp3Btn.disabled = false;
+    downloadBatchMp3Btn.textContent = "Download batch MP3";
   }
 }
 
@@ -5121,6 +7425,7 @@ function speakText(text, languageCode) {
     return;
   }
 
+  stopSpanishAudioPlayback();
   loadVoices();
   window.speechSynthesis.cancel();
   window.speechSynthesis.resume();
@@ -5145,6 +7450,7 @@ function speakTextWithCallback(text, languageCode, callback) {
     return;
   }
 
+  stopSpanishAudioPlayback(false);
   loadVoices();
   window.speechSynthesis.cancel();
   window.speechSynthesis.resume();
@@ -5237,6 +7543,7 @@ function exportPracticeBackup() {
     settings: {
       aiModeEnabled,
       sentenceDisplayMode,
+      shadowGapSeconds: Number(shadowGapSelect?.value || 0) || 0,
       activePageId
     },
     progress: {
@@ -5244,8 +7551,11 @@ function exportPracticeBackup() {
       recallSentences,
       favourites,
       playlists,
+      savedDialogues,
+      currentDialogue,
       savedConversations,
       conversationPlaylist,
+      languageChats: buildLanguageChatBackup(),
       currentChat: {
         activeConversationId,
         chatAccumulatedSeconds: getCurrentChatDurationSeconds(),
@@ -5311,6 +7621,13 @@ function updateAiModeNote() {
     return;
   }
 
+  const profile = getTargetLanguageProfile();
+
+  if (targetLanguage !== "spanish") {
+    aiModeNote.textContent = `${profile.label} mode uses the AI sentence engine for generation, chat, custom translation, and dialogues.`;
+    return;
+  }
+
   aiModeNote.textContent = aiModeEnabled
     ? "AI mode is on. The app will ask the Netlify backend for a fresh sentence, then fall back to the built-in generator if needed."
     : "AI mode is off. The app is using the built-in sentence generator.";
@@ -5334,15 +7651,16 @@ function savePlaylists() {
 
 // This helper returns the selected playlist object.
 function getSelectedPlaylist() {
-  return playlists.find((playlist) => playlist.id === playlistSelect.value) || null;
+  return getCurrentLanguageItems(playlists).find((playlist) => playlist.id === playlistSelect.value) || null;
 }
 
 // This function draws the playlist dropdown and sentence list.
 function renderPlaylists() {
   const previousValue = playlistSelect.value;
+  const languagePlaylists = getCurrentLanguageItems(playlists);
   playlistSelect.innerHTML = "";
 
-  if (playlists.length === 0) {
+  if (languagePlaylists.length === 0) {
     const option = document.createElement("option");
     option.value = "";
     option.textContent = "No playlists yet";
@@ -5351,15 +7669,15 @@ function renderPlaylists() {
     return;
   }
 
-  playlists.forEach((playlist) => {
+  languagePlaylists.forEach((playlist) => {
     const option = document.createElement("option");
     option.value = playlist.id;
     option.textContent = `${playlist.name} (${playlist.sentences.length})`;
     playlistSelect.appendChild(option);
   });
 
-  const hasPrevious = playlists.some((playlist) => playlist.id === previousValue);
-  playlistSelect.value = hasPrevious ? previousValue : playlists[0].id;
+  const hasPrevious = languagePlaylists.some((playlist) => playlist.id === previousValue);
+  playlistSelect.value = hasPrevious ? previousValue : languagePlaylists[0].id;
   renderSelectedPlaylist();
 }
 
@@ -5438,6 +7756,7 @@ function createPlaylist() {
 
   playlists.push({
     id: createId(),
+    targetLanguage,
     name,
     sentences: []
   });
@@ -5454,20 +7773,21 @@ function addSentenceToSelectedPlaylist(sentence) {
 
   if (!playlist) {
     alert("Create a playlist first.");
-    return;
+    return false;
   }
 
   const alreadyAdded = playlist.sentences.some((item) => item.spanish === sentence.spanish);
 
   if (alreadyAdded) {
     alert("This sentence is already in the selected playlist.");
-    return;
+    return false;
   }
 
-  playlist.sentences.push(sentence);
+  playlist.sentences.push(withCurrentLanguage(sentence));
   savePlaylists();
   renderPlaylists();
   showStatusMessage("Sentence added to the playlist.");
+  return true;
 }
 
 // This function removes one sentence from the selected playlist.
@@ -5499,9 +7819,44 @@ function deleteSelectedPlaylist() {
   showStatusMessage("Playlist deleted.");
 }
 
+// This helper returns the selected shadowing pause in milliseconds.
+function getShadowGapMs() {
+  return Math.max(0, Number(shadowGapSelect?.value || 0) || 0) * 1000;
+}
+
+// This helper saves the radio shadowing gap preference.
+function saveShadowGapPreference() {
+  if (shadowGapSelect) {
+    localStorage.setItem("spanishSentenceShadowGap", shadowGapSelect.value);
+  }
+}
+
+// This helper waits before continuing radio playback so the learner can repeat.
+function continueRadioAfterShadowGap(callback) {
+  const gapMs = getShadowGapMs();
+
+  if (!gapMs) {
+    callback();
+    return;
+  }
+
+  const seconds = Math.round(gapMs / 1000);
+  radioStatus.textContent = `Shadowing pause: repeat out loud now. Next sentence in ${seconds} seconds.`;
+  radioState.shadowTimeoutId = window.setTimeout(() => {
+    radioState.shadowTimeoutId = null;
+    if (radioState.isPlaying) {
+      callback();
+    }
+  }, gapMs);
+}
+
 // This function stops any radio playback.
 function stopRadioMode() {
   radioState.isPlaying = false;
+  if (radioState.shadowTimeoutId) {
+    window.clearTimeout(radioState.shadowTimeoutId);
+    radioState.shadowTimeoutId = null;
+  }
   ensureSpanishAudioPlayer().pause();
   ensureSpanishAudioPlayer().currentTime = 0;
   spanishAudioEndedCallback = null;
@@ -5528,28 +7883,30 @@ function playRadioStep() {
       return;
     }
 
-    if (radioState.mode === "repeat-one") {
-      playRadioStep();
-      return;
-    }
-
-    if (radioState.mode === "play-once") {
-      radioState.index += 1;
-
-      if (radioState.index >= playlist.sentences.length) {
-        radioState.isPlaying = false;
-        radioStatus.textContent = "Playlist finished.";
+    continueRadioAfterShadowGap(() => {
+      if (radioState.mode === "repeat-one") {
+        playRadioStep();
         return;
       }
 
-      playRadioStep();
-      return;
-    }
+      if (radioState.mode === "play-once") {
+        radioState.index += 1;
 
-    if (radioState.mode === "loop-all") {
-      radioState.index = (radioState.index + 1) % playlist.sentences.length;
-      playRadioStep();
-    }
+        if (radioState.index >= playlist.sentences.length) {
+          radioState.isPlaying = false;
+          radioStatus.textContent = "Playlist finished.";
+          return;
+        }
+
+        playRadioStep();
+        return;
+      }
+
+      if (radioState.mode === "loop-all") {
+        radioState.index = (radioState.index + 1) % playlist.sentences.length;
+        playRadioStep();
+      }
+    });
   });
 }
 
@@ -5660,14 +8017,15 @@ function saveSentenceToFavourites(sentence, emptyMessage = "Generate a sentence 
     return false;
   }
 
-  const alreadySaved = favourites.some((item) => item.spanish === sentence.spanish);
+  const sentenceToSave = withCurrentLanguage(sentence);
+  const alreadySaved = favourites.some((item) => isCurrentLanguageItem(item) && item.spanish === sentenceToSave.spanish);
 
   if (alreadySaved) {
     alert("This sentence is already in your favourites.");
     return false;
   }
 
-  favourites.push(sentence);
+  favourites.push(sentenceToSave);
   saveFavourites();
   renderFavourites();
   incrementPracticeStat("saved");
@@ -5682,7 +8040,7 @@ function saveCurrentSentence() {
 
 // This function deletes one favourite sentence.
 function deleteFavourite(spanishText) {
-  favourites = favourites.filter((item) => item.spanish !== spanishText);
+  favourites = favourites.filter((item) => !(isCurrentLanguageItem(item) && item.spanish === spanishText));
   saveFavourites();
   renderFavourites();
 }
@@ -5703,6 +8061,7 @@ function withRecallSchedule(sentence) {
 
   return {
     ...sentence,
+    targetLanguage: getSavedItemLanguage(sentence),
     recallStreak: sentence.recallStreak || 0,
     recallCorrect: sentence.recallCorrect || 0,
     recallWrong: sentence.recallWrong || 0,
@@ -5719,14 +8078,15 @@ function isRecallDue(sentence) {
 
 // This function adds a sentence to the recall list.
 function addSentenceToRecall(sentence) {
-  const alreadyAdded = recallSentences.some((item) => item.spanish === sentence.spanish);
+  const sentenceToAdd = withCurrentLanguage(sentence);
+  const alreadyAdded = recallSentences.some((item) => isCurrentLanguageItem(item) && item.spanish === sentenceToAdd.spanish);
 
   if (alreadyAdded) {
     alert("This sentence is already in Recall.");
     return;
   }
 
-  recallSentences.push(withRecallSchedule(sentence));
+  recallSentences.push(withRecallSchedule(sentenceToAdd));
   saveRecallSentences();
   renderRecallSentences();
   showStatusMessage("Sentence added to Recall.");
@@ -5735,7 +8095,7 @@ function addSentenceToRecall(sentence) {
 // This function updates the spaced-repetition schedule after a review.
 function markRecallReview(spanishText, remembered) {
   recallSentences = recallSentences.map((item) => {
-    if (item.spanish !== spanishText) {
+    if (!isCurrentLanguageItem(item) || item.spanish !== spanishText) {
       return item;
     }
 
@@ -5768,7 +8128,7 @@ function markRecallReview(spanishText, remembered) {
 
 // This function removes a sentence from the recall list.
 function deleteRecallSentence(spanishText) {
-  recallSentences = recallSentences.filter((item) => item.spanish !== spanishText);
+  recallSentences = recallSentences.filter((item) => !(isCurrentLanguageItem(item) && item.spanish === spanishText));
   saveRecallSentences();
   renderRecallSentences();
 }
@@ -5777,18 +8137,19 @@ function deleteRecallSentence(spanishText) {
 function renderRecallSentences() {
   recallList.innerHTML = "";
   recallSentences = recallSentences.map(withRecallSchedule);
+  const languageRecallSentences = getCurrentLanguageItems(recallSentences);
 
-  if (recallSentences.length === 0) {
+  if (languageRecallSentences.length === 0) {
     recallEmptyMessage.style.display = "block";
     recallSummary.textContent = "No recall reviews due yet.";
     return;
   }
 
   recallEmptyMessage.style.display = "none";
-  const dueCount = recallSentences.filter(isRecallDue).length;
-  recallSummary.textContent = `${dueCount} due now | ${recallSentences.length} total in Recall`;
+  const dueCount = languageRecallSentences.filter(isRecallDue).length;
+  recallSummary.textContent = `${dueCount} due now | ${languageRecallSentences.length} total in Recall`;
 
-  recallSentences
+  languageRecallSentences
     .slice()
     .sort((first, second) => {
       const firstDue = isRecallDue(first) ? 0 : 1;
@@ -5885,14 +8246,15 @@ function renderRecallSentences() {
 function renderFavourites() {
   favouritesList.innerHTML = "";
   const searchText = favouritesSearchInput.value.trim().toLowerCase();
+  const languageFavourites = getCurrentLanguageItems(favourites);
 
-  if (favourites.length === 0) {
+  if (languageFavourites.length === 0) {
     emptyMessage.style.display = "block";
     emptyMessage.textContent = "No favourites saved yet.";
     return;
   }
 
-  const filteredFavourites = favourites.filter((item) => {
+  const filteredFavourites = languageFavourites.filter((item) => {
     return (
       item.spanish.toLowerCase().includes(searchText) ||
       item.english.toLowerCase().includes(searchText) ||
@@ -5970,6 +8332,9 @@ function renderFavourites() {
 
 // Event listeners tell the app what to do when buttons are clicked.
 generateBtn.addEventListener("click", generateSentence);
+generateBatchBtn.addEventListener("click", generateSentenceBatch);
+downloadBatchPdfBtn.addEventListener("click", downloadBatchPdf);
+downloadBatchMp3Btn.addEventListener("click", downloadBatchMp3);
 
 speakSpanishBtn.addEventListener("click", () => {
   if (!currentSentence) {
@@ -6015,14 +8380,59 @@ resetScoreBtn.addEventListener("click", resetQuizScore);
 createPlaylistBtn.addEventListener("click", createPlaylist);
 addCustomGeneratorTopicBtn.addEventListener("click", addCustomGeneratorTopic);
 themeToggleBtn.addEventListener("click", toggleThemeMode);
+if (targetLanguageSelect) {
+  targetLanguageSelect.addEventListener("change", () => {
+    saveTargetLanguagePreference();
+    showStatusMessage(`${getTargetLanguageProfile().label} selected.`);
+  });
+}
+if (testVoiceBtn) {
+  testVoiceBtn.addEventListener("click", testSelectedVoice);
+}
+if (callPauseModeSelect) {
+  callPauseModeSelect.addEventListener("change", () => {
+    saveCallPausePreference();
+    chatStatus.textContent = `Call pause set to ${callPauseModeSelect.options[callPauseModeSelect.selectedIndex].text}.`;
+  });
+}
+if (spanishVoiceSelect) {
+  spanishVoiceSelect.addEventListener("change", () => {
+    saveSpanishVoicePreference();
+    showStatusMessage(`${getTargetLanguageProfile().label} voice set to ${spanishVoiceSelect.options[spanishVoiceSelect.selectedIndex].text}.`);
+  });
+}
 translateCustomBtn.addEventListener("click", translateCustomSentence);
+generateDialogueBtn.addEventListener("click", generateDialogue);
+saveDialogueBtn.addEventListener("click", saveCurrentDialogue);
+downloadDialoguePdfBtn.addEventListener("click", downloadDialoguePdf);
+playDialogueBtn.addEventListener("click", playDialogueMedia);
+stopDialogueBtn.addEventListener("click", () => stopDialoguePlayback());
+previousDialogueBtn.addEventListener("click", () => skipDialoguePlayback("previous"));
+pauseDialogueBtn.addEventListener("click", toggleDialoguePlaybackPause);
+nextDialogueBtn.addEventListener("click", () => skipDialoguePlayback("next"));
+dialogueAudioPlayer.addEventListener("timeupdate", updateDialoguePlaybackControls);
+dialogueAudioPlayer.addEventListener("loadedmetadata", updateDialoguePlaybackControls);
+dialogueAudioPlayer.addEventListener("play", updateDialoguePlaybackControls);
+dialogueAudioPlayer.addEventListener("pause", updateDialoguePlaybackControls);
+dialogueAudioPlayer.addEventListener("ended", () => {
+  stopDialoguePlayback("Dialogue finished.");
+});
+downloadDialogueMp3Btn.addEventListener("click", downloadDialogueMp3);
+clearDialogueBtn.addEventListener("click", clearDialogue);
+loadYoutubeVideoBtn.addEventListener("click", loadYouTubeVideo);
+importYoutubeCaptionsBtn.addEventListener("click", importYouTubeCaptions);
+usePastedTranscriptBtn.addEventListener("click", usePastedTranscript);
 startChatBtn.addEventListener("click", startChat);
 startCallBtn.addEventListener("click", startCallMode);
-endCallBtn.addEventListener("click", () => stopCallMode());
+endCallBtn.addEventListener("click", () => stopCallMode("Call mode ended.", { autoSave: true }));
 interruptCallBtn.addEventListener("click", interruptCallReply);
+focusEndCallBtn.addEventListener("click", () => stopCallMode("Call mode ended.", { autoSave: true }));
+focusInterruptCallBtn.addEventListener("click", interruptCallReply);
 saveConversationBtn.addEventListener("click", saveCurrentConversation);
 downloadChatPdfBtn.addEventListener("click", downloadCorrectedConversationPdf);
 downloadChatMp3sBtn.addEventListener("click", downloadCorrectedConversationMp3s);
+reviewConversationBtn.addEventListener("click", showConversationReview);
+hideConversationReviewBtn.addEventListener("click", hideConversationReview);
 playFullChatBtn.addEventListener("click", playFullConversation);
 stopFullChatBtn.addEventListener("click", () => stopFullConversationPlayback());
 previousConversationTurnBtn.addEventListener("click", () => skipFullConversationTurn("previous"));
@@ -6104,6 +8514,9 @@ stopRadioBtn.addEventListener("click", stopRadioMode);
 deletePlaylistBtn.addEventListener("click", deleteSelectedPlaylist);
 exportPracticeBtn.addEventListener("click", exportPracticeBackup);
 playlistSelect.addEventListener("change", renderSelectedPlaylist);
+if (shadowGapSelect) {
+  shadowGapSelect.addEventListener("change", saveShadowGapPreference);
+}
 
 quizModeCheckbox.addEventListener("change", () => {
   if (!currentSentence) {
@@ -6154,12 +8567,27 @@ chatInput.addEventListener("keydown", (event) => {
     sendChatMessage();
   }
 });
+chatInput.addEventListener("input", () => {
+  localStorage.setItem(getChatStorageKey("spanishSentenceChatDraft"), chatInput.value || "");
+});
 
 // These functions run as soon as the page loads.
 loadVoices();
 applyThemePreference();
+applyTargetLanguagePreference();
+applySpanishVoicePreference();
+applyCallPausePreference();
+if (chatInput) {
+  chatInput.value = getStoredChatValue("spanishSentenceChatDraft") || "";
+}
+if (shadowGapSelect) {
+  shadowGapSelect.value = localStorage.getItem("spanishSentenceShadowGap") || "0";
+}
 renderPracticeStats();
+renderBatchSentences();
 renderGeneratorTopics();
+renderDialogue();
+renderSavedDialogues();
 setupChatRecognition();
 setupCallRecognition();
 if ("speechSynthesis" in window) {
@@ -6183,7 +8611,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=11").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=12").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
