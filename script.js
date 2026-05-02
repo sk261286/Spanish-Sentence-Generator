@@ -1532,8 +1532,13 @@ const batchCountSelect = document.getElementById("batch-count");
 const generateBatchBtn = document.getElementById("generate-batch-btn");
 const downloadBatchPdfBtn = document.getElementById("download-batch-pdf-btn");
 const downloadBatchMp3Btn = document.getElementById("download-batch-mp3-btn");
+const saveBatchFavouritesBtn = document.getElementById("save-batch-favourites-btn");
+const addBatchPlaylistBtn = document.getElementById("add-batch-playlist-btn");
 const batchStatus = document.getElementById("batch-status");
 const batchList = document.getElementById("batch-list");
+const batchMp3Panel = document.getElementById("batch-mp3-panel");
+const batchMp3Player = document.getElementById("batch-mp3-player");
+const batchMp3Link = document.getElementById("batch-mp3-link");
 const speakSpanishBtn = document.getElementById("speak-spanish-btn");
 const speakEnglishBtn = document.getElementById("speak-english-btn");
 const addGeneratorToPlaylistBtn = document.getElementById("add-generator-to-playlist-btn");
@@ -1567,6 +1572,7 @@ const createPlaylistBtn = document.getElementById("create-playlist-btn");
 const addCurrentToPlaylistBtn = document.getElementById("add-current-to-playlist-btn");
 const playRadioBtn = document.getElementById("play-radio-btn");
 const stopRadioBtn = document.getElementById("stop-radio-btn");
+const downloadPlaylistMp3Btn = document.getElementById("download-playlist-mp3-btn");
 const deletePlaylistBtn = document.getElementById("delete-playlist-btn");
 const exportPracticeBtn = document.getElementById("export-practice-btn");
 const radioStatus = document.getElementById("radio-status");
@@ -1613,10 +1619,14 @@ const videoTranscriptLanguageSelect = document.getElementById("video-transcript-
 const loadYoutubeVideoBtn = document.getElementById("load-youtube-video-btn");
 const importYoutubeCaptionsBtn = document.getElementById("import-youtube-captions-btn");
 const usePastedTranscriptBtn = document.getElementById("use-pasted-transcript-btn");
+const generateVideoDialogueBtn = document.getElementById("generate-video-dialogue-btn");
+const saveVideoDialogueBtn = document.getElementById("save-video-dialogue-btn");
+const playVideoDialogueBtn = document.getElementById("play-video-dialogue-btn");
 const youtubePlayerElement = document.getElementById("youtube-player");
 const manualTranscriptInput = document.getElementById("manual-transcript-input");
 const videoStatus = document.getElementById("video-status");
 const videoTranscriptList = document.getElementById("video-transcript-list");
+const videoDialogueResult = document.getElementById("video-dialogue-result");
 const videoSelectedLine = document.getElementById("video-selected-line");
 const videoLineTranslation = document.getElementById("video-line-translation");
 const videoWordHint = document.getElementById("video-word-hint");
@@ -1744,6 +1754,7 @@ let currentSpanishMediaSource = null;
 let currentSpanishStreamReader = null;
 let spanishAudioEndedCallback = null;
 let spanishAudioPlaybackId = 0;
+let batchMp3ObjectUrl = "";
 let wordHintRequestId = 0;
 let aiWordHintCache = JSON.parse(localStorage.getItem("spanishSentenceAiWordHints")) || {};
 let chatTimerInterval = null;
@@ -1797,7 +1808,9 @@ let radioState = {
   playlistId: "",
   mode: "repeat-one",
   index: 0,
-  shadowTimeoutId: null
+  shadowTimeoutId: null,
+  recoveryTimeoutId: null,
+  playbackToken: 0
 };
 let latestCustomSentence = null;
 let currentDialogue = JSON.parse(localStorage.getItem("spanishSentenceCurrentDialogue")) || null;
@@ -5228,6 +5241,24 @@ function downloadAudioBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
+// This helper keeps a prepared batch MP3 available for mobile browsers.
+function showBatchMp3Ready(blob, filename) {
+  if (!batchMp3Panel || !batchMp3Player || !batchMp3Link) {
+    return;
+  }
+
+  if (batchMp3ObjectUrl) {
+    URL.revokeObjectURL(batchMp3ObjectUrl);
+  }
+
+  batchMp3ObjectUrl = URL.createObjectURL(blob);
+  batchMp3Player.src = batchMp3ObjectUrl;
+  batchMp3Link.href = batchMp3ObjectUrl;
+  batchMp3Link.download = filename;
+  batchMp3Link.textContent = "Open/save MP3";
+  batchMp3Panel.classList.remove("hidden");
+}
+
 // This helper formats audio time for the full-conversation media player.
 function formatMediaTime(seconds) {
   if (!Number.isFinite(seconds) || seconds < 0) {
@@ -5271,6 +5302,25 @@ async function fetchConversationAudioBlob(turns) {
   }
 
   return response.blob();
+}
+
+// This helper creates one playable MP3 from several smaller backend requests.
+async function fetchChunkedConversationAudioBlob(turns, statusCallback = null, chunkSize = 10) {
+  const chunks = [];
+
+  for (let index = 0; index < turns.length; index += chunkSize) {
+    const chunkTurns = turns.slice(index, index + chunkSize);
+    const chunkNumber = Math.floor(index / chunkSize) + 1;
+    const totalChunks = Math.ceil(turns.length / chunkSize);
+
+    if (typeof statusCallback === "function") {
+      statusCallback(chunkNumber, totalChunks);
+    }
+
+    chunks.push(await fetchConversationAudioBlob(chunkTurns));
+  }
+
+  return new Blob(chunks, { type: "audio/mpeg" });
 }
 
 // This function downloads the full corrected conversation as one MP3.
@@ -6696,6 +6746,7 @@ function setVideoTranscriptLines(lines, statusText) {
   activeVideoLineIndex = -1;
   videoLineTranslationCache = {};
   videoWordHintCache = {};
+  renderVideoDialogueResult();
   renderVideoTranscript();
   startVideoTranscriptSync();
   videoStatus.textContent = statusText || `${videoTranscriptLines.length} transcript lines loaded.`;
@@ -6798,6 +6849,131 @@ function renderVideoTranscript() {
     });
     videoTranscriptList.appendChild(row);
   });
+}
+
+// This helper builds a compact transcript context for AI video discussion.
+function buildVideoTranscriptContext() {
+  return videoTranscriptLines
+    .slice(0, 80)
+    .map((line) => `${formatVideoTime(line.start)} ${line.text}`)
+    .join("\n")
+    .slice(0, 6000);
+}
+
+// This helper redraws the NotebookLM-style video discussion panel.
+function renderVideoDialogueResult() {
+  if (!videoDialogueResult) {
+    return;
+  }
+
+  videoDialogueResult.innerHTML = "";
+
+  if (!currentDialogue || currentDialogue.source !== "video") {
+    return;
+  }
+
+  const title = document.createElement("h4");
+  const meta = document.createElement("p");
+  const list = document.createElement("div");
+
+  title.className = "dialogue-title";
+  title.textContent = currentDialogue.title || "Video discussion";
+  meta.className = "sentence-meta";
+  meta.textContent = `${currentDialogue.lines?.length || 0} lines | Based on the loaded transcript`;
+  list.className = "dialogue-lines";
+
+  currentDialogue.lines.forEach((line, index) => {
+    const row = document.createElement("div");
+    const speaker = document.createElement("p");
+    const targetText = document.createElement("p");
+    const english = document.createElement("p");
+    const saveButton = document.createElement("button");
+
+    row.className = "dialogue-line";
+    speaker.className = "dialogue-speaker";
+    targetText.className = "dialogue-target";
+    english.className = "dialogue-english";
+    saveButton.className = "secondary-btn";
+
+    speaker.textContent = line.speaker || (index % 2 === 0 ? "A" : "B");
+    targetText.textContent = line.spanish;
+    english.textContent = line.english || "";
+    saveButton.textContent = "Save line";
+    saveButton.addEventListener("click", () => {
+      saveSentenceToFavourites({
+        spanish: line.spanish,
+        english: line.english || "",
+        difficulty: currentDialogue.level || "intermediate",
+        topic: currentDialogue.topic || "video",
+        tone: currentDialogue.tone || "informal",
+        source: "video-dialogue"
+      }, "Generate a video discussion first.");
+      videoStatus.textContent = "Discussion line saved to favourites.";
+    });
+
+    row.appendChild(speaker);
+    row.appendChild(targetText);
+    row.appendChild(english);
+    row.appendChild(saveButton);
+    list.appendChild(row);
+  });
+
+  videoDialogueResult.appendChild(title);
+  videoDialogueResult.appendChild(meta);
+  videoDialogueResult.appendChild(list);
+}
+
+// This function creates a learner dialogue about the loaded YouTube transcript.
+async function generateVideoDialogue() {
+  if (!videoTranscriptLines.length) {
+    videoStatus.textContent = "Import YouTube captions or paste a transcript before discussing the video.";
+    return;
+  }
+
+  const transcriptContext = buildVideoTranscriptContext();
+
+  if (!transcriptContext) {
+    videoStatus.textContent = "The transcript is empty, so there is nothing to discuss yet.";
+    return;
+  }
+
+  generateVideoDialogueBtn.disabled = true;
+  generateVideoDialogueBtn.textContent = "Generating...";
+  videoStatus.textContent = "Creating a discussion about the video...";
+
+  try {
+    const data = await callAiLanguageCoach({
+      mode: "video-dialogue",
+      targetLanguage,
+      transcript: transcriptContext,
+      videoUrl: youtubeUrlInput?.value || "",
+      level: "intermediate",
+      tone: "informal",
+      turnCount: 10
+    });
+
+    if (!data?.dialogue?.lines?.length) {
+      throw new Error("The AI did not return a valid video discussion.");
+    }
+
+    currentDialogue = {
+      id: createId(),
+      targetLanguage,
+      source: "video",
+      createdAt: Date.now(),
+      ...data.dialogue
+    };
+
+    saveCurrentDialogueState();
+    renderCurrentDialogue();
+    renderVideoDialogueResult();
+    videoStatus.textContent = "Video discussion generated. You can save it, play it, or save individual lines.";
+  } catch (error) {
+    videoStatus.textContent = `Could not generate a video discussion. ${formatAiErrorMessage(error.message)}`;
+  } finally {
+    generateVideoDialogueBtn.disabled = false;
+    generateVideoDialogueBtn.textContent = "Discuss video";
+  }
 }
 
 function updateVideoLinePlaybackButtons(isPlaying = false) {
@@ -7215,13 +7391,22 @@ function renderBatchSentences() {
   }
 
   batchList.innerHTML = "";
+  const hasBatchSentences = currentBatchSentences.length > 0;
 
-  if (!currentBatchSentences.length) {
+  if (saveBatchFavouritesBtn) {
+    saveBatchFavouritesBtn.disabled = !hasBatchSentences;
+  }
+
+  if (addBatchPlaylistBtn) {
+    addBatchPlaylistBtn.disabled = !hasBatchSentences;
+  }
+
+  if (!hasBatchSentences) {
     batchStatus.textContent = `Generate a batch to view ${getTargetLanguageProfile().label} and English side by side.`;
     return;
   }
 
-  batchStatus.textContent = `${currentBatchSentences.length} sentences ready. You can save them as a PDF or one MP3.`;
+  batchStatus.textContent = `${currentBatchSentences.length} sentences ready. You can save, add, play, export PDF, or make one MP3.`;
 
   currentBatchSentences.forEach((sentence, index) => {
     const row = document.createElement("div");
@@ -7229,6 +7414,7 @@ function renderBatchSentences() {
     const spanish = document.createElement("p");
     const english = document.createElement("p");
     const actions = document.createElement("div");
+    const playButton = document.createElement("button");
     const favouriteButton = document.createElement("button");
     const playlistButton = document.createElement("button");
 
@@ -7237,14 +7423,21 @@ function renderBatchSentences() {
     spanish.className = "batch-spanish";
     english.className = "batch-english";
     actions.className = "batch-actions";
+    playButton.className = "secondary-btn batch-action-btn";
     favouriteButton.className = "secondary-btn batch-action-btn";
     playlistButton.className = "secondary-btn batch-action-btn";
 
     number.textContent = String(index + 1);
     spanish.textContent = sentence.spanish;
     english.textContent = sentence.english;
+    playButton.textContent = "Play";
     favouriteButton.textContent = "Save";
     playlistButton.textContent = "Playlist";
+
+    playButton.addEventListener("click", () => {
+      playSpanishAudio(sentence.spanish, `Batch sentence ${index + 1}`);
+      batchStatus.textContent = `Playing sentence ${index + 1}.`;
+    });
 
     favouriteButton.addEventListener("click", () => {
       if (saveSentenceToFavourites(sentence, "Generate a batch first.")) {
@@ -7261,11 +7454,83 @@ function renderBatchSentences() {
     row.appendChild(number);
     row.appendChild(spanish);
     row.appendChild(english);
+    actions.appendChild(playButton);
     actions.appendChild(favouriteButton);
     actions.appendChild(playlistButton);
     row.appendChild(actions);
     batchList.appendChild(row);
   });
+}
+
+// This function saves every generated batch sentence to favourites.
+function saveBatchToFavourites() {
+  if (!currentBatchSentences.length) {
+    alert("Generate a batch first.");
+    return;
+  }
+
+  let savedCount = 0;
+  let skippedCount = 0;
+
+  currentBatchSentences.forEach((sentence) => {
+    const sentenceToSave = withCurrentLanguage(sentence);
+    const alreadySaved = favourites.some((item) => isCurrentLanguageItem(item) && item.spanish === sentenceToSave.spanish);
+
+    if (alreadySaved) {
+      skippedCount += 1;
+      return;
+    }
+
+    favourites.push(sentenceToSave);
+    savedCount += 1;
+  });
+
+  if (savedCount) {
+    saveFavourites();
+    renderFavourites();
+    incrementPracticeStat("saved", savedCount);
+  }
+
+  batchStatus.textContent = `${savedCount} sentences saved to favourites.${skippedCount ? ` ${skippedCount} already saved.` : ""}`;
+  showStatusMessage(batchStatus.textContent);
+}
+
+// This function adds every generated batch sentence to the selected playlist.
+function addBatchToPlaylist() {
+  if (!currentBatchSentences.length) {
+    alert("Generate a batch first.");
+    return;
+  }
+
+  const playlist = getSelectedPlaylist();
+
+  if (!playlist) {
+    alert("Create a playlist first.");
+    return;
+  }
+
+  let addedCount = 0;
+  let skippedCount = 0;
+
+  currentBatchSentences.forEach((sentence) => {
+    const alreadyAdded = playlist.sentences.some((item) => item.spanish === sentence.spanish);
+
+    if (alreadyAdded) {
+      skippedCount += 1;
+      return;
+    }
+
+    playlist.sentences.push(withCurrentLanguage(sentence));
+    addedCount += 1;
+  });
+
+  if (addedCount) {
+    savePlaylists();
+    renderPlaylists();
+  }
+
+  batchStatus.textContent = `${addedCount} sentences added to "${playlist.name}".${skippedCount ? ` ${skippedCount} already in the playlist.` : ""}`;
+  showStatusMessage(batchStatus.textContent);
 }
 
 // This function creates a batch of generator sentences using the current filters.
@@ -7400,16 +7665,25 @@ async function downloadBatchMp3() {
     return;
   }
 
+  if (batchMp3Panel) {
+    batchMp3Panel.classList.add("hidden");
+  }
+
   downloadBatchMp3Btn.disabled = true;
   downloadBatchMp3Btn.textContent = "Preparing MP3...";
   batchStatus.textContent = "Preparing one MP3 for the whole batch...";
 
   try {
     const turns = currentBatchSentences.map((sentence) => ({ spanish: sentence.spanish }));
-    const audioBlob = await fetchConversationAudioBlob(turns);
+    const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
+      batchStatus.textContent = `Preparing audio part ${chunkNumber} of ${totalChunks}...`;
+    });
     const title = slugifyFilename(`${difficultySelect.value}-${topicSelect.value}-sentence-batch`);
-    downloadAudioBlob(audioBlob, `${title}.mp3`);
-    batchStatus.textContent = "Batch MP3 downloaded.";
+    const filename = `${title}.mp3`;
+
+    showBatchMp3Ready(audioBlob, filename);
+    downloadAudioBlob(audioBlob, filename);
+    batchStatus.textContent = "Batch MP3 ready. If your phone did not download it automatically, use Open/save MP3.";
   } catch (error) {
     batchStatus.textContent = `Could not download the batch MP3. ${error.message}`;
   } finally {
@@ -7685,6 +7959,11 @@ function renderPlaylists() {
 function renderSelectedPlaylist() {
   playlistSentences.innerHTML = "";
   const playlist = getSelectedPlaylist();
+  const hasPlaylistSentences = Boolean(playlist?.sentences?.length);
+
+  if (downloadPlaylistMp3Btn) {
+    downloadPlaylistMp3Btn.disabled = !hasPlaylistSentences;
+  }
 
   if (!playlist) {
     playlistEmptyMessage.style.display = "block";
@@ -7819,6 +8098,39 @@ function deleteSelectedPlaylist() {
   showStatusMessage("Playlist deleted.");
 }
 
+// This function downloads the selected sentence playlist as one MP3.
+async function downloadSelectedPlaylistMp3() {
+  const playlist = getSelectedPlaylist();
+
+  if (!playlist) {
+    alert("Create a playlist first.");
+    return;
+  }
+
+  if (!playlist.sentences.length) {
+    alert("Add at least one sentence to the playlist first.");
+    return;
+  }
+
+  stopRadioMode();
+  downloadPlaylistMp3Btn.disabled = true;
+  downloadPlaylistMp3Btn.textContent = "Preparing MP3...";
+  radioStatus.textContent = `Preparing one MP3 for "${playlist.name}"...`;
+
+  try {
+    const turns = playlist.sentences.map((sentence) => ({ spanish: sentence.spanish }));
+    const audioBlob = await fetchConversationAudioBlob(turns);
+    const filename = slugifyFilename(`${getTargetLanguageProfile().label}-${playlist.name}-playlist`);
+    downloadAudioBlob(audioBlob, `${filename}.mp3`);
+    radioStatus.textContent = `Playlist MP3 downloaded: ${playlist.name}.`;
+  } catch (error) {
+    radioStatus.textContent = `Could not download the playlist MP3. ${error.message}`;
+  } finally {
+    downloadPlaylistMp3Btn.disabled = false;
+    downloadPlaylistMp3Btn.textContent = "Download playlist MP3";
+  }
+}
+
 // This helper returns the selected shadowing pause in milliseconds.
 function getShadowGapMs() {
   return Math.max(0, Number(shadowGapSelect?.value || 0) || 0) * 1000;
@@ -7850,13 +8162,85 @@ function continueRadioAfterShadowGap(callback) {
   }, gapMs);
 }
 
+// This helper clears the safety timer that keeps radio mode moving on mobile.
+function clearRadioRecoveryTimer() {
+  if (radioState.recoveryTimeoutId) {
+    window.clearTimeout(radioState.recoveryTimeoutId);
+    radioState.recoveryTimeoutId = null;
+  }
+}
+
+// This helper advances radio playback once, even if an audio end event fires twice.
+function advanceRadioOnce(playbackToken, playlist) {
+  if (!radioState.isPlaying || playbackToken !== radioState.playbackToken) {
+    return;
+  }
+
+  radioState.playbackToken += 1;
+  clearRadioRecoveryTimer();
+
+  continueRadioAfterShadowGap(() => {
+    if (!radioState.isPlaying) {
+      return;
+    }
+
+    if (radioState.mode === "repeat-one") {
+      playRadioStep();
+      return;
+    }
+
+    if (radioState.mode === "play-once") {
+      radioState.index += 1;
+
+      if (radioState.index >= playlist.sentences.length) {
+        radioState.isPlaying = false;
+        radioStatus.textContent = "Playlist finished.";
+        return;
+      }
+
+      playRadioStep();
+      return;
+    }
+
+    if (radioState.mode === "loop-all") {
+      radioState.index = (radioState.index + 1) % playlist.sentences.length;
+      playRadioStep();
+    }
+  });
+}
+
+// This helper recovers if a mobile browser finishes audio without firing "ended".
+function armRadioRecoveryTimer(playbackToken, playlist) {
+  clearRadioRecoveryTimer();
+
+  radioState.recoveryTimeoutId = window.setTimeout(() => {
+    radioState.recoveryTimeoutId = null;
+
+    if (!radioState.isPlaying || playbackToken !== radioState.playbackToken) {
+      return;
+    }
+
+    const player = ensureSpanishAudioPlayer();
+    const audioLooksFinished = player.ended || (player.paused && player.currentTime > 0 && !player.seeking);
+
+    if (audioLooksFinished) {
+      advanceRadioOnce(playbackToken, playlist);
+      return;
+    }
+
+    armRadioRecoveryTimer(playbackToken, playlist);
+  }, 1500);
+}
+
 // This function stops any radio playback.
 function stopRadioMode() {
   radioState.isPlaying = false;
+  radioState.playbackToken += 1;
   if (radioState.shadowTimeoutId) {
     window.clearTimeout(radioState.shadowTimeoutId);
     radioState.shadowTimeoutId = null;
   }
+  clearRadioRecoveryTimer();
   ensureSpanishAudioPlayer().pause();
   ensureSpanishAudioPlayer().currentTime = 0;
   spanishAudioEndedCallback = null;
@@ -7876,38 +8260,23 @@ function playRadioStep() {
   }
 
   const currentPlaylistSentence = playlist.sentences[radioState.index];
+  const sentenceText = currentPlaylistSentence?.spanish || "";
+
+  if (!sentenceText.trim()) {
+    radioState.index = (radioState.index + 1) % playlist.sentences.length;
+    radioStatus.textContent = "Skipped an empty playlist sentence.";
+    playRadioStep();
+    return;
+  }
+
+  radioState.playbackToken += 1;
+  const playbackToken = radioState.playbackToken;
   radioStatus.textContent = `Playing ${radioState.index + 1} of ${playlist.sentences.length}: ${playlist.name}`;
 
-  playSpanishAudio(currentPlaylistSentence.spanish, `${playlist.name} ${radioState.index + 1}`, () => {
-    if (!radioState.isPlaying) {
-      return;
-    }
-
-    continueRadioAfterShadowGap(() => {
-      if (radioState.mode === "repeat-one") {
-        playRadioStep();
-        return;
-      }
-
-      if (radioState.mode === "play-once") {
-        radioState.index += 1;
-
-        if (radioState.index >= playlist.sentences.length) {
-          radioState.isPlaying = false;
-          radioStatus.textContent = "Playlist finished.";
-          return;
-        }
-
-        playRadioStep();
-        return;
-      }
-
-      if (radioState.mode === "loop-all") {
-        radioState.index = (radioState.index + 1) % playlist.sentences.length;
-        playRadioStep();
-      }
-    });
-  });
+  playSpanishAudio(sentenceText, `${playlist.name} ${radioState.index + 1}`, () => {
+    advanceRadioOnce(playbackToken, playlist);
+  }, { progressive: false });
+  armRadioRecoveryTimer(playbackToken, playlist);
 }
 
 // This function starts radio playback.
@@ -8335,6 +8704,12 @@ generateBtn.addEventListener("click", generateSentence);
 generateBatchBtn.addEventListener("click", generateSentenceBatch);
 downloadBatchPdfBtn.addEventListener("click", downloadBatchPdf);
 downloadBatchMp3Btn.addEventListener("click", downloadBatchMp3);
+if (saveBatchFavouritesBtn) {
+  saveBatchFavouritesBtn.addEventListener("click", saveBatchToFavourites);
+}
+if (addBatchPlaylistBtn) {
+  addBatchPlaylistBtn.addEventListener("click", addBatchToPlaylist);
+}
 
 speakSpanishBtn.addEventListener("click", () => {
   if (!currentSentence) {
@@ -8422,6 +8797,28 @@ clearDialogueBtn.addEventListener("click", clearDialogue);
 loadYoutubeVideoBtn.addEventListener("click", loadYouTubeVideo);
 importYoutubeCaptionsBtn.addEventListener("click", importYouTubeCaptions);
 usePastedTranscriptBtn.addEventListener("click", usePastedTranscript);
+if (generateVideoDialogueBtn) {
+  generateVideoDialogueBtn.addEventListener("click", generateVideoDialogue);
+}
+if (saveVideoDialogueBtn) {
+  saveVideoDialogueBtn.addEventListener("click", () => {
+    if (!currentDialogue || currentDialogue.source !== "video") {
+      alert("Generate a video discussion first.");
+      return;
+    }
+    saveCurrentDialogue();
+    videoStatus.textContent = "Video discussion saved.";
+  });
+}
+if (playVideoDialogueBtn) {
+  playVideoDialogueBtn.addEventListener("click", () => {
+    if (!currentDialogue || currentDialogue.source !== "video") {
+      alert("Generate a video discussion first.");
+      return;
+    }
+    playDialogueMedia();
+  });
+}
 startChatBtn.addEventListener("click", startChat);
 startCallBtn.addEventListener("click", startCallMode);
 endCallBtn.addEventListener("click", () => stopCallMode("Call mode ended.", { autoSave: true }));
@@ -8511,6 +8908,9 @@ saveCustomBtn.addEventListener("click", () => {
 });
 playRadioBtn.addEventListener("click", startRadioMode);
 stopRadioBtn.addEventListener("click", stopRadioMode);
+if (downloadPlaylistMp3Btn) {
+  downloadPlaylistMp3Btn.addEventListener("click", downloadSelectedPlaylistMp3);
+}
 deletePlaylistBtn.addEventListener("click", deleteSelectedPlaylist);
 exportPracticeBtn.addEventListener("click", exportPracticeBackup);
 playlistSelect.addEventListener("change", renderSelectedPlaylist);

@@ -644,6 +644,85 @@ Use this JSON shape:
   };
 }
 
+async function handleVideoDialogueMode(apiKey, model, requestBody) {
+  const language = getLanguageProfile(requestBody.targetLanguage);
+  const requestedLineCount = Math.min(14, Math.max(6, Number(requestBody.turnCount) || 10));
+  const transcript = String(requestBody.transcript || "").trim().slice(0, 6000);
+
+  if (!transcript) {
+    throw new Error("No video transcript was provided.");
+  }
+
+  const prompt = `
+Create a natural two-person learner dialogue in ${language.natural} about this YouTube video transcript.
+
+Transcript excerpt:
+${transcript}
+
+Rules:
+- Use ${language.natural} only for the dialogue lines.
+- Make it feel like two people discussing what the video said, similar to a short NotebookLM-style audio overview.
+- Do not invent major facts that are not supported by the transcript.
+- Keep the discussion useful for a language learner: natural phrasing, clear reactions, and a few practical takeaways.
+- Keep each line short enough to practise aloud.
+- Add an English translation for every ${language.label} line.
+- Number of lines: ${requestedLineCount}
+- Return 2 to 4 useful phrase notes from the discussion.
+- Reply with JSON only.
+
+Use this JSON shape:
+{
+  "title": "string",
+  "topic": "video discussion",
+  "setting": "video overview",
+  "level": "intermediate",
+  "tone": "informal",
+  "lines": [
+    {
+      "speaker": "string",
+      "spanish": "string",
+      "english": "string"
+    }
+  ],
+  "usefulPhrases": [
+    {
+      "spanish": "string",
+      "english": "string",
+      "note": "string"
+    }
+  ]
+}
+`.trim();
+
+  const dialogue = await callOpenAi(apiKey, model, prompt);
+  const lines = Array.isArray(dialogue.lines) ? dialogue.lines.slice(0, requestedLineCount) : [];
+  const usefulPhrases = Array.isArray(dialogue.usefulPhrases) ? dialogue.usefulPhrases.slice(0, 4) : [];
+
+  if (!lines.length || lines.some((line) => !line.spanish || (language.bannedCheck && hasBannedWords(line.spanish)))) {
+    throw new Error("The AI returned an invalid video discussion.");
+  }
+
+  return {
+    dialogue: {
+      title: dialogue.title || `${language.label} video discussion`,
+      topic: dialogue.topic || "video discussion",
+      setting: dialogue.setting || "video overview",
+      level: dialogue.level || "intermediate",
+      tone: dialogue.tone || "informal",
+      lines: lines.map((line, index) => ({
+        speaker: line.speaker || (index % 2 === 0 ? "A" : "B"),
+        spanish: line.spanish,
+        english: line.english || ""
+      })),
+      usefulPhrases: usefulPhrases.map((phrase) => ({
+        spanish: phrase.spanish || "",
+        english: phrase.english || "",
+        note: phrase.note || ""
+      })).filter((phrase) => phrase.spanish)
+    }
+  };
+}
+
 async function handler(event) {
   if (event.httpMethod !== "POST") {
     return {
@@ -675,6 +754,8 @@ async function handler(event) {
       result = await handleWordHintsMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "video-line") {
       result = await handleVideoLineMode(apiKey, model, requestBody);
+    } else if (requestBody.mode === "video-dialogue") {
+      result = await handleVideoDialogueMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "dialogue") {
       result = await handleDialogueMode(apiKey, model, requestBody);
     } else {

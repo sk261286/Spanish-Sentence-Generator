@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=37">
+  <link rel="stylesheet" href="style.css?v=41">
 </head>
 <body>
   <main class="app">
@@ -232,8 +232,16 @@
           <p class="section-label">Generated batch</p>
           <h3>Sentence set</h3>
         </div>
+        <div class="batch-bulk-actions">
+          <button id="save-batch-favourites-btn" class="secondary-btn">Save all to favourites</button>
+          <button id="add-batch-playlist-btn" class="secondary-btn">Add all to playlist</button>
+        </div>
       </div>
       <p id="batch-status" class="sentence-meta">Generate a batch to view Spanish and English side by side.</p>
+      <div id="batch-mp3-panel" class="batch-mp3-panel hidden">
+        <audio id="batch-mp3-player" class="full-conversation-audio-player" controls preload="metadata"></audio>
+        <a id="batch-mp3-link" class="secondary-btn batch-mp3-link" href="#" download>Open/save MP3</a>
+      </div>
       <div id="batch-list" class="batch-list"></div>
     </section>
     </section>
@@ -434,8 +442,11 @@
 
       <div class="actions chat-save-actions">
         <button id="load-youtube-video-btn" class="secondary-btn">Load video</button>
-        <button id="import-youtube-captions-btn" class="secondary-btn">Import captions</button>
+        <button id="import-youtube-captions-btn" class="secondary-btn">Import YouTube captions</button>
         <button id="use-pasted-transcript-btn" class="secondary-btn">Use pasted transcript</button>
+        <button id="generate-video-dialogue-btn" class="secondary-btn">Discuss video</button>
+        <button id="save-video-dialogue-btn" class="secondary-btn">Save discussion</button>
+        <button id="play-video-dialogue-btn" class="secondary-btn">Play discussion</button>
       </div>
 
       <div class="video-layout">
@@ -456,6 +467,7 @@
       </div>
 
       <p id="video-status" class="sentence-meta">Load a YouTube video, then import available captions or paste a timestamped transcript.</p>
+      <div id="video-dialogue-result" class="dialogue-result video-dialogue-result"></div>
       <div id="video-transcript-list" class="video-transcript-list"></div>
     </section>
     </section>
@@ -702,6 +714,7 @@
         <button id="add-current-to-playlist-btn" class="secondary-btn">Add current sentence</button>
         <button id="play-radio-btn" class="secondary-btn">Play radio mode</button>
         <button id="stop-radio-btn" class="secondary-btn">Stop radio mode</button>
+        <button id="download-playlist-mp3-btn" class="secondary-btn">Download playlist MP3</button>
         <button id="delete-playlist-btn" class="secondary-btn">Delete playlist</button>
         <button id="export-practice-btn" class="secondary-btn">Export practice backup</button>
       </div>
@@ -713,6 +726,6 @@
     </section>
   </main>
 
-  <script src="script.js?v=49"></script>
+  <script src="script.js?v=53"></script>
 </body>
 </html>
