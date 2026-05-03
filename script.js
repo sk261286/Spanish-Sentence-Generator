@@ -1564,6 +1564,9 @@ const emptyMessage = document.getElementById("empty-message");
 const recallList = document.getElementById("recall-list");
 const recallSummary = document.getElementById("recall-summary");
 const recallEmptyMessage = document.getElementById("recall-empty-message");
+const wordRecallList = document.getElementById("word-recall-list");
+const wordRecallSummary = document.getElementById("word-recall-summary");
+const wordRecallEmptyMessage = document.getElementById("word-recall-empty-message");
 const playlistNameInput = document.getElementById("playlist-name");
 const playlistSelect = document.getElementById("playlist-select");
 const radioModeSelect = document.getElementById("radio-mode");
@@ -1572,12 +1575,20 @@ const createPlaylistBtn = document.getElementById("create-playlist-btn");
 const addCurrentToPlaylistBtn = document.getElementById("add-current-to-playlist-btn");
 const playRadioBtn = document.getElementById("play-radio-btn");
 const stopRadioBtn = document.getElementById("stop-radio-btn");
+const previousRadioBtn = document.getElementById("previous-radio-btn");
+const pauseRadioBtn = document.getElementById("pause-radio-btn");
+const nextRadioBtn = document.getElementById("next-radio-btn");
+const radioPlayerControls = document.getElementById("radio-player-controls");
+const radioPlaybackProgress = document.getElementById("radio-playback-progress");
 const downloadPlaylistMp3Btn = document.getElementById("download-playlist-mp3-btn");
 const deletePlaylistBtn = document.getElementById("delete-playlist-btn");
 const exportPracticeBtn = document.getElementById("export-practice-btn");
 const radioStatus = document.getElementById("radio-status");
 const playlistSentences = document.getElementById("playlist-sentences");
 const playlistEmptyMessage = document.getElementById("playlist-empty-message");
+const playlistMp3Panel = document.getElementById("playlist-mp3-panel");
+const playlistMp3Player = document.getElementById("playlist-mp3-player");
+const playlistMp3Link = document.getElementById("playlist-mp3-link");
 const customEnglishInput = document.getElementById("custom-english-input");
 const customToneLabel = document.getElementById("custom-tone-label");
 const customToneSelect = document.getElementById("custom-tone");
@@ -1755,6 +1766,7 @@ let currentSpanishStreamReader = null;
 let spanishAudioEndedCallback = null;
 let spanishAudioPlaybackId = 0;
 let batchMp3ObjectUrl = "";
+let playlistMp3ObjectUrl = "";
 let wordHintRequestId = 0;
 let aiWordHintCache = JSON.parse(localStorage.getItem("spanishSentenceAiWordHints")) || {};
 let chatTimerInterval = null;
@@ -1798,6 +1810,7 @@ const targetLanguageProfiles = {
 // We load saved data from localStorage when the page opens.
 let favourites = JSON.parse(localStorage.getItem("spanishSentenceFavourites")) || [];
 let recallSentences = JSON.parse(localStorage.getItem("spanishSentenceRecall")) || [];
+let savedWords = JSON.parse(localStorage.getItem("spanishSentenceSavedWords")) || [];
 let quizScore = JSON.parse(localStorage.getItem("spanishSentenceQuizScore")) || {
   correct: 0,
   wrong: 0
@@ -1805,6 +1818,7 @@ let quizScore = JSON.parse(localStorage.getItem("spanishSentenceQuizScore")) || 
 let playlists = JSON.parse(localStorage.getItem("spanishSentencePlaylists")) || [];
 let radioState = {
   isPlaying: false,
+  isPaused: false,
   playlistId: "",
   mode: "repeat-one",
   index: 0,
@@ -2315,6 +2329,107 @@ function buildLanguageChatBackup() {
 
     return backup;
   }, {});
+}
+
+// This helper saves vocabulary cards in localStorage.
+function saveSavedWords() {
+  localStorage.setItem("spanishSentenceSavedWords", JSON.stringify(savedWords));
+}
+
+// This helper normalises older or newly saved word cards.
+function withWordSchedule(wordCard) {
+  const nowText = new Date().toISOString();
+  const cleanWord = normaliseWord(wordCard.word || wordCard.displayWord || "");
+
+  return {
+    id: wordCard.id || createId(),
+    targetLanguage: getSavedItemLanguage(wordCard),
+    word: wordCard.word || wordCard.displayWord || "",
+    normalisedWord: wordCard.normalisedWord || cleanWord,
+    meaning: wordCard.meaning || "",
+    exampleSpanish: wordCard.exampleSpanish || "",
+    exampleEnglish: wordCard.exampleEnglish || "",
+    source: wordCard.source || "sentence",
+    createdAt: wordCard.createdAt || nowText,
+    lastReviewedAt: wordCard.lastReviewedAt || "",
+    nextReviewAt: wordCard.nextReviewAt || nowText,
+    repetitions: wordCard.repetitions || 0,
+    easeFactor: wordCard.easeFactor || 2.5,
+    intervalDays: wordCard.intervalDays || 0,
+    correct: wordCard.correct || 0,
+    wrong: wordCard.wrong || 0
+  };
+}
+
+// This helper checks whether a saved word is due now.
+function isWordDue(wordCard) {
+  return !wordCard.nextReviewAt || new Date(wordCard.nextReviewAt).getTime() <= Date.now();
+}
+
+// This helper returns the source sentence object for a clicked word.
+function getWordExampleFromElement(wordElement) {
+  const exampleText = wordElement?.dataset?.example || "";
+  const exampleEnglish = wordElement?.dataset?.exampleEnglish || "";
+
+  if (exampleText) {
+    return {
+      spanish: exampleText,
+      english: exampleEnglish
+    };
+  }
+
+  if (currentSentence?.spanish) {
+    return currentSentence;
+  }
+
+  return {
+    spanish: wordElement?.textContent || "",
+    english: ""
+  };
+}
+
+// This helper saves one clicked word with its example sentence.
+function saveWordFromElement(wordElement, source = "sentence") {
+  const rawWord = wordElement?.textContent?.trim() || "";
+  const cleanWord = normaliseWord(rawWord);
+  const meaning = wordElement?.getAttribute("data-translation") || "";
+
+  if (!cleanWord) {
+    return false;
+  }
+
+  const example = getWordExampleFromElement(wordElement);
+  const existingIndex = savedWords.findIndex((item) => {
+    const scheduledItem = withWordSchedule(item);
+    return scheduledItem.targetLanguage === targetLanguage && scheduledItem.normalisedWord === cleanWord;
+  });
+
+  const wordCard = withWordSchedule({
+    targetLanguage,
+    word: rawWord.replace(/[.,!?¿¡;:]+$/g, ""),
+    normalisedWord: cleanWord,
+    meaning: meaning && !meaning.toLowerCase().includes("hint") ? meaning : "",
+    exampleSpanish: example.spanish || "",
+    exampleEnglish: example.english || "",
+    source
+  });
+
+  if (existingIndex >= 0) {
+    savedWords[existingIndex] = {
+      ...withWordSchedule(savedWords[existingIndex]),
+      meaning: wordCard.meaning || withWordSchedule(savedWords[existingIndex]).meaning,
+      exampleSpanish: wordCard.exampleSpanish || withWordSchedule(savedWords[existingIndex]).exampleSpanish,
+      exampleEnglish: wordCard.exampleEnglish || withWordSchedule(savedWords[existingIndex]).exampleEnglish
+    };
+    showStatusMessage(`Updated saved word: ${wordCard.word}.`);
+  } else {
+    savedWords.push(wordCard);
+    showStatusMessage(`Saved word: ${wordCard.word}.`);
+  }
+
+  saveSavedWords();
+  renderSavedWords();
+  return true;
 }
 
 // This helper updates the visible chat timer.
@@ -2991,6 +3106,7 @@ function clearMixedLanguageChatIfNeeded() {
 function refreshLanguageScopedViews() {
   renderFavourites();
   renderRecallSentences();
+  renderSavedWords();
   renderPlaylists();
   renderSavedDialogues();
   renderSavedConversations();
@@ -4510,12 +4626,12 @@ async function translateCustomSentence() {
     customEnglishOutput.textContent = latestCustomSentence.english;
   }
 
-  setCurrentSentence(latestCustomSentence, "Custom translation");
+  setCurrentSentence(latestCustomSentence, "Translated sentence");
 
   if (!(aiModeEnabled && latestCustomSentence.ai !== true)) {
     customStatus.textContent = latestCustomSentence.ai
       ? `AI translated your sentence and made it sound more native in ${profile.label}.`
-      : "Custom sentence translated and loaded into the main player. You can now speak it, save it, or add it to a playlist.";
+      : "Sentence translated and loaded into the main player. You can now speak it, save it, or add it to a playlist.";
   }
 }
 
@@ -5241,22 +5357,43 @@ function downloadAudioBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-// This helper keeps a prepared batch MP3 available for mobile browsers.
-function showBatchMp3Ready(blob, filename) {
-  if (!batchMp3Panel || !batchMp3Player || !batchMp3Link) {
+// This helper keeps a prepared MP3 available for mobile browsers.
+function showPreparedMp3(panel, player, link, objectUrlName, blob, filename) {
+  if (!panel || !player || !link) {
     return;
   }
 
-  if (batchMp3ObjectUrl) {
+  if (objectUrlName === "playlist" && playlistMp3ObjectUrl) {
+    URL.revokeObjectURL(playlistMp3ObjectUrl);
+  }
+
+  if (objectUrlName === "batch" && batchMp3ObjectUrl) {
     URL.revokeObjectURL(batchMp3ObjectUrl);
   }
 
-  batchMp3ObjectUrl = URL.createObjectURL(blob);
-  batchMp3Player.src = batchMp3ObjectUrl;
-  batchMp3Link.href = batchMp3ObjectUrl;
-  batchMp3Link.download = filename;
-  batchMp3Link.textContent = "Open/save MP3";
-  batchMp3Panel.classList.remove("hidden");
+  const objectUrl = URL.createObjectURL(blob);
+
+  if (objectUrlName === "playlist") {
+    playlistMp3ObjectUrl = objectUrl;
+  } else {
+    batchMp3ObjectUrl = objectUrl;
+  }
+
+  player.src = objectUrl;
+  link.href = objectUrl;
+  link.download = filename;
+  link.textContent = "Open/save MP3";
+  panel.classList.remove("hidden");
+}
+
+// This helper keeps a prepared batch MP3 available for mobile browsers.
+function showBatchMp3Ready(blob, filename) {
+  showPreparedMp3(batchMp3Panel, batchMp3Player, batchMp3Link, "batch", blob, filename);
+}
+
+// This helper keeps a prepared playlist MP3 available for mobile browsers.
+function showPlaylistMp3Ready(blob, filename) {
+  showPreparedMp3(playlistMp3Panel, playlistMp3Player, playlistMp3Link, "playlist", blob, filename);
 }
 
 // This helper formats audio time for the full-conversation media player.
@@ -5291,11 +5428,15 @@ async function fetchConversationAudioBlob(turns) {
   if (!response.ok) {
     let errorMessage = "The conversation audio backend was not ready.";
 
+    const responseText = await response.text();
+
     try {
-      const errorData = await response.json();
+      const errorData = JSON.parse(responseText);
       errorMessage = errorData.details || errorData.error || errorMessage;
     } catch (error) {
-      errorMessage = "The conversation audio backend returned an unexpected error.";
+      errorMessage = responseText.trim()
+        ? `The conversation audio backend returned ${response.status}: ${responseText.trim().slice(0, 180)}`
+        : `The conversation audio backend returned ${response.status} without details.`;
     }
 
     throw new Error(errorMessage);
@@ -5879,9 +6020,10 @@ function removeConversationPlaylistItem(conversationId) {
 }
 
 // This function turns a Spanish sentence into hoverable words.
-function buildHoverableFragment(text) {
+function buildHoverableFragment(text, exampleSentence = null) {
   const fragment = document.createDocumentFragment();
   const parts = text.split(" ");
+  const example = exampleSentence || { spanish: text, english: "" };
 
   parts.forEach((part, index) => {
     const wordSpan = document.createElement("span");
@@ -5889,6 +6031,12 @@ function buildHoverableFragment(text) {
     wordSpan.textContent = part;
     wordSpan.setAttribute("tabindex", "0");
     wordSpan.setAttribute("data-translation", getWordTranslation(part));
+    wordSpan.dataset.example = example.spanish || text;
+    wordSpan.dataset.exampleEnglish = example.english || "";
+    wordSpan.title = "Click to save this word";
+    wordSpan.addEventListener("click", () => {
+      saveWordFromElement(wordSpan, "sentence");
+    });
     fragment.appendChild(wordSpan);
 
     if (index < parts.length - 1) {
@@ -5902,7 +6050,7 @@ function buildHoverableFragment(text) {
 // This function draws the current Spanish sentence with hover hints.
 function renderSpanishSentence(text) {
   spanishSentence.innerHTML = "";
-  spanishSentence.appendChild(buildHoverableFragment(text));
+  spanishSentence.appendChild(buildHoverableFragment(text, currentSentence));
 }
 
 // This helper removes the final full stop so we can add more pieces.
@@ -6240,6 +6388,10 @@ function ensureSpanishAudioPlayer() {
       callback();
     }
   });
+  spanishAudioPlayer.addEventListener("timeupdate", updateRadioPlaybackControls);
+  spanishAudioPlayer.addEventListener("loadedmetadata", updateRadioPlaybackControls);
+  spanishAudioPlayer.addEventListener("play", updateRadioPlaybackControls);
+  spanishAudioPlayer.addEventListener("pause", updateRadioPlaybackControls);
 
   return spanishAudioPlayer;
 }
@@ -6972,7 +7124,7 @@ async function generateVideoDialogue() {
     videoStatus.textContent = `Could not generate a video discussion. ${formatAiErrorMessage(error.message)}`;
   } finally {
     generateVideoDialogueBtn.disabled = false;
-    generateVideoDialogueBtn.textContent = "Discuss video";
+    generateVideoDialogueBtn.textContent = "Generate video discussion";
   }
 }
 
@@ -7158,7 +7310,7 @@ async function lookupVideoWord(index, rawWord) {
   selectVideoLine(index);
   const cacheKey = `${index}:${cleanWord.toLowerCase()}`;
   if (videoWordHintCache[cacheKey]) {
-    videoWordHint.textContent = `${cleanWord}: ${videoWordHintCache[cacheKey]}`;
+    renderVideoWordHint(cleanWord, videoWordHintCache[cacheKey], line, index);
     return;
   }
 
@@ -7174,10 +7326,35 @@ async function lookupVideoWord(index, rawWord) {
     });
     const hint = data.hints?.[cleanWord] || Object.values(data.hints || {})[0] || "No hint returned.";
     videoWordHintCache[cacheKey] = hint;
-    videoWordHint.textContent = `${cleanWord}: ${hint}`;
+    renderVideoWordHint(cleanWord, hint, line, index);
   } catch (error) {
     videoWordHint.textContent = formatAiErrorMessage(error.message);
   }
+}
+
+// This helper shows a video word hint with a save action.
+function renderVideoWordHint(word, hint, line, index) {
+  videoWordHint.innerHTML = "";
+
+  const text = document.createElement("span");
+  const saveButton = document.createElement("button");
+
+  text.textContent = `${word}: ${hint}`;
+  saveButton.type = "button";
+  saveButton.className = "secondary-btn word-save-btn";
+  saveButton.textContent = "Save word";
+  saveButton.addEventListener("click", () => {
+    const fakeWordElement = document.createElement("span");
+    fakeWordElement.textContent = word;
+    fakeWordElement.setAttribute("data-translation", hint);
+    fakeWordElement.dataset.example = line.text;
+    fakeWordElement.dataset.exampleEnglish = videoLineTranslationCache[index] || "";
+    saveWordFromElement(fakeWordElement, "video");
+    videoStatus.textContent = `Saved word: ${word}.`;
+  });
+
+  videoWordHint.appendChild(text);
+  videoWordHint.appendChild(saveButton);
 }
 
 // This function asks the Netlify backend for a fresh AI sentence.
@@ -7985,6 +8162,10 @@ function renderSelectedPlaylist() {
   playlist.sentences.forEach((sentence, index) => {
     const listItem = document.createElement("li");
     listItem.className = "favourite-item";
+    listItem.dataset.playlistIndex = String(index);
+    if (radioState.isPlaying && radioState.playlistId === playlist.id && radioState.index === index) {
+      listItem.classList.add("active-playlist-item");
+    }
 
     const textWrapper = document.createElement("div");
     const title = document.createElement("h4");
@@ -7993,9 +8174,12 @@ function renderSelectedPlaylist() {
     const difficultyTag = document.createElement("span");
     const topicTag = document.createElement("span");
     const toneTag = document.createElement("span");
+    const actionRow = document.createElement("div");
+    const playButton = document.createElement("button");
+    const startHereButton = document.createElement("button");
     const removeButton = document.createElement("button");
 
-    title.appendChild(buildHoverableFragment(sentence.spanish));
+    title.appendChild(buildHoverableFragment(sentence.spanish, sentence));
     translation.textContent = sentence.english;
 
     tagRow.className = "tag-row";
@@ -8006,6 +8190,17 @@ function renderSelectedPlaylist() {
     topicTag.textContent = capitalize(sentence.topic);
     toneTag.textContent = capitalize(sentence.tone);
 
+    actionRow.className = "playlist-item-actions";
+    playButton.textContent = "Play";
+    playButton.className = "secondary-btn";
+    playButton.addEventListener("click", () => {
+      playSinglePlaylistSentence(sentence, index);
+    });
+    startHereButton.textContent = "Start from here";
+    startHereButton.className = "secondary-btn";
+    startHereButton.addEventListener("click", () => {
+      startRadioMode(index);
+    });
     removeButton.textContent = "Remove";
     removeButton.className = "delete-btn";
     removeButton.addEventListener("click", () => {
@@ -8018,8 +8213,11 @@ function renderSelectedPlaylist() {
     textWrapper.appendChild(title);
     textWrapper.appendChild(translation);
     textWrapper.appendChild(tagRow);
+    actionRow.appendChild(playButton);
+    actionRow.appendChild(startHereButton);
+    actionRow.appendChild(removeButton);
     listItem.appendChild(textWrapper);
-    listItem.appendChild(removeButton);
+    listItem.appendChild(actionRow);
     playlistSentences.appendChild(listItem);
   });
 }
@@ -8098,6 +8296,17 @@ function deleteSelectedPlaylist() {
   showStatusMessage("Playlist deleted.");
 }
 
+// This helper plays one playlist sentence without continuing through the playlist.
+function playSinglePlaylistSentence(sentence, index) {
+  if (!sentence?.spanish) {
+    return;
+  }
+
+  stopRadioMode("");
+  playSpanishAudio(sentence.spanish, `Playlist sentence ${index + 1}`);
+  radioStatus.textContent = `Playing sentence ${index + 1}.`;
+}
+
 // This function downloads the selected sentence playlist as one MP3.
 async function downloadSelectedPlaylistMp3() {
   const playlist = getSelectedPlaylist();
@@ -8113,16 +8322,25 @@ async function downloadSelectedPlaylistMp3() {
   }
 
   stopRadioMode();
+  if (playlistMp3Panel) {
+    playlistMp3Panel.classList.add("hidden");
+  }
+
   downloadPlaylistMp3Btn.disabled = true;
   downloadPlaylistMp3Btn.textContent = "Preparing MP3...";
   radioStatus.textContent = `Preparing one MP3 for "${playlist.name}"...`;
 
   try {
     const turns = playlist.sentences.map((sentence) => ({ spanish: sentence.spanish }));
-    const audioBlob = await fetchConversationAudioBlob(turns);
+    const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
+      radioStatus.textContent = `Preparing playlist audio part ${chunkNumber} of ${totalChunks}...`;
+    });
     const filename = slugifyFilename(`${getTargetLanguageProfile().label}-${playlist.name}-playlist`);
-    downloadAudioBlob(audioBlob, `${filename}.mp3`);
-    radioStatus.textContent = `Playlist MP3 downloaded: ${playlist.name}.`;
+    const fullFilename = `${filename}.mp3`;
+
+    showPlaylistMp3Ready(audioBlob, fullFilename);
+    downloadAudioBlob(audioBlob, fullFilename);
+    radioStatus.textContent = `Playlist MP3 ready: ${playlist.name}. If your phone did not download it automatically, use Open/save MP3.`;
   } catch (error) {
     radioStatus.textContent = `Could not download the playlist MP3. ${error.message}`;
   } finally {
@@ -8162,7 +8380,7 @@ function continueRadioAfterShadowGap(callback) {
   }, gapMs);
 }
 
-// This helper clears the safety timer that keeps radio mode moving on mobile.
+// This helper clears the safety timer that keeps playlist practice moving on mobile.
 function clearRadioRecoveryTimer() {
   if (radioState.recoveryTimeoutId) {
     window.clearTimeout(radioState.recoveryTimeoutId);
@@ -8170,9 +8388,82 @@ function clearRadioRecoveryTimer() {
   }
 }
 
+// This helper redraws the compact playlist media controls.
+function updateRadioPlaybackControls() {
+  if (!radioPlayerControls || !radioPlaybackProgress || !pauseRadioBtn) {
+    return;
+  }
+
+  const playlist = playlists.find((item) => item.id === radioState.playlistId);
+  const player = spanishAudioPlayer;
+  const isActive = radioState.isPlaying && playlist;
+  const currentTime = player ? player.currentTime : 0;
+  const duration = player ? player.duration : 0;
+  const hasDuration = Number.isFinite(duration) && duration > 0;
+
+  radioPlayerControls.classList.toggle("hidden", !isActive);
+  pauseRadioBtn.textContent = radioState.isPaused ? "Resume" : "Pause";
+  radioPlaybackProgress.textContent = isActive
+    ? `${radioState.isPaused ? "Paused" : "Playing"} ${radioState.index + 1} of ${playlist.sentences.length} | ${formatMediaTime(currentTime)} / ${hasDuration ? formatMediaTime(duration) : "--:--"}`
+    : "Not playing";
+
+  document.querySelectorAll("[data-playlist-index]").forEach((item) => {
+    item.classList.toggle(
+      "active-playlist-item",
+      isActive && Number(item.dataset.playlistIndex) === radioState.index
+    );
+  });
+}
+
+// This helper skips to a different sentence while playlist practice is active.
+function skipRadioSentence(direction) {
+  const playlist = playlists.find((item) => item.id === radioState.playlistId) || getSelectedPlaylist();
+
+  if (!playlist || !playlist.sentences.length) {
+    return;
+  }
+
+  radioState.isPlaying = true;
+  radioState.isPaused = false;
+  radioState.playlistId = playlist.id;
+  radioState.mode = radioModeSelect.value;
+  radioState.index = (radioState.index + direction + playlist.sentences.length) % playlist.sentences.length;
+  spanishAudioEndedCallback = null;
+  playRadioStep();
+}
+
+// This function pauses or resumes playlist radio playback.
+function toggleRadioPause() {
+  if (!radioState.isPlaying) {
+    startRadioMode(radioState.index || 0);
+    return;
+  }
+
+  const player = ensureSpanishAudioPlayer();
+
+  if (radioState.isPaused) {
+    radioState.isPaused = false;
+    player.play().catch(() => {
+      radioStatus.textContent = "Tap play again to resume audio.";
+    });
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.resume();
+    }
+  } else {
+    radioState.isPaused = true;
+    clearRadioRecoveryTimer();
+    player.pause();
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.pause();
+    }
+  }
+
+  updateRadioPlaybackControls();
+}
+
 // This helper advances radio playback once, even if an audio end event fires twice.
 function advanceRadioOnce(playbackToken, playlist) {
-  if (!radioState.isPlaying || playbackToken !== radioState.playbackToken) {
+  if (!radioState.isPlaying || radioState.isPaused || playbackToken !== radioState.playbackToken) {
     return;
   }
 
@@ -8235,6 +8526,7 @@ function armRadioRecoveryTimer(playbackToken, playlist) {
 // This function stops any radio playback.
 function stopRadioMode() {
   radioState.isPlaying = false;
+  radioState.isPaused = false;
   radioState.playbackToken += 1;
   if (radioState.shadowTimeoutId) {
     window.clearTimeout(radioState.shadowTimeoutId);
@@ -8247,10 +8539,12 @@ function stopRadioMode() {
   if ("speechSynthesis" in window) {
     window.speechSynthesis.cancel();
   }
-  radioStatus.textContent = "Radio mode stopped.";
+  radioStatus.textContent = "Playlist practice stopped.";
+  updateRadioPlaybackControls();
+  renderSelectedPlaylist();
 }
 
-// This function chooses which sentence to play next in radio mode.
+// This function chooses which sentence to play next in playlist practice.
 function playRadioStep() {
   const playlist = playlists.find((item) => item.id === radioState.playlistId);
 
@@ -8272,6 +8566,8 @@ function playRadioStep() {
   radioState.playbackToken += 1;
   const playbackToken = radioState.playbackToken;
   radioStatus.textContent = `Playing ${radioState.index + 1} of ${playlist.sentences.length}: ${playlist.name}`;
+  radioState.isPaused = false;
+  updateRadioPlaybackControls();
 
   playSpanishAudio(sentenceText, `${playlist.name} ${radioState.index + 1}`, () => {
     advanceRadioOnce(playbackToken, playlist);
@@ -8280,7 +8576,7 @@ function playRadioStep() {
 }
 
 // This function starts radio playback.
-function startRadioMode() {
+function startRadioMode(startIndex = 0) {
   const playlist = getSelectedPlaylist();
 
   if (!playlist) {
@@ -8295,9 +8591,12 @@ function startRadioMode() {
 
   stopFullConversationPlayback("");
   radioState.isPlaying = true;
+  radioState.isPaused = false;
   radioState.playlistId = playlist.id;
   radioState.mode = radioModeSelect.value;
-  radioState.index = 0;
+  radioState.index = typeof startIndex === "number"
+    ? Math.max(0, Math.min(startIndex, playlist.sentences.length - 1))
+    : 0;
   playRadioStep();
 }
 
@@ -8558,7 +8857,7 @@ function renderRecallSentences() {
     revealButton.className = "secondary-btn";
     revealButton.addEventListener("click", () => {
       hiddenSpanish.innerHTML = "";
-      hiddenSpanish.appendChild(buildHoverableFragment(item.spanish));
+      hiddenSpanish.appendChild(buildHoverableFragment(item.spanish, item));
       revealButton.textContent = "Spanish shown";
       revealButton.disabled = true;
     });
@@ -8573,7 +8872,7 @@ function renderRecallSentences() {
     missedButton.className = "secondary-btn";
     missedButton.addEventListener("click", () => {
       hiddenSpanish.innerHTML = "";
-      hiddenSpanish.appendChild(buildHoverableFragment(item.spanish));
+      hiddenSpanish.appendChild(buildHoverableFragment(item.spanish, item));
       markRecallReview(item.spanish, false);
     });
 
@@ -8608,6 +8907,181 @@ function renderRecallSentences() {
     recallList.appendChild(listItem);
   });
   saveRecallSentences();
+}
+
+// This helper updates a saved word with a high-quality spaced repetition grade.
+function markWordReview(wordId, quality) {
+  savedWords = savedWords.map((wordCard) => {
+    const scheduledCard = withWordSchedule(wordCard);
+
+    if (scheduledCard.id !== wordId) {
+      return scheduledCard;
+    }
+
+    const nextEase = Math.max(
+      1.3,
+      scheduledCard.easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
+    );
+    const remembered = quality >= 3;
+    const nextRepetitions = remembered ? scheduledCard.repetitions + 1 : 0;
+    let nextIntervalDays = 0;
+
+    if (quality === 0) {
+      nextIntervalDays = 0;
+    } else if (quality === 3) {
+      nextIntervalDays = Math.max(1, Math.round(Math.max(1, scheduledCard.intervalDays) * 1.2));
+    } else if (quality === 4) {
+      nextIntervalDays = nextRepetitions === 1
+        ? 1
+        : nextRepetitions === 2
+          ? 3
+          : Math.round(Math.max(1, scheduledCard.intervalDays) * nextEase);
+    } else {
+      nextIntervalDays = nextRepetitions === 1
+        ? 3
+        : Math.round(Math.max(2, scheduledCard.intervalDays) * nextEase * 1.3);
+    }
+
+    const nextReviewDate = new Date();
+
+    if (quality === 0) {
+      nextReviewDate.setMinutes(nextReviewDate.getMinutes() + 10);
+    } else {
+      nextReviewDate.setDate(nextReviewDate.getDate() + nextIntervalDays);
+    }
+
+    return {
+      ...scheduledCard,
+      repetitions: nextRepetitions,
+      easeFactor: nextEase,
+      intervalDays: nextIntervalDays,
+      correct: scheduledCard.correct + (remembered ? 1 : 0),
+      wrong: scheduledCard.wrong + (remembered ? 0 : 1),
+      lastReviewedAt: new Date().toISOString(),
+      nextReviewAt: nextReviewDate.toISOString()
+    };
+  });
+
+  saveSavedWords();
+  renderSavedWords();
+  showStatusMessage(quality === 0 ? "Word stays due soon." : "Word review scheduled.");
+}
+
+// This function removes a saved word.
+function deleteSavedWord(wordId) {
+  savedWords = savedWords.filter((wordCard) => withWordSchedule(wordCard).id !== wordId);
+  saveSavedWords();
+  renderSavedWords();
+}
+
+// This function draws the saved-word spaced repetition list.
+function renderSavedWords() {
+  if (!wordRecallList || !wordRecallSummary || !wordRecallEmptyMessage) {
+    return;
+  }
+
+  wordRecallList.innerHTML = "";
+  savedWords = savedWords.map(withWordSchedule);
+  const languageWords = getCurrentLanguageItems(savedWords).filter((wordCard) => wordCard.normalisedWord);
+
+  if (!languageWords.length) {
+    wordRecallEmptyMessage.style.display = "block";
+    wordRecallSummary.textContent = "No saved words yet.";
+    saveSavedWords();
+    return;
+  }
+
+  wordRecallEmptyMessage.style.display = "none";
+  const dueCount = languageWords.filter(isWordDue).length;
+  wordRecallSummary.textContent = `${dueCount} due now | ${languageWords.length} saved words`;
+
+  languageWords
+    .slice()
+    .sort((first, second) => {
+      const firstDue = isWordDue(first) ? 0 : 1;
+      const secondDue = isWordDue(second) ? 0 : 1;
+
+      if (firstDue !== secondDue) {
+        return firstDue - secondDue;
+      }
+
+      return new Date(first.nextReviewAt) - new Date(second.nextReviewAt);
+    })
+    .forEach((wordCard) => {
+      const listItem = document.createElement("li");
+      const title = document.createElement("h4");
+      const meaning = document.createElement("p");
+      const example = document.createElement("p");
+      const exampleEnglish = document.createElement("p");
+      const schedule = document.createElement("p");
+      const tagRow = document.createElement("div");
+      const dueTag = document.createElement("span");
+      const actionRow = document.createElement("div");
+      const againButton = document.createElement("button");
+      const hardButton = document.createElement("button");
+      const goodButton = document.createElement("button");
+      const easyButton = document.createElement("button");
+      const playButton = document.createElement("button");
+      const removeButton = document.createElement("button");
+
+      listItem.className = "recall-item word-recall-item";
+      title.textContent = wordCard.word;
+      meaning.textContent = wordCard.meaning || "Meaning not saved yet. Click the word again after its hint loads to update it.";
+      example.className = "word-example";
+      example.textContent = wordCard.exampleSpanish || "";
+      exampleEnglish.className = "word-example-english";
+      exampleEnglish.textContent = wordCard.exampleEnglish || "";
+      schedule.textContent = `Next review: ${isWordDue(wordCard) ? "due now" : formatReviewDate(wordCard.nextReviewAt)} | Interval: ${wordCard.intervalDays || "same day"} | Ease: ${wordCard.easeFactor.toFixed(2)} | Right: ${wordCard.correct} | Missed: ${wordCard.wrong}`;
+
+      tagRow.className = "tag-row";
+      dueTag.className = "tag";
+      dueTag.textContent = isWordDue(wordCard) ? "Due now" : `Due ${formatReviewDate(wordCard.nextReviewAt)}`;
+      tagRow.appendChild(dueTag);
+
+      actionRow.className = "actions";
+      againButton.textContent = "Again";
+      hardButton.textContent = "Hard";
+      goodButton.textContent = "Good";
+      easyButton.textContent = "Easy";
+      playButton.textContent = "Play example";
+      removeButton.textContent = "Remove";
+
+      [againButton, hardButton, goodButton, easyButton, playButton].forEach((button) => {
+        button.className = "secondary-btn";
+      });
+      removeButton.className = "delete-btn";
+
+      againButton.addEventListener("click", () => markWordReview(wordCard.id, 0));
+      hardButton.addEventListener("click", () => markWordReview(wordCard.id, 3));
+      goodButton.addEventListener("click", () => markWordReview(wordCard.id, 4));
+      easyButton.addEventListener("click", () => markWordReview(wordCard.id, 5));
+      playButton.addEventListener("click", () => {
+        playSpanishAudio(wordCard.exampleSpanish || wordCard.word, `Word example: ${wordCard.word}`);
+      });
+      removeButton.addEventListener("click", () => deleteSavedWord(wordCard.id));
+
+      actionRow.appendChild(againButton);
+      actionRow.appendChild(hardButton);
+      actionRow.appendChild(goodButton);
+      actionRow.appendChild(easyButton);
+      actionRow.appendChild(playButton);
+      actionRow.appendChild(removeButton);
+
+      listItem.appendChild(title);
+      listItem.appendChild(meaning);
+      if (wordCard.exampleSpanish) {
+        listItem.appendChild(example);
+      }
+      if (wordCard.exampleEnglish) {
+        listItem.appendChild(exampleEnglish);
+      }
+      listItem.appendChild(schedule);
+      listItem.appendChild(tagRow);
+      listItem.appendChild(actionRow);
+      wordRecallList.appendChild(listItem);
+    });
+
+  saveSavedWords();
 }
 
 // This function draws the favourites list.
@@ -8656,7 +9130,7 @@ function renderFavourites() {
     const playlistButton = document.createElement("button");
     const recallButton = document.createElement("button");
 
-    title.appendChild(buildHoverableFragment(item.spanish));
+    title.appendChild(buildHoverableFragment(item.spanish, item));
     translation.textContent = item.english;
 
     tagRow.className = "tag-row";
@@ -8908,6 +9382,15 @@ saveCustomBtn.addEventListener("click", () => {
 });
 playRadioBtn.addEventListener("click", startRadioMode);
 stopRadioBtn.addEventListener("click", stopRadioMode);
+if (previousRadioBtn) {
+  previousRadioBtn.addEventListener("click", () => skipRadioSentence(-1));
+}
+if (pauseRadioBtn) {
+  pauseRadioBtn.addEventListener("click", toggleRadioPause);
+}
+if (nextRadioBtn) {
+  nextRadioBtn.addEventListener("click", () => skipRadioSentence(1));
+}
 if (downloadPlaylistMp3Btn) {
   downloadPlaylistMp3Btn.addEventListener("click", downloadSelectedPlaylistMp3);
 }

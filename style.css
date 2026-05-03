@@ -68,17 +68,8 @@ body.dark-mode {
 }
 
 .hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 24px;
+  display: block;
   padding: 14px 2px 18px;
-}
-
-.hero .hero-eyebrow,
-.hero h1,
-.hero .intro {
-  grid-column: 1;
 }
 
 .theme-toggle-btn {
@@ -100,16 +91,40 @@ body.dark-mode {
   position: sticky;
   top: max(8px, env(safe-area-inset-top));
   z-index: 20;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 0.8fr auto;
+  gap: 8px;
   margin: 0 0 18px;
-  padding: 6px;
+  padding: 8px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 10px 24px rgba(20, 30, 48, 0.07);
   backdrop-filter: blur(12px);
+}
+
+.nav-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px;
+  border-radius: 7px;
+  background: rgba(248, 250, 252, 0.75);
+}
+
+body.dark-mode .nav-group {
+  background: rgba(15, 23, 42, 0.62);
+}
+
+.nav-group-label {
+  flex: 0 0 auto;
+  padding: 0 8px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 body.dark-mode .page-nav {
@@ -118,7 +133,7 @@ body.dark-mode .page-nav {
 
 .page-tab {
   flex: 1 1 auto;
-  min-width: 118px;
+  min-width: 0;
   background: transparent;
   color: #465264;
   border: 1px solid transparent;
@@ -171,6 +186,39 @@ body.dark-mode .page-tab.active {
   min-height: 42px;
   padding: 9px 14px;
   white-space: nowrap;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.settings-panel {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel-soft);
+}
+
+.settings-panel-wide {
+  grid-column: 1 / -1;
+}
+
+.settings-fields {
+  display: grid;
+  gap: 14px;
+}
+
+.settings-fields .helper-note {
+  margin: 0;
+}
+
+.settings-fields .theme-toggle-btn {
+  grid-column: auto;
+  grid-row: auto;
+  align-self: stretch;
+  width: 100%;
 }
 
 .app-page {
@@ -258,7 +306,8 @@ body.dark-mode .page-tab.active {
 .recall-card,
 .custom-card,
 .dialogue-card,
-.chat-card {
+.chat-card,
+.settings-card {
   padding: 24px;
   margin-bottom: 16px;
 }
@@ -544,20 +593,27 @@ body.dark-mode .chat-language-badge.warning {
   margin: -4px 0 18px;
 }
 
-.conversation-playback-controls {
+.media-player-panel {
   align-items: center;
   margin: -6px 0 18px;
-  padding: 12px;
-  border: 1px solid var(--line);
+  padding: 14px;
+  border: 1px solid rgba(3, 105, 161, 0.18);
   border-radius: var(--radius);
-  background: var(--panel-soft);
+  background: linear-gradient(180deg, #f8fafc 0%, #eef7ff 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+body.dark-mode .media-player-panel {
+  background: linear-gradient(180deg, #172033 0%, #102235 100%);
+  border-color: #334155;
 }
 
 .full-conversation-audio-player {
   flex: 1 1 100%;
   width: 100%;
   min-width: min(100%, 320px);
-  margin-top: 4px;
+  margin-top: 2px;
+  accent-color: var(--accent);
 }
 
 .conversation-playback-progress {
@@ -567,8 +623,8 @@ body.dark-mode .chat-language-badge.warning {
   padding: 9px 12px;
   border-radius: 7px;
   background: #ffffff;
-  border: 1px solid var(--line);
-  color: var(--muted);
+  border: 1px solid rgba(3, 105, 161, 0.16);
+  color: #0f5f8c;
   font-weight: 700;
 }
 
@@ -711,6 +767,138 @@ body.dark-mode .theme-toggle-btn {
   box-shadow: 0 8px 16px rgba(20, 30, 48, 0.08);
 }
 
+body:not(.dark-mode) #speak-spanish-btn,
+body:not(.dark-mode) #speak-english-btn,
+body:not(.dark-mode) #speak-chat-reply-btn,
+body:not(.dark-mode) #play-full-chat-btn,
+body:not(.dark-mode) #play-dialogue-btn,
+body:not(.dark-mode) #play-radio-btn,
+body:not(.dark-mode) #play-conversation-playlist-btn,
+body:not(.dark-mode) #play-video-dialogue-btn,
+body:not(.dark-mode) .video-line-play-btn,
+body:not(.dark-mode) .chat-audio-btn,
+body:not(.dark-mode) .playlist-item-actions .secondary-btn:first-child,
+body:not(.dark-mode) .batch-action-btn:first-child {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+body:not(.dark-mode) #speak-spanish-btn:hover,
+body:not(.dark-mode) #speak-english-btn:hover,
+body:not(.dark-mode) #speak-chat-reply-btn:hover,
+body:not(.dark-mode) #play-full-chat-btn:hover,
+body:not(.dark-mode) #play-dialogue-btn:hover,
+body:not(.dark-mode) #play-radio-btn:hover,
+body:not(.dark-mode) #play-conversation-playlist-btn:hover,
+body:not(.dark-mode) #play-video-dialogue-btn:hover,
+body:not(.dark-mode) .video-line-play-btn:hover,
+body:not(.dark-mode) .chat-audio-btn:hover,
+body:not(.dark-mode) .playlist-item-actions .secondary-btn:first-child:hover,
+body:not(.dark-mode) .batch-action-btn:first-child:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+body:not(.dark-mode) #save-btn,
+body:not(.dark-mode) #save-chat-reply-btn,
+body:not(.dark-mode) #save-dialogue-btn,
+body:not(.dark-mode) #save-conversation-btn,
+body:not(.dark-mode) #save-custom-btn,
+body:not(.dark-mode) #save-batch-favourites-btn,
+body:not(.dark-mode) #save-video-dialogue-btn,
+body:not(.dark-mode) .batch-action-btn:nth-child(2) {
+  background: #fffbeb;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+body:not(.dark-mode) #save-btn:hover,
+body:not(.dark-mode) #save-chat-reply-btn:hover,
+body:not(.dark-mode) #save-dialogue-btn:hover,
+body:not(.dark-mode) #save-conversation-btn:hover,
+body:not(.dark-mode) #save-custom-btn:hover,
+body:not(.dark-mode) #save-batch-favourites-btn:hover,
+body:not(.dark-mode) #save-video-dialogue-btn:hover,
+body:not(.dark-mode) .batch-action-btn:nth-child(2):hover {
+  background: #fef3c7;
+  border-color: #fbbf24;
+}
+
+body:not(.dark-mode) #add-generator-to-playlist-btn,
+body:not(.dark-mode) #add-chat-reply-to-playlist-btn,
+body:not(.dark-mode) #add-custom-to-playlist-btn,
+body:not(.dark-mode) #add-current-to-playlist-btn,
+body:not(.dark-mode) #add-full-chat-to-playlist-btn,
+body:not(.dark-mode) #add-batch-playlist-btn,
+body:not(.dark-mode) #create-playlist-btn,
+body:not(.dark-mode) #add-custom-generator-topic-btn,
+body:not(.dark-mode) .batch-action-btn:nth-child(3),
+body:not(.dark-mode) .playlist-item-actions .secondary-btn:nth-child(2) {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+body:not(.dark-mode) #add-generator-to-playlist-btn:hover,
+body:not(.dark-mode) #add-chat-reply-to-playlist-btn:hover,
+body:not(.dark-mode) #add-custom-to-playlist-btn:hover,
+body:not(.dark-mode) #add-current-to-playlist-btn:hover,
+body:not(.dark-mode) #add-full-chat-to-playlist-btn:hover,
+body:not(.dark-mode) #add-batch-playlist-btn:hover,
+body:not(.dark-mode) #create-playlist-btn:hover,
+body:not(.dark-mode) #add-custom-generator-topic-btn:hover,
+body:not(.dark-mode) .batch-action-btn:nth-child(3):hover,
+body:not(.dark-mode) .playlist-item-actions .secondary-btn:nth-child(2):hover {
+  background: #d1fae5;
+  border-color: #6ee7b7;
+}
+
+body:not(.dark-mode) #download-chat-pdf-btn,
+body:not(.dark-mode) #download-chat-mp3s-btn,
+body:not(.dark-mode) #download-dialogue-pdf-btn,
+body:not(.dark-mode) #download-dialogue-mp3-btn,
+body:not(.dark-mode) #download-batch-pdf-btn,
+body:not(.dark-mode) #download-batch-mp3-btn,
+body:not(.dark-mode) #download-playlist-mp3-btn,
+body:not(.dark-mode) #export-practice-btn,
+body:not(.dark-mode) .batch-mp3-link {
+  background: #ecfeff;
+  color: #0e7490;
+  border-color: #67e8f9;
+}
+
+body:not(.dark-mode) #download-chat-pdf-btn:hover,
+body:not(.dark-mode) #download-chat-mp3s-btn:hover,
+body:not(.dark-mode) #download-dialogue-pdf-btn:hover,
+body:not(.dark-mode) #download-dialogue-mp3-btn:hover,
+body:not(.dark-mode) #download-batch-pdf-btn:hover,
+body:not(.dark-mode) #download-batch-mp3-btn:hover,
+body:not(.dark-mode) #download-playlist-mp3-btn:hover,
+body:not(.dark-mode) #export-practice-btn:hover,
+body:not(.dark-mode) .batch-mp3-link:hover {
+  background: #cffafe;
+  border-color: #22d3ee;
+}
+
+body:not(.dark-mode) #stop-radio-btn,
+body:not(.dark-mode) #stop-full-chat-btn,
+body:not(.dark-mode) #stop-dialogue-btn,
+body:not(.dark-mode) #stop-conversation-playlist-btn,
+body:not(.dark-mode) #pause-radio-btn,
+body:not(.dark-mode) #pause-dialogue-btn,
+body:not(.dark-mode) #pause-conversation-btn,
+body:not(.dark-mode) #previous-radio-btn,
+body:not(.dark-mode) #next-radio-btn,
+body:not(.dark-mode) #previous-dialogue-btn,
+body:not(.dark-mode) #next-dialogue-btn,
+body:not(.dark-mode) #previous-conversation-turn-btn,
+body:not(.dark-mode) #next-conversation-turn-btn {
+  background: #f8fafc;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
 .actions {
   align-items: center;
 }
@@ -754,17 +942,20 @@ button::before {
 }
 
 #previous-conversation-turn-btn::before,
-#previous-dialogue-btn::before {
+#previous-dialogue-btn::before,
+#previous-radio-btn::before {
   content: "\23ea";
 }
 
 #pause-conversation-btn::before,
-#pause-dialogue-btn::before {
+#pause-dialogue-btn::before,
+#pause-radio-btn::before {
   content: "\23f8";
 }
 
 #next-conversation-turn-btn::before,
-#next-dialogue-btn::before {
+#next-dialogue-btn::before,
+#next-radio-btn::before {
   content: "\23e9";
 }
 
@@ -811,6 +1002,7 @@ button::before {
 #download-dialogue-mp3-btn::before,
 #download-batch-pdf-btn::before,
 #download-batch-mp3-btn::before,
+#download-playlist-mp3-btn::before,
 #export-practice-btn::before {
   content: "\2193";
 }
@@ -1027,14 +1219,26 @@ body.dark-mode .score-summary {
   align-items: center;
   gap: 10px;
   margin: 12px 0 16px;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--panel-soft);
 }
 
 .batch-mp3-link {
   flex: 0 0 auto;
+}
+
+.radio-player-controls {
+  margin-top: -8px;
+}
+
+.playlist-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.active-playlist-item {
+  border-color: rgba(3, 105, 161, 0.55);
+  box-shadow: inset 4px 0 0 var(--accent);
 }
 
 .video-dialogue-result {
@@ -1591,6 +1795,7 @@ body.dark-mode .tag {
   }
 
   .page-nav {
+    display: flex;
     flex-wrap: nowrap;
     gap: 6px;
     margin-left: -10px;
@@ -1601,6 +1806,14 @@ body.dark-mode .tag {
     border-right: 0;
     border-radius: 0;
     scrollbar-width: none;
+  }
+
+  .nav-group {
+    flex: 0 0 auto;
+  }
+
+  .nav-group-label {
+    display: none;
   }
 
   .page-nav::-webkit-scrollbar {
@@ -1623,6 +1836,7 @@ body.dark-mode .tag {
   }
 
   .controls-grid,
+  .settings-grid,
   .batch-generator-panel,
   .batch-row,
   .radio-grid,
@@ -1723,12 +1937,14 @@ body.dark-mode .tag {
   .recall-card,
   .custom-card,
   .dialogue-card,
-  .chat-card {
+  .chat-card,
+  .settings-card {
     padding: 16px;
   }
 
   .batch-bulk-actions,
   .batch-actions,
+  .playlist-item-actions,
   .favourites-header {
     align-items: stretch;
     flex-direction: column;
@@ -1739,6 +1955,7 @@ body.dark-mode .tag {
   }
 
   .batch-action-btn,
+  .playlist-item-actions button,
   .batch-mp3-link {
     width: 100%;
   }
