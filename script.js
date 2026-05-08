@@ -1536,6 +1536,8 @@ const saveBatchFavouritesBtn = document.getElementById("save-batch-favourites-bt
 const addBatchPlaylistBtn = document.getElementById("add-batch-playlist-btn");
 const batchStatus = document.getElementById("batch-status");
 const batchList = document.getElementById("batch-list");
+const savedBatchList = document.getElementById("saved-batch-list");
+const savedBatchEmpty = document.getElementById("saved-batch-empty");
 const batchMp3Panel = document.getElementById("batch-mp3-panel");
 const batchMp3Player = document.getElementById("batch-mp3-player");
 const batchMp3Link = document.getElementById("batch-mp3-link");
@@ -1703,10 +1705,6 @@ if (useChatReplyBtn) {
   useChatReplyBtn.textContent = "Use best version as sentence";
 }
 
-if (saveChatReplyBtn) {
-  saveChatReplyBtn.textContent = "Save best version";
-}
-
 if (addChatReplyToPlaylistBtn) {
   addChatReplyToPlaylistBtn.textContent = "Add best version to playlist";
 }
@@ -1811,6 +1809,7 @@ const targetLanguageProfiles = {
 let favourites = JSON.parse(localStorage.getItem("spanishSentenceFavourites")) || [];
 let recallSentences = JSON.parse(localStorage.getItem("spanishSentenceRecall")) || [];
 let savedWords = JSON.parse(localStorage.getItem("spanishSentenceSavedWords")) || [];
+let savedBatches = JSON.parse(localStorage.getItem("spanishSentenceSavedBatches")) || [];
 let quizScore = JSON.parse(localStorage.getItem("spanishSentenceQuizScore")) || {
   correct: 0,
   wrong: 0
@@ -2616,7 +2615,7 @@ function renderDialogue() {
     const english = document.createElement("p");
     const actionRow = document.createElement("div");
     const speakButton = document.createElement("button");
-    const saveButton = document.createElement("button");
+    const playlistButton = document.createElement("button");
 
     row.className = "dialogue-line";
     speaker.className = "chat-role";
@@ -2630,11 +2629,11 @@ function renderDialogue() {
     speakButton.type = "button";
     speakButton.textContent = "Speak";
     speakButton.addEventListener("click", () => playSpanishAudio(line.spanish, `${currentDialogue.title || "Dialogue"} line ${index + 1}`));
-    saveButton.className = "secondary-btn chat-audio-btn";
-    saveButton.type = "button";
-    saveButton.textContent = "Save line";
-    saveButton.addEventListener("click", () => {
-    const saved = saveSentenceToFavourites({
+    playlistButton.className = "secondary-btn chat-audio-btn";
+    playlistButton.type = "button";
+    playlistButton.textContent = "Playlist";
+    playlistButton.addEventListener("click", () => {
+      const added = addSentenceToSelectedPlaylist({
         targetLanguage,
         spanish: line.spanish,
         english: line.english || "",
@@ -2644,10 +2643,10 @@ function renderDialogue() {
         source: "dialogue",
         generated: true,
         ai: true
-      }, "Generate a dialogue first.");
+      });
 
-      if (saved) {
-        dialogueStatus.textContent = "Dialogue line saved to favourites.";
+      if (added) {
+        dialogueStatus.textContent = "Dialogue line added to the selected playlist.";
       }
     });
 
@@ -2657,7 +2656,7 @@ function renderDialogue() {
       textWrapper.appendChild(english);
     }
     actionRow.appendChild(speakButton);
-    actionRow.appendChild(saveButton);
+    actionRow.appendChild(playlistButton);
     row.appendChild(textWrapper);
     row.appendChild(actionRow);
     list.appendChild(row);
@@ -3107,6 +3106,7 @@ function refreshLanguageScopedViews() {
   renderFavourites();
   renderRecallSentences();
   renderSavedWords();
+  renderSavedBatches();
   renderPlaylists();
   renderSavedDialogues();
   renderSavedConversations();
@@ -5527,7 +5527,8 @@ async function generateDialogue() {
     };
     saveCurrentDialogueState();
     renderDialogue();
-    dialogueStatus.textContent = "Dialogue generated. Save any lines you like, or download the full PDF/MP3.";
+    saveCurrentDialogue({ silent: true });
+    dialogueStatus.textContent = "Dialogue generated and auto-saved. Add any lines you like to a playlist, or download the full PDF/MP3.";
   } catch (error) {
     dialogueStatus.textContent = `Could not generate the dialogue. ${formatAiErrorMessage(error.message)}`;
   } finally {
@@ -5537,10 +5538,14 @@ async function generateDialogue() {
 }
 
 // This function saves the full generated dialogue for later.
-function saveCurrentDialogue() {
+function saveCurrentDialogue(options = {}) {
+  const silent = Boolean(options.silent);
+
   if (!currentDialogue || !currentDialogue.lines?.length) {
-    alert("Generate a dialogue first.");
-    return;
+    if (!silent) {
+      alert("Generate a dialogue first.");
+    }
+    return false;
   }
 
   const savedDialogue = {
@@ -5561,7 +5566,10 @@ function saveCurrentDialogue() {
   saveCurrentDialogueState();
   saveDialogues();
   renderSavedDialogues();
-  dialogueStatus.textContent = "Dialogue saved.";
+  if (!silent) {
+    dialogueStatus.textContent = "Dialogue saved.";
+  }
+  return true;
 }
 
 // This function opens a print-ready dialogue document for saving as PDF.
@@ -6263,7 +6271,7 @@ function getFilteredSentences() {
   const selectedDifficulty = difficultySelect.value;
   const selectedTopic = topicSelect.value;
   const selectedTone = toneSelect.value;
-  const sourceSentences = favouritesOnlyCheckbox.checked
+  const sourceSentences = favouritesOnlyCheckbox?.checked
     ? getCurrentLanguageItems(favourites)
     : baseSentences;
 
@@ -7423,7 +7431,7 @@ async function generateAiSentence() {
 
 // This helper contains the built-in sentence generation path.
 function generateLocalSentence(filteredSentences) {
-  if (favouritesOnlyCheckbox.checked) {
+  if (favouritesOnlyCheckbox?.checked) {
     return pickRandom(filteredSentences);
   }
 
@@ -7448,7 +7456,7 @@ function generateLocalSentence(filteredSentences) {
 async function generateSentence() {
   const filteredSentences = getFilteredSentences();
 
-  if (filteredSentences.length === 0 && favouritesOnlyCheckbox.checked) {
+  if (filteredSentences.length === 0 && favouritesOnlyCheckbox?.checked) {
     renderSpanishSentence("No hay frases para esta combinación.");
     englishTranslation.textContent = "There are no favourite sentences for this combination.";
     sentenceMeta.textContent = "Try another topic, style, difficulty, or save more favourites.";
@@ -7462,7 +7470,7 @@ async function generateSentence() {
 
   let nextSentence;
 
-  if ((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox.checked) {
+  if ((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox?.checked) {
     let remainingCooldown = Math.max(0, Math.ceil((aiCooldownUntil - Date.now()) / 1000));
 
     if (remainingCooldown > 2) {
@@ -7552,7 +7560,7 @@ async function generateSentence() {
 
   incrementPracticeStat("generated");
 
-  if (!((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox.checked && nextSentence.ai !== true)) {
+  if (!((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox?.checked && nextSentence.ai !== true)) {
     showStatusMessage(
       quizModeCheckbox.checked
         ? "Quiz mode is on. Try to guess the meaning first."
@@ -7592,7 +7600,6 @@ function renderBatchSentences() {
     const english = document.createElement("p");
     const actions = document.createElement("div");
     const playButton = document.createElement("button");
-    const favouriteButton = document.createElement("button");
     const playlistButton = document.createElement("button");
 
     row.className = "batch-row";
@@ -7601,25 +7608,17 @@ function renderBatchSentences() {
     english.className = "batch-english";
     actions.className = "batch-actions";
     playButton.className = "secondary-btn batch-action-btn";
-    favouriteButton.className = "secondary-btn batch-action-btn";
     playlistButton.className = "secondary-btn batch-action-btn";
 
     number.textContent = String(index + 1);
     spanish.textContent = sentence.spanish;
     english.textContent = sentence.english;
     playButton.textContent = "Play";
-    favouriteButton.textContent = "Save";
     playlistButton.textContent = "Playlist";
 
     playButton.addEventListener("click", () => {
       playSpanishAudio(sentence.spanish, `Batch sentence ${index + 1}`);
       batchStatus.textContent = `Playing sentence ${index + 1}.`;
-    });
-
-    favouriteButton.addEventListener("click", () => {
-      if (saveSentenceToFavourites(sentence, "Generate a batch first.")) {
-        batchStatus.textContent = `Sentence ${index + 1} saved to favourites.`;
-      }
     });
 
     playlistButton.addEventListener("click", () => {
@@ -7632,7 +7631,6 @@ function renderBatchSentences() {
     row.appendChild(spanish);
     row.appendChild(english);
     actions.appendChild(playButton);
-    actions.appendChild(favouriteButton);
     actions.appendChild(playlistButton);
     row.appendChild(actions);
     batchList.appendChild(row);
@@ -7715,7 +7713,7 @@ async function generateSentenceBatch() {
   const filteredSentences = getFilteredSentences();
   const requestedCount = Math.min(30, Math.max(1, Number(batchCountSelect.value) || 10));
 
-  if (filteredSentences.length === 0 && favouritesOnlyCheckbox.checked) {
+  if (filteredSentences.length === 0 && favouritesOnlyCheckbox?.checked) {
     currentBatchSentences = [];
     renderBatchSentences();
     batchStatus.textContent = "There are no favourite sentences for this combination.";
@@ -7732,7 +7730,7 @@ async function generateSentenceBatch() {
     for (let index = 0; index < requestedCount; index += 1) {
       let nextSentence;
 
-      if ((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox.checked) {
+      if ((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox?.checked) {
         try {
           nextSentence = await generateAiSentence();
         } catch (error) {
@@ -7766,6 +7764,11 @@ async function generateSentenceBatch() {
 
     incrementPracticeStat("generated", requestedCount);
     renderBatchSentences();
+    const savedBatch = saveGeneratedBatch(currentBatchSentences);
+    if (savedBatch) {
+      batchStatus.textContent = `${currentBatchSentences.length} sentences ready and auto-saved as "${savedBatch.title}".`;
+      showStatusMessage("Generated batch saved with its own radio playlist.");
+    }
   } catch (error) {
     batchStatus.textContent = `Could not finish the batch. ${error.message}`;
   } finally {
@@ -7972,15 +7975,16 @@ function saveActivePage() {
 }
 
 function showPage(pageId) {
-  activePageId = pageId;
+  const nextPageId = document.getElementById(pageId) ? pageId : "generator-page";
+  activePageId = nextPageId;
   saveActivePage();
 
   appPages.forEach((page) => {
-    page.classList.toggle("active-page", page.id === pageId);
+    page.classList.toggle("active-page", page.id === nextPageId);
   });
 
   pageTabs.forEach((tab) => {
-    tab.classList.toggle("active", tab.dataset.pageTarget === pageId);
+    tab.classList.toggle("active", tab.dataset.pageTarget === nextPageId);
   });
 }
 
@@ -8000,8 +8004,9 @@ function exportPracticeBackup() {
     progress: {
       quizScore,
       recallSentences,
-      favourites,
       playlists,
+      savedBatches,
+      savedWords,
       savedDialogues,
       currentDialogue,
       savedConversations,
@@ -8067,7 +8072,7 @@ function saveSentenceDisplayPreference() {
 
 // This helper updates the short AI note under the controls.
 function updateAiModeNote() {
-  if (favouritesOnlyCheckbox.checked) {
+  if (favouritesOnlyCheckbox?.checked) {
     aiModeNote.textContent = "AI mode does not change favourite-only practice. That mode still uses your saved sentences.";
     return;
   }
@@ -8098,6 +8103,224 @@ function saveQuizScore() {
 // This function saves playlists in localStorage.
 function savePlaylists() {
   localStorage.setItem("spanishSentencePlaylists", JSON.stringify(playlists));
+}
+
+function saveSavedBatches() {
+  localStorage.setItem("spanishSentenceSavedBatches", JSON.stringify(savedBatches));
+}
+
+function formatSavedBatchDate(dateText) {
+  const date = new Date(dateText);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Saved batch";
+  }
+
+  return date.toLocaleString([], {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function getBatchTitleFromMeta(createdAt = new Date().toISOString()) {
+  return `${capitalize(getTargetLanguageProfile().label)} ${capitalize(topicSelect.value)} set - ${formatSavedBatchDate(createdAt)}`;
+}
+
+function ensureBatchPlaylist(batch) {
+  if (!batch?.sentences?.length) {
+    return null;
+  }
+
+  let playlist = playlists.find((item) => item.id === batch.playlistId);
+
+  if (!playlist) {
+    playlist = {
+      id: batch.playlistId || createId(),
+      targetLanguage: getSavedItemLanguage(batch),
+      name: batch.title,
+      source: "batch",
+      batchId: batch.id,
+      sentences: []
+    };
+    batch.playlistId = playlist.id;
+    playlists.push(playlist);
+  }
+
+  playlist.targetLanguage = getSavedItemLanguage(batch);
+  playlist.name = batch.title;
+  playlist.source = "batch";
+  playlist.batchId = batch.id;
+  playlist.sentences = batch.sentences.map((sentence) => ({
+    ...sentence,
+    targetLanguage: getSavedItemLanguage(batch)
+  }));
+
+  savePlaylists();
+  saveSavedBatches();
+  renderPlaylists();
+  return playlist;
+}
+
+function saveGeneratedBatch(sentences) {
+  if (!sentences?.length) {
+    return null;
+  }
+
+  const createdAt = new Date().toISOString();
+  const batch = {
+    id: createId(),
+    targetLanguage,
+    title: getBatchTitleFromMeta(createdAt),
+    createdAt,
+    difficulty: difficultySelect.value,
+    topic: topicSelect.value,
+    tone: toneSelect.value,
+    grammarFocus: grammarFocusSelect.value,
+    count: sentences.length,
+    playlistId: createId(),
+    sentences: sentences.map((sentence) => withCurrentLanguage(sentence))
+  };
+
+  savedBatches.unshift(batch);
+
+  const currentLanguageBatches = savedBatches.filter((item) => getSavedItemLanguage(item) === targetLanguage);
+  const otherLanguageBatches = savedBatches.filter((item) => getSavedItemLanguage(item) !== targetLanguage);
+  savedBatches = [
+    ...currentLanguageBatches.slice(0, 30),
+    ...otherLanguageBatches
+  ];
+
+  ensureBatchPlaylist(batch);
+  saveSavedBatches();
+  renderSavedBatches();
+  return batch;
+}
+
+function loadSavedBatch(batchId) {
+  const batch = savedBatches.find((item) => item.id === batchId);
+
+  if (!batch) {
+    return;
+  }
+
+  currentBatchSentences = batch.sentences.map((sentence) => ({
+    ...sentence,
+    targetLanguage: getSavedItemLanguage(batch)
+  }));
+  renderBatchSentences();
+  batchStatus.textContent = `Loaded "${batch.title}".`;
+  showStatusMessage(batchStatus.textContent);
+}
+
+function openBatchPlaylist(batchId, shouldStartRadio = false) {
+  const batch = savedBatches.find((item) => item.id === batchId);
+
+  if (!batch) {
+    return;
+  }
+
+  const playlist = ensureBatchPlaylist(batch);
+
+  if (!playlist) {
+    alert("This saved batch has no sentences.");
+    return;
+  }
+
+  playlistSelect.value = playlist.id;
+  renderSelectedPlaylist();
+  showPage("radio-page");
+
+  if (radioModeSelect) {
+    radioModeSelect.value = "play-once";
+  }
+
+  if (shouldStartRadio) {
+    startRadioMode(0);
+  } else {
+    radioStatus.textContent = `Opened batch playlist: ${playlist.name}`;
+  }
+}
+
+function deleteSavedBatch(batchId) {
+  const batch = savedBatches.find((item) => item.id === batchId);
+
+  if (!batch) {
+    return;
+  }
+
+  if (radioState.playlistId === batch.playlistId) {
+    stopRadioMode("");
+  }
+
+  savedBatches = savedBatches.filter((item) => item.id !== batchId);
+  playlists = playlists.filter((playlist) => !(playlist.source === "batch" && playlist.batchId === batchId));
+  saveSavedBatches();
+  savePlaylists();
+  renderSavedBatches();
+  renderPlaylists();
+  batchStatus.textContent = `Deleted "${batch.title}".`;
+}
+
+function renderSavedBatches() {
+  if (!savedBatchList || !savedBatchEmpty) {
+    return;
+  }
+
+  const languageBatches = getCurrentLanguageItems(savedBatches);
+  savedBatchList.innerHTML = "";
+  savedBatchEmpty.style.display = languageBatches.length ? "none" : "block";
+
+  languageBatches.forEach((batch) => {
+    const item = document.createElement("li");
+    const textWrapper = document.createElement("div");
+    const title = document.createElement("h4");
+    const meta = document.createElement("p");
+    const preview = document.createElement("p");
+    const actions = document.createElement("div");
+    const loadButton = document.createElement("button");
+    const radioButton = document.createElement("button");
+    const playlistButton = document.createElement("button");
+    const removeButton = document.createElement("button");
+
+    item.className = "favourite-item saved-batch-item";
+    meta.className = "sentence-meta saved-batch-meta";
+    preview.className = "saved-batch-preview";
+    actions.className = "playlist-item-actions saved-batch-actions";
+
+    title.textContent = batch.title || "Saved generated set";
+    meta.textContent = `${batch.sentences?.length || 0} sentences | ${capitalize(batch.difficulty || "mixed")} | ${capitalize(batch.topic || "mixed")} | ${formatSavedBatchDate(batch.createdAt)}`;
+    preview.textContent = (batch.sentences || [])
+      .slice(0, 2)
+      .map((sentence) => sentence.spanish)
+      .join("  ");
+
+    loadButton.className = "secondary-btn";
+    radioButton.className = "secondary-btn";
+    playlistButton.className = "secondary-btn";
+    removeButton.className = "delete-btn";
+    loadButton.textContent = "Load set";
+    radioButton.textContent = "Start radio";
+    playlistButton.textContent = "Open playlist";
+    removeButton.textContent = "Delete";
+
+    loadButton.addEventListener("click", () => loadSavedBatch(batch.id));
+    radioButton.addEventListener("click", () => openBatchPlaylist(batch.id, true));
+    playlistButton.addEventListener("click", () => openBatchPlaylist(batch.id, false));
+    removeButton.addEventListener("click", () => deleteSavedBatch(batch.id));
+
+    textWrapper.appendChild(title);
+    textWrapper.appendChild(meta);
+    textWrapper.appendChild(preview);
+    actions.appendChild(loadButton);
+    actions.appendChild(radioButton);
+    actions.appendChild(playlistButton);
+    actions.appendChild(removeButton);
+    item.appendChild(textWrapper);
+    item.appendChild(actions);
+    savedBatchList.appendChild(item);
+  });
 }
 
 // This helper returns the selected playlist object.
@@ -8177,6 +8400,7 @@ function renderSelectedPlaylist() {
     const actionRow = document.createElement("div");
     const playButton = document.createElement("button");
     const startHereButton = document.createElement("button");
+    const recallButton = document.createElement("button");
     const removeButton = document.createElement("button");
 
     title.appendChild(buildHoverableFragment(sentence.spanish, sentence));
@@ -8201,6 +8425,11 @@ function renderSelectedPlaylist() {
     startHereButton.addEventListener("click", () => {
       startRadioMode(index);
     });
+    recallButton.textContent = "Recall";
+    recallButton.className = "secondary-btn";
+    recallButton.addEventListener("click", () => {
+      addSentenceToRecall(sentence);
+    });
     removeButton.textContent = "Remove";
     removeButton.className = "delete-btn";
     removeButton.addEventListener("click", () => {
@@ -8215,6 +8444,7 @@ function renderSelectedPlaylist() {
     textWrapper.appendChild(tagRow);
     actionRow.appendChild(playButton);
     actionRow.appendChild(startHereButton);
+    actionRow.appendChild(recallButton);
     actionRow.appendChild(removeButton);
     listItem.appendChild(textWrapper);
     listItem.appendChild(actionRow);
@@ -9087,6 +9317,10 @@ function renderSavedWords() {
 // This function draws the favourites list.
 // Saved Spanish text also uses hover word hints now.
 function renderFavourites() {
+  if (!favouritesList || !emptyMessage || !favouritesSearchInput) {
+    return;
+  }
+
   favouritesList.innerHTML = "";
   const searchText = favouritesSearchInput.value.trim().toLowerCase();
   const languageFavourites = getCurrentLanguageItems(favourites);
@@ -9221,7 +9455,9 @@ toggleTranslationBtn.addEventListener("click", () => {
   showStatusMessage(translationVisible ? "Translation revealed." : "Translation hidden.");
 });
 
-saveBtn.addEventListener("click", saveCurrentSentence);
+if (saveBtn) {
+  saveBtn.addEventListener("click", saveCurrentSentence);
+}
 copySentenceBtn.addEventListener("click", copyCurrentSentence);
 markCorrectBtn.addEventListener("click", () => markQuizAnswer("correct"));
 markWrongBtn.addEventListener("click", () => markQuizAnswer("wrong"));
@@ -9252,7 +9488,9 @@ if (spanishVoiceSelect) {
 }
 translateCustomBtn.addEventListener("click", translateCustomSentence);
 generateDialogueBtn.addEventListener("click", generateDialogue);
-saveDialogueBtn.addEventListener("click", saveCurrentDialogue);
+if (saveDialogueBtn) {
+  saveDialogueBtn.addEventListener("click", saveCurrentDialogue);
+}
 downloadDialoguePdfBtn.addEventListener("click", downloadDialoguePdf);
 playDialogueBtn.addEventListener("click", playDialogueMedia);
 stopDialogueBtn.addEventListener("click", () => stopDialoguePlayback());
@@ -9268,9 +9506,15 @@ dialogueAudioPlayer.addEventListener("ended", () => {
 });
 downloadDialogueMp3Btn.addEventListener("click", downloadDialogueMp3);
 clearDialogueBtn.addEventListener("click", clearDialogue);
-loadYoutubeVideoBtn.addEventListener("click", loadYouTubeVideo);
-importYoutubeCaptionsBtn.addEventListener("click", importYouTubeCaptions);
-usePastedTranscriptBtn.addEventListener("click", usePastedTranscript);
+if (loadYoutubeVideoBtn) {
+  loadYoutubeVideoBtn.addEventListener("click", loadYouTubeVideo);
+}
+if (importYoutubeCaptionsBtn) {
+  importYoutubeCaptionsBtn.addEventListener("click", importYouTubeCaptions);
+}
+if (usePastedTranscriptBtn) {
+  usePastedTranscriptBtn.addEventListener("click", usePastedTranscript);
+}
 if (generateVideoDialogueBtn) {
   generateVideoDialogueBtn.addEventListener("click", generateVideoDialogue);
 }
@@ -9339,14 +9583,16 @@ speakChatReplyBtn.addEventListener("click", () => {
   playSpanishAudio(lastCoachReply.spanish, "Last chat reply");
 });
 useChatReplyBtn.addEventListener("click", useLastChatReplyAsSentence);
-saveChatReplyBtn.addEventListener("click", () => {
-  const chatSentence = getBestChatSentence();
-  saveSentenceToFavourites(chatSentence, "Start a chat first.");
+if (saveChatReplyBtn) {
+  saveChatReplyBtn.addEventListener("click", () => {
+    const chatSentence = getBestChatSentence();
+    saveSentenceToFavourites(chatSentence, "Start a chat first.");
 
-  if (chatSentence && lastCoachReply.correctionSpanish) {
-    chatStatus.textContent = "The more native version was saved to favourites.";
-  }
-});
+    if (chatSentence && lastCoachReply.correctionSpanish) {
+      chatStatus.textContent = "The more native version was saved to favourites.";
+    }
+  });
+}
 addChatReplyToPlaylistBtn.addEventListener("click", () => {
   const chatSentence = getBestChatSentence();
 
@@ -9377,9 +9623,11 @@ addCustomToPlaylistBtn.addEventListener("click", () => {
 
   addSentenceToSelectedPlaylist(latestCustomSentence);
 });
-saveCustomBtn.addEventListener("click", () => {
-  saveSentenceToFavourites(latestCustomSentence, "Translate a custom sentence first.");
-});
+if (saveCustomBtn) {
+  saveCustomBtn.addEventListener("click", () => {
+    saveSentenceToFavourites(latestCustomSentence, "Translate a custom sentence first.");
+  });
+}
 playRadioBtn.addEventListener("click", startRadioMode);
 stopRadioBtn.addEventListener("click", stopRadioMode);
 if (previousRadioBtn) {
@@ -9414,12 +9662,16 @@ quizModeCheckbox.addEventListener("change", () => {
   showStatusMessage(quizModeCheckbox.checked ? "Quiz mode is on. Translation hidden." : "Quiz mode is off. Translation visible.");
 });
 
-favouritesSearchInput.addEventListener("input", renderFavourites);
+if (favouritesSearchInput) {
+  favouritesSearchInput.addEventListener("input", renderFavourites);
+}
 
-favouritesOnlyCheckbox.addEventListener("change", () => {
-  showStatusMessage(favouritesOnlyCheckbox.checked ? "Now practising saved favourites only." : "Now practising from all sentences, including unlimited generated ones.");
-  updateAiModeNote();
-});
+if (favouritesOnlyCheckbox) {
+  favouritesOnlyCheckbox.addEventListener("change", () => {
+    showStatusMessage(favouritesOnlyCheckbox.checked ? "Now practising saved favourites only." : "Now practising from all sentences, including unlimited generated ones.");
+    updateAiModeNote();
+  });
+}
 aiModeCheckbox.addEventListener("change", () => {
   aiModeEnabled = aiModeCheckbox.checked;
   saveAiModePreference();
@@ -9468,6 +9720,7 @@ if (shadowGapSelect) {
 }
 renderPracticeStats();
 renderBatchSentences();
+renderSavedBatches();
 renderGeneratorTopics();
 renderDialogue();
 renderSavedDialogues();
@@ -9520,6 +9773,7 @@ pageTabs.forEach((tab) => {
 });
 renderFavourites();
 renderRecallSentences();
+renderSavedWords();
 renderPlaylists();
 renderChatMessages();
 renderSavedConversations();

@@ -774,8 +774,6 @@ body:not(.dark-mode) #play-full-chat-btn,
 body:not(.dark-mode) #play-dialogue-btn,
 body:not(.dark-mode) #play-radio-btn,
 body:not(.dark-mode) #play-conversation-playlist-btn,
-body:not(.dark-mode) #play-video-dialogue-btn,
-body:not(.dark-mode) .video-line-play-btn,
 body:not(.dark-mode) .chat-audio-btn,
 body:not(.dark-mode) .playlist-item-actions .secondary-btn:first-child,
 body:not(.dark-mode) .batch-action-btn:first-child {
@@ -791,8 +789,6 @@ body:not(.dark-mode) #play-full-chat-btn:hover,
 body:not(.dark-mode) #play-dialogue-btn:hover,
 body:not(.dark-mode) #play-radio-btn:hover,
 body:not(.dark-mode) #play-conversation-playlist-btn:hover,
-body:not(.dark-mode) #play-video-dialogue-btn:hover,
-body:not(.dark-mode) .video-line-play-btn:hover,
 body:not(.dark-mode) .chat-audio-btn:hover,
 body:not(.dark-mode) .playlist-item-actions .secondary-btn:first-child:hover,
 body:not(.dark-mode) .batch-action-btn:first-child:hover {
@@ -806,7 +802,6 @@ body:not(.dark-mode) #save-dialogue-btn,
 body:not(.dark-mode) #save-conversation-btn,
 body:not(.dark-mode) #save-custom-btn,
 body:not(.dark-mode) #save-batch-favourites-btn,
-body:not(.dark-mode) #save-video-dialogue-btn,
 body:not(.dark-mode) .batch-action-btn:nth-child(2) {
   background: #fffbeb;
   color: #92400e;
@@ -819,7 +814,6 @@ body:not(.dark-mode) #save-dialogue-btn:hover,
 body:not(.dark-mode) #save-conversation-btn:hover,
 body:not(.dark-mode) #save-custom-btn:hover,
 body:not(.dark-mode) #save-batch-favourites-btn:hover,
-body:not(.dark-mode) #save-video-dialogue-btn:hover,
 body:not(.dark-mode) .batch-action-btn:nth-child(2):hover {
   background: #fef3c7;
   border-color: #fbbf24;
@@ -1206,6 +1200,38 @@ body.dark-mode .score-summary {
   gap: 12px;
 }
 
+.saved-batches-panel {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.compact-header {
+  margin-bottom: 12px;
+}
+
+.compact-header h3 {
+  font-size: 1.1rem;
+}
+
+.saved-batch-item {
+  align-items: flex-start;
+}
+
+.saved-batch-meta {
+  margin: 4px 0 8px;
+}
+
+.saved-batch-preview {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.saved-batch-actions {
+  min-width: 330px;
+}
+
 .batch-bulk-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1239,14 +1265,6 @@ body.dark-mode .score-summary {
 .active-playlist-item {
   border-color: rgba(3, 105, 161, 0.55);
   box-shadow: inset 4px 0 0 var(--accent);
-}
-
-.video-dialogue-result {
-  margin: 14px 0 18px;
-}
-
-.video-dialogue-result:empty {
-  display: none;
 }
 
 .batch-row {
@@ -1316,7 +1334,6 @@ body.dark-mode .score-summary {
 
 .favourite-item,
 .dialogue-line,
-.video-transcript-line,
 .chat-bubble {
   transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
@@ -1599,90 +1616,6 @@ body.dark-mode .dialogue-phrases {
   background: #1f2937;
 }
 
-.video-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
-  gap: 16px;
-  align-items: start;
-  margin: 14px 0;
-}
-
-.video-player-shell {
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: #0f172a;
-}
-
-.youtube-player,
-.youtube-player iframe {
-  width: 100%;
-  height: 100%;
-}
-
-.video-translation-panel {
-  display: grid;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--panel-soft);
-}
-
-.video-selected-line {
-  margin: 0;
-  line-height: 1.55;
-  font-weight: 700;
-}
-
-.video-transcript-list {
-  display: grid;
-  gap: 8px;
-  max-height: 460px;
-  overflow-y: auto;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--panel-soft);
-}
-
-.video-transcript-line {
-  display: grid;
-  grid-template-columns: 72px 64px 1fr auto;
-  gap: 10px;
-  align-items: start;
-  padding: 10px;
-  border: 1px solid transparent;
-  border-radius: var(--radius);
-  background: var(--panel);
-}
-
-.video-transcript-line.active {
-  border-color: rgba(3, 105, 161, 0.35);
-  box-shadow: inset 4px 0 0 var(--accent);
-}
-
-.video-time {
-  color: var(--muted);
-  font-size: 0.86rem;
-  font-weight: 700;
-}
-
-.video-line-play-btn {
-  min-width: 64px;
-}
-
-.video-line-text {
-  margin: 0;
-  line-height: 1.55;
-}
-
-.video-word {
-  cursor: pointer;
-  border-bottom: 1px dotted rgba(180, 83, 9, 0.45);
-}
-
 .saved-conversations-panel {
   margin-top: 22px;
   padding-top: 18px;
@@ -1840,8 +1773,6 @@ body.dark-mode .tag {
   .batch-generator-panel,
   .batch-row,
   .radio-grid,
-  .video-layout,
-  .video-transcript-line,
   .dialogue-line,
   .favourite-item {
     grid-template-columns: 1fr;

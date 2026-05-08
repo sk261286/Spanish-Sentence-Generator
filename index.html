@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=47">
+  <link rel="stylesheet" href="style.css?v=48">
 </head>
 <body>
   <main class="app">
@@ -36,7 +36,6 @@
       </div>
       <div class="nav-group">
         <span class="nav-group-label">Library</span>
-        <button class="page-tab" data-page-target="favourites-page">Favourites</button>
         <button class="page-tab" data-page-target="recall-page">Recall</button>
         <button class="page-tab" data-page-target="words-page">Words</button>
         <button class="page-tab" data-page-target="dialogue-page">Dialogue</button>
@@ -44,7 +43,6 @@
       <div class="nav-group">
         <span class="nav-group-label">Tools</span>
         <button class="page-tab" data-page-target="custom-page">Translate</button>
-        <button class="page-tab" data-page-target="video-page">Video</button>
       </div>
       <div class="nav-group nav-group-settings">
         <span class="nav-group-label">System</span>
@@ -122,13 +120,6 @@
         <ul id="custom-generator-topics-list" class="custom-topic-list"></ul>
       </div>
 
-      <div class="extra-controls">
-        <label class="checkbox-row" for="favourites-only">
-          <input type="checkbox" id="favourites-only">
-          <span>Practise favourites only</span>
-        </label>
-      </div>
-
       <button id="generate-btn" class="primary-btn">Generate Sentence</button>
 
       <div class="batch-generator-panel">
@@ -202,7 +193,6 @@
         <button id="speak-english-btn" class="secondary-btn">Speak English</button>
         <button id="toggle-translation-btn" class="secondary-btn">Hide translation</button>
         <button id="copy-sentence-btn" class="secondary-btn">Copy Spanish</button>
-        <button id="save-btn" class="secondary-btn">Save to favourites</button>
         <button id="add-generator-to-playlist-btn" class="secondary-btn">Add to playlist</button>
       </div>
     </section>
@@ -214,7 +204,6 @@
           <h3>Generated set</h3>
         </div>
         <div class="batch-bulk-actions">
-          <button id="save-batch-favourites-btn" class="secondary-btn">Save all to favourites</button>
           <button id="add-batch-playlist-btn" class="secondary-btn">Add all to playlist</button>
         </div>
       </div>
@@ -224,6 +213,16 @@
         <a id="batch-mp3-link" class="secondary-btn batch-mp3-link" href="#" download>Open/save MP3</a>
       </div>
       <div id="batch-list" class="batch-list"></div>
+      <div class="saved-batches-panel">
+        <div class="favourites-header compact-header">
+          <div>
+            <p class="section-label">Saved batches</p>
+            <h3>Auto-saved generated sets</h3>
+          </div>
+        </div>
+        <ul id="saved-batch-list" class="favourites-list"></ul>
+        <p id="saved-batch-empty" class="empty-message">No generated sets saved yet.</p>
+      </div>
     </section>
     </section>
 
@@ -237,13 +236,13 @@
       </div>
 
       <p class="sentence-meta">
-        Add sentences here from Favourites. This page shows the English first, hides the Spanish,
+        Add sentences here from playlists. This page shows the English first, hides the Spanish,
         and schedules reviews based on whether you remembered the answer.
       </p>
       <p id="recall-summary" class="sentence-meta">No recall reviews due yet.</p>
 
       <ul id="recall-list" class="favourites-list"></ul>
-      <p id="recall-empty-message" class="empty-message">No recall sentences yet. Add some from Favourites.</p>
+      <p id="recall-empty-message" class="empty-message">No recall sentences yet. Add some from a playlist.</p>
     </section>
     </section>
 
@@ -313,7 +312,6 @@
 
       <div class="actions">
         <button id="translate-custom-btn" class="secondary-btn">Translate to Spanish</button>
-        <button id="save-custom-btn" class="secondary-btn">Save translated sentence</button>
         <button id="add-custom-to-playlist-btn" class="secondary-btn">Add translated sentence to playlist</button>
       </div>
 
@@ -386,7 +384,6 @@
 
       <div class="actions chat-save-actions">
         <button id="generate-dialogue-btn" class="secondary-btn">Generate dialogue</button>
-        <button id="save-dialogue-btn" class="secondary-btn">Save dialogue</button>
         <button id="download-dialogue-pdf-btn" class="secondary-btn">Download PDF</button>
         <button id="play-dialogue-btn" class="secondary-btn">Open player</button>
         <button id="stop-dialogue-btn" class="secondary-btn hidden">Stop dialogue</button>
@@ -411,64 +408,6 @@
         <ul id="saved-dialogues-list" class="favourites-list"></ul>
         <p id="saved-dialogues-empty" class="empty-message">No saved dialogues yet.</p>
       </div>
-    </section>
-    </section>
-
-    <section id="video-page" class="app-page">
-    <section class="card video-card">
-      <div class="favourites-header">
-        <div>
-          <p class="section-label">Video transcriber</p>
-          <h3 id="video-title">YouTube synced transcript</h3>
-        </div>
-      </div>
-
-      <div class="radio-grid">
-        <div class="field">
-          <label for="youtube-url-input">YouTube link</label>
-          <input id="youtube-url-input" type="url" placeholder="Paste a YouTube video link">
-        </div>
-        <div class="field">
-          <label for="video-transcript-language">Transcript language</label>
-          <select id="video-transcript-language">
-            <option value="current">Current app language</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="it">Italian</option>
-            <option value="en">English</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="actions chat-save-actions">
-        <button id="load-youtube-video-btn" class="secondary-btn">Load video</button>
-        <button id="import-youtube-captions-btn" class="secondary-btn">Import YouTube captions</button>
-        <button id="use-pasted-transcript-btn" class="secondary-btn">Use pasted transcript</button>
-        <button id="generate-video-dialogue-btn" class="secondary-btn">Generate video discussion</button>
-        <button id="save-video-dialogue-btn" class="secondary-btn">Save discussion</button>
-        <button id="play-video-dialogue-btn" class="secondary-btn">Open discussion player</button>
-      </div>
-
-      <div class="video-layout">
-        <div class="video-player-shell">
-          <div id="youtube-player" class="youtube-player"></div>
-        </div>
-        <div class="video-translation-panel">
-          <p class="section-label">Translation</p>
-          <p id="video-selected-line" class="video-selected-line">Select a transcript line.</p>
-          <p id="video-line-translation" class="chat-text chat-english">Line translation will appear here.</p>
-          <p id="video-word-hint" class="sentence-meta">Click a word for a quick hint.</p>
-        </div>
-      </div>
-
-      <div class="field custom-field">
-        <label for="manual-transcript-input">Paste timestamped transcript</label>
-        <textarea id="manual-transcript-input" rows="5" placeholder="[00:03] Hola, bienvenidos.\n00:07 Aujourd'hui on va parler..."></textarea>
-      </div>
-
-      <p id="video-status" class="sentence-meta">Load a YouTube video, then import available captions or paste a timestamped transcript.</p>
-      <div id="video-dialogue-result" class="dialogue-result video-dialogue-result"></div>
-      <div id="video-transcript-list" class="video-transcript-list"></div>
     </section>
     </section>
 
@@ -556,7 +495,6 @@
           <button id="interrupt-call-btn" class="secondary-btn hidden">Interrupt</button>
           <button id="speak-chat-reply-btn" class="secondary-btn">Speak last reply</button>
           <button id="use-chat-reply-btn" class="secondary-btn">Use best version as sentence</button>
-          <button id="save-chat-reply-btn" class="secondary-btn">Save best version</button>
           <button id="add-chat-reply-to-playlist-btn" class="secondary-btn">Add best version to playlist</button>
         </div>
       </div>
@@ -646,25 +584,6 @@
         <ul id="conversation-playlist-list" class="favourites-list"></ul>
         <p id="conversation-playlist-empty" class="empty-message">No full conversations added yet.</p>
       </div>
-    </section>
-    </section>
-
-    <section id="favourites-page" class="app-page">
-    <section class="card favourites-card">
-      <div class="favourites-header">
-        <div>
-          <p class="section-label">Saved sentences</p>
-          <h3>Favourites</h3>
-        </div>
-      </div>
-
-      <div class="field favourites-search">
-        <label for="favourites-search">Search favourites</label>
-        <input id="favourites-search" type="text" placeholder="Search Spanish or English">
-      </div>
-
-      <ul id="favourites-list" class="favourites-list"></ul>
-      <p id="empty-message" class="empty-message">No favourites saved yet.</p>
     </section>
     </section>
 
@@ -799,6 +718,6 @@
     </section>
   </main>
 
-  <script src="script.js?v=59"></script>
+  <script src="script.js?v=60"></script>
 </body>
 </html>
