@@ -28,6 +28,17 @@ function classifyElevenLabsSttError(statusCode, errorText) {
   };
 }
 
+function getSttLanguageCode(targetLanguage) {
+  const languageCodes = {
+    spanish: "es",
+    english: "en",
+    french: "fr",
+    italian: "it"
+  };
+
+  return languageCodes[targetLanguage] || "en";
+}
+
 async function handler(event) {
   if (event.httpMethod !== "POST") {
     return {
@@ -54,6 +65,7 @@ async function handler(event) {
     const audioBase64 = requestBody.audioBase64 || "";
     const mimeType = requestBody.mimeType || "audio/webm";
     const fileName = requestBody.fileName || "chat-mic-audio.webm";
+    const targetLanguage = requestBody.targetLanguage || "english";
 
     if (!audioBase64) {
       return {
@@ -67,7 +79,7 @@ async function handler(event) {
     const audioBlob = new Blob([audioBuffer], { type: mimeType });
 
     formData.append("model_id", modelId);
-    formData.append("language_code", "en");
+    formData.append("language_code", getSttLanguageCode(targetLanguage));
     formData.append("num_speakers", "1");
     formData.append("tag_audio_events", "false");
     formData.append("no_verbatim", "true");

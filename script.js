@@ -1509,12 +1509,17 @@ const difficultySelect = document.getElementById("difficulty");
 const appEyebrow = document.getElementById("app-eyebrow");
 const appTitle = document.getElementById("app-title");
 const appIntro = document.getElementById("app-intro");
+const firstRunSetup = document.getElementById("first-run-setup");
+const finishSetupBtn = document.getElementById("finish-setup-btn");
+const setupLanguageButtons = document.querySelectorAll("[data-setup-language]");
+const setupPresetButtons = document.querySelectorAll("[data-setup-preset]");
 const installBanner = document.getElementById("install-banner");
 const installBannerText = document.getElementById("install-banner-text");
 const installAppBtn = document.getElementById("install-app-btn");
 const dismissInstallBtn = document.getElementById("dismiss-install-btn");
 const themeToggleBtn = document.getElementById("theme-toggle-btn");
 const targetLanguageSelect = document.getElementById("target-language-select");
+const learningDirectionNote = document.getElementById("learning-direction-note");
 const spanishVoiceSelect = document.getElementById("spanish-voice-select");
 const testVoiceBtn = document.getElementById("test-voice-btn");
 const topicSelect = document.getElementById("topic");
@@ -1543,6 +1548,9 @@ const batchMp3Player = document.getElementById("batch-mp3-player");
 const batchMp3Link = document.getElementById("batch-mp3-link");
 const speakSpanishBtn = document.getElementById("speak-spanish-btn");
 const speakEnglishBtn = document.getElementById("speak-english-btn");
+const tooEasyBtn = document.getElementById("too-easy-btn");
+const levelRightBtn = document.getElementById("level-right-btn");
+const tooHardBtn = document.getElementById("too-hard-btn");
 const addGeneratorToPlaylistBtn = document.getElementById("add-generator-to-playlist-btn");
 const toggleTranslationBtn = document.getElementById("toggle-translation-btn");
 const copySentenceBtn = document.getElementById("copy-sentence-btn");
@@ -1568,11 +1576,26 @@ const recallSummary = document.getElementById("recall-summary");
 const recallEmptyMessage = document.getElementById("recall-empty-message");
 const wordRecallList = document.getElementById("word-recall-list");
 const wordRecallSummary = document.getElementById("word-recall-summary");
+const wordLanguageSummary = document.getElementById("word-language-summary");
 const wordRecallEmptyMessage = document.getElementById("word-recall-empty-message");
+const dailyReviewSummary = document.getElementById("daily-review-summary");
+const todayWordsDue = document.getElementById("today-words-due");
+const todayRecallDue = document.getElementById("today-recall-due");
+const todaySavedBatches = document.getElementById("today-saved-batches");
+const todayMistakePatterns = document.getElementById("today-mistake-patterns");
+const todaySuggestion = document.getElementById("today-suggestion");
+const dailyReviewCard = document.getElementById("daily-review-card");
+const buildDailyReviewBtn = document.getElementById("build-daily-review-btn");
+const startDailyReviewBtn = document.getElementById("start-daily-review-btn");
+const nextDailyReviewBtn = document.getElementById("next-daily-review-btn");
+const playDailyReviewBtn = document.getElementById("play-daily-review-btn");
+const playlistFolderSelect = document.getElementById("playlist-folder");
+const playlistFolderNameInput = document.getElementById("playlist-folder-name");
 const playlistNameInput = document.getElementById("playlist-name");
 const playlistSelect = document.getElementById("playlist-select");
 const radioModeSelect = document.getElementById("radio-mode");
 const shadowGapSelect = document.getElementById("shadow-gap");
+const createPlaylistFolderBtn = document.getElementById("create-playlist-folder-btn");
 const createPlaylistBtn = document.getElementById("create-playlist-btn");
 const addCurrentToPlaylistBtn = document.getElementById("add-current-to-playlist-btn");
 const playRadioBtn = document.getElementById("play-radio-btn");
@@ -1592,6 +1615,7 @@ const playlistMp3Panel = document.getElementById("playlist-mp3-panel");
 const playlistMp3Player = document.getElementById("playlist-mp3-player");
 const playlistMp3Link = document.getElementById("playlist-mp3-link");
 const customEnglishInput = document.getElementById("custom-english-input");
+const customEnglishLabel = document.querySelector('label[for="custom-english-input"]');
 const customToneLabel = document.getElementById("custom-tone-label");
 const customToneSelect = document.getElementById("custom-tone");
 const customTopicSelect = document.getElementById("custom-topic");
@@ -1627,6 +1651,7 @@ const dialogueResult = document.getElementById("dialogue-result");
 const dialogueTitle = document.getElementById("dialogue-title");
 const savedDialoguesList = document.getElementById("saved-dialogues-list");
 const savedDialoguesEmpty = document.getElementById("saved-dialogues-empty");
+const deleteOldDialoguesBtn = document.getElementById("delete-old-dialogues-btn");
 const youtubeUrlInput = document.getElementById("youtube-url-input");
 const videoTranscriptLanguageSelect = document.getElementById("video-transcript-language");
 const loadYoutubeVideoBtn = document.getElementById("load-youtube-video-btn");
@@ -1660,6 +1685,14 @@ const callFocusTimer = document.getElementById("call-focus-timer");
 const callFocusStatus = document.getElementById("call-focus-status");
 const focusEndCallBtn = document.getElementById("focus-end-call-btn");
 const focusInterruptCallBtn = document.getElementById("focus-interrupt-call-btn");
+const callSummaryPanel = document.getElementById("call-summary-panel");
+const callSummaryTitle = document.getElementById("call-summary-title");
+const callSummaryDuration = document.getElementById("call-summary-duration");
+const callSummaryTurns = document.getElementById("call-summary-turns");
+const callSummaryCorrections = document.getElementById("call-summary-corrections");
+const callSummaryPhrases = document.getElementById("call-summary-phrases");
+const callSummaryReviewBtn = document.getElementById("call-summary-review-btn");
+const callSummarySaveBtn = document.getElementById("call-summary-save-btn");
 const speakChatReplyBtn = document.getElementById("speak-chat-reply-btn");
 const useChatReplyBtn = document.getElementById("use-chat-reply-btn");
 const saveChatReplyBtn = document.getElementById("save-chat-reply-btn");
@@ -1673,6 +1706,7 @@ const downloadChatMp3sBtn = document.getElementById("download-chat-mp3s-btn");
 const playFullChatBtn = document.getElementById("play-full-chat-btn");
 const stopFullChatBtn = document.getElementById("stop-full-chat-btn");
 const reviewConversationBtn = document.getElementById("review-conversation-btn");
+const deepReviewConversationBtn = document.getElementById("deep-review-conversation-btn");
 const addFullChatToPlaylistBtn = document.getElementById("add-full-chat-to-playlist-btn");
 const conversationPlaybackControls = document.getElementById("conversation-playback-controls");
 const previousConversationTurnBtn = document.getElementById("previous-conversation-turn-btn");
@@ -1688,6 +1722,7 @@ const savedConversationsList = document.getElementById("saved-conversations-list
 const savedConversationsEmpty = document.getElementById("saved-conversations-empty");
 const conversationReviewPanel = document.getElementById("conversation-review-panel");
 const hideConversationReviewBtn = document.getElementById("hide-conversation-review-btn");
+const repairConversationLanguageBtn = document.getElementById("repair-conversation-language-btn");
 const conversationReviewSummary = document.getElementById("conversation-review-summary");
 const conversationReviewList = document.getElementById("conversation-review-list");
 const chatMessages = document.getElementById("chat-messages");
@@ -1699,6 +1734,8 @@ const chatStatus = document.getElementById("chat-status");
 const chatCard = document.querySelector(".chat-card");
 const pageTabs = document.querySelectorAll(".page-tab");
 const appPages = document.querySelectorAll(".app-page");
+const runDiagnosticsBtn = document.getElementById("run-diagnostics-btn");
+const diagnosticsList = document.getElementById("diagnostics-list");
 
 // Keep the chat action labels aligned with the "best version" behavior.
 if (useChatReplyBtn) {
@@ -1753,7 +1790,10 @@ let aiModeEnabled = JSON.parse(localStorage.getItem("spanishSentenceAiMode")) ||
 let darkModeEnabled = JSON.parse(localStorage.getItem("spanishSentenceDarkMode")) || false;
 let sentenceDisplayMode = localStorage.getItem("spanishSentenceDisplayMode") || "show-translation";
 let targetLanguage = localStorage.getItem("spanishSentenceTargetLanguage") || "spanish";
-let spanishVoiceChoice = localStorage.getItem("spanishSentenceVoiceChoice") || "primary";
+let languageVoiceChoices = JSON.parse(localStorage.getItem("spanishSentenceVoiceChoicesByLanguage")) || {};
+let spanishVoiceChoice = languageVoiceChoices[targetLanguage] || localStorage.getItem("spanishSentenceVoiceChoice") || "primary";
+let difficultyCalibration = JSON.parse(localStorage.getItem("spanishSentenceDifficultyCalibration")) || {};
+let mistakePatterns = JSON.parse(localStorage.getItem("spanishSentenceMistakePatterns")) || [];
 let callPauseMode = localStorage.getItem("spanishSentenceCallPauseMode") || "normal";
 let aiCooldownUntil = 0;
 let activePageId = localStorage.getItem("spanishSentenceActivePage") || "generator-page";
@@ -1766,6 +1806,7 @@ let spanishAudioPlaybackId = 0;
 let batchMp3ObjectUrl = "";
 let playlistMp3ObjectUrl = "";
 let wordHintRequestId = 0;
+let activeWordActionPanel = null;
 let aiWordHintCache = JSON.parse(localStorage.getItem("spanishSentenceAiWordHints")) || {};
 let chatTimerInterval = null;
 let fullConversationPlayback = {
@@ -1776,19 +1817,37 @@ let fullConversationPlayback = {
   playbackId: 0,
   audioUrl: ""
 };
+let lastCallSummaryChatHistory = [];
 const SPANISH_AUDIO_CACHE_VERSION = "v3";
 
 const targetLanguageProfiles = {
   spanish: {
     label: "Spanish",
+    translationLabel: "English",
+    sourceLabel: "English",
+    translationSpeechCode: "en-GB",
     flagClass: "flag-spanish",
     phrase: "natural Spanish from Spain",
     speechCode: "es-ES",
     example: "I am going to Madrid tomorrow.",
     voiceTest: "Hola, esta es la voz que usaré para practicar contigo."
   },
+  english: {
+    label: "English",
+    translationLabel: "Spanish",
+    sourceLabel: "Spanish",
+    translationSpeechCode: "es-ES",
+    flagClass: "flag-english",
+    phrase: "natural British English",
+    speechCode: "en-GB",
+    example: "Manana voy a Londres.",
+    voiceTest: "Hi, this is the voice I will use to practise English with you."
+  },
   french: {
     label: "French",
+    translationLabel: "English",
+    sourceLabel: "English",
+    translationSpeechCode: "en-GB",
     flagClass: "flag-french",
     phrase: "natural French from France",
     speechCode: "fr-FR",
@@ -1797,6 +1856,9 @@ const targetLanguageProfiles = {
   },
   italian: {
     label: "Italian",
+    translationLabel: "English",
+    sourceLabel: "English",
+    translationSpeechCode: "en-GB",
     flagClass: "flag-italian",
     phrase: "natural Italian from Italy",
     speechCode: "it-IT",
@@ -1815,6 +1877,10 @@ let quizScore = JSON.parse(localStorage.getItem("spanishSentenceQuizScore")) || 
   wrong: 0
 };
 let playlists = JSON.parse(localStorage.getItem("spanishSentencePlaylists")) || [];
+let playlistFolders = JSON.parse(localStorage.getItem("spanishSentencePlaylistFolders")) || ["General", "Daily life", "Chat corrections", "Generated batches", "Dialogues", "Weak sentences"];
+let selectedPlaylistFolder = localStorage.getItem("spanishSentenceSelectedPlaylistFolder") || "all";
+let dailyReviewQueue = [];
+let dailyReviewIndex = 0;
 let radioState = {
   isPlaying: false,
   isPaused: false,
@@ -2027,6 +2093,71 @@ function getCurrentPracticeStats() {
 // This helper saves the daily practice stats.
 function savePracticeStats() {
   localStorage.setItem("spanishSentencePracticeStats", JSON.stringify(getCurrentPracticeStats()));
+}
+
+function saveMistakePatterns() {
+  localStorage.setItem("spanishSentenceMistakePatterns", JSON.stringify(mistakePatterns));
+}
+
+function getLanguageMistakePatterns() {
+  return mistakePatterns.filter((item) => item.targetLanguage === targetLanguage);
+}
+
+function rememberMistakePattern(message) {
+  if (!message?.correctionSpanish || !message?.spanish || message.correctionSpanish === message.spanish) {
+    return;
+  }
+
+  const note = message.feedback || "More natural wording";
+  const existing = mistakePatterns.find((item) => item.targetLanguage === targetLanguage && item.note === note);
+
+  if (existing) {
+    existing.count += 1;
+    existing.lastSeenAt = new Date().toISOString();
+    existing.example = message.correctionSpanish;
+  } else {
+    mistakePatterns.push({
+      id: createId(),
+      targetLanguage,
+      note,
+      count: 1,
+      example: message.correctionSpanish,
+      lastSeenAt: new Date().toISOString()
+    });
+  }
+
+  mistakePatterns = mistakePatterns
+    .sort((first, second) => new Date(second.lastSeenAt) - new Date(first.lastSeenAt))
+    .slice(0, 80);
+  saveMistakePatterns();
+  renderTodayDashboard();
+}
+
+function applyDifficultyCalibration(value) {
+  const order = ["beginner", "intermediate", "advanced"];
+  const currentIndex = order.indexOf(difficultySelect.value);
+
+  if (currentIndex === -1) {
+    return;
+  }
+
+  let nextIndex = currentIndex;
+  if (value === "too-easy") {
+    nextIndex = Math.min(order.length - 1, currentIndex + 1);
+  } else if (value === "too-hard") {
+    nextIndex = Math.max(0, currentIndex - 1);
+  }
+
+  difficultySelect.value = order[nextIndex];
+  difficultyCalibration[targetLanguage] = {
+    level: order[nextIndex],
+    lastFeedback: value,
+    updatedAt: new Date().toISOString()
+  };
+  localStorage.setItem("spanishSentenceDifficultyCalibration", JSON.stringify(difficultyCalibration));
+  showStatusMessage(value === "about-right"
+    ? `Great. Keeping ${capitalize(order[nextIndex])} for ${getTargetLanguageProfile().label}.`
+    : `Adjusted future practice to ${capitalize(order[nextIndex])}.`);
 }
 
 // This helper redraws the daily practice stats strip.
@@ -2333,6 +2464,7 @@ function buildLanguageChatBackup() {
 // This helper saves vocabulary cards in localStorage.
 function saveSavedWords() {
   localStorage.setItem("spanishSentenceSavedWords", JSON.stringify(savedWords));
+  renderTodayDashboard();
 }
 
 // This helper normalises older or newly saved word cards.
@@ -2430,6 +2562,129 @@ function saveWordFromElement(wordElement, source = "sentence") {
   renderSavedWords();
   return true;
 }
+
+function isPlaceholderWordHint(hint) {
+  return !hint || hint === "Hint coming soon" || hint.endsWith("hint not added yet") || hint.startsWith("Loading ");
+}
+
+async function improveClickedWordHint(wordElement, meaningElement) {
+  const currentHint = wordElement.getAttribute("data-translation") || "";
+  const example = getWordExampleFromElement(wordElement);
+  const cleanWord = normaliseWord(wordElement.textContent || "");
+
+  if (!cleanWord || !isPlaceholderWordHint(currentHint) || !example.spanish) {
+    return;
+  }
+
+  meaningElement.textContent = "Finding a better hint...";
+
+  try {
+    const responseData = await callAiLanguageCoach({
+      mode: "word-hints",
+      targetLanguage,
+      spanish: example.spanish,
+      english: example.english || "",
+      words: [wordElement.textContent.trim().replace(/[.,!?¿¡;:]+$/g, "")]
+    });
+    const hints = responseData.hints || {};
+    const hint = hints[cleanWord] || hints[wordElement.textContent.trim()] || Object.values(hints)[0];
+
+    if (!hint) {
+      meaningElement.textContent = "No hint returned yet.";
+      return;
+    }
+
+    wordElement.setAttribute("data-translation", hint);
+    meaningElement.textContent = hint;
+  } catch (error) {
+    meaningElement.textContent = "No hint available yet. You can still save the word with its example.";
+  }
+}
+
+function closeWordActionPanel() {
+  if (activeWordActionPanel) {
+    activeWordActionPanel.remove();
+    activeWordActionPanel = null;
+  }
+  document.body.classList.remove("word-panel-open");
+}
+
+function showWordActionPanel(wordElement, source = "sentence") {
+  const rawWord = wordElement?.textContent?.trim() || "";
+  const cleanWord = normaliseWord(rawWord);
+
+  if (!cleanWord) {
+    return;
+  }
+
+  closeWordActionPanel();
+
+  const hint = wordElement.getAttribute("data-translation") || `${getTargetLanguageProfile().translationLabel} hint not added yet`;
+  const example = getWordExampleFromElement(wordElement);
+  const alreadySaved = savedWords.some((item) => {
+    const scheduledItem = withWordSchedule(item);
+    return scheduledItem.targetLanguage === targetLanguage && scheduledItem.normalisedWord === cleanWord;
+  });
+  const panel = document.createElement("div");
+  const header = document.createElement("div");
+  const title = document.createElement("p");
+  const closeButton = document.createElement("button");
+  const meaning = document.createElement("p");
+  const exampleText = document.createElement("p");
+  const actions = document.createElement("div");
+  const saveButton = document.createElement("button");
+
+  panel.className = "word-action-panel";
+  header.className = "word-action-header";
+  title.className = "word-action-title";
+  closeButton.className = "word-action-close";
+  meaning.className = "word-action-meaning";
+  exampleText.className = "word-action-example";
+  actions.className = "word-action-actions";
+  saveButton.className = "secondary-btn word-save-btn";
+  closeButton.type = "button";
+  saveButton.type = "button";
+
+  title.textContent = rawWord.replace(/[.,!?¿¡;:]+$/g, "");
+  closeButton.textContent = "Close";
+  meaning.textContent = hint;
+  exampleText.textContent = example.spanish || "";
+  saveButton.textContent = alreadySaved ? "Update saved word" : "Save word";
+
+  closeButton.addEventListener("click", closeWordActionPanel);
+  saveButton.addEventListener("click", () => {
+    if (saveWordFromElement(wordElement, source)) {
+      saveButton.textContent = "Saved";
+      setTimeout(closeWordActionPanel, 450);
+    }
+  });
+
+  header.appendChild(title);
+  header.appendChild(closeButton);
+  actions.appendChild(saveButton);
+  panel.appendChild(header);
+  panel.appendChild(meaning);
+  if (example.spanish) {
+    panel.appendChild(exampleText);
+  }
+  panel.appendChild(actions);
+  document.body.appendChild(panel);
+  activeWordActionPanel = panel;
+  document.body.classList.add("word-panel-open");
+  improveClickedWordHint(wordElement, meaning);
+}
+
+document.addEventListener("click", (event) => {
+  if (!activeWordActionPanel) {
+    return;
+  }
+
+  if (event.target.closest(".word-action-panel") || event.target.closest(".spanish-word")) {
+    return;
+  }
+
+  closeWordActionPanel();
+});
 
 // This helper updates the visible chat timer.
 function updateChatTimerDisplay() {
@@ -2623,7 +2878,10 @@ function renderDialogue() {
     english.className = "chat-text chat-english";
     actionRow.className = "actions";
     speaker.textContent = line.speaker || `Speaker ${index + 1}`;
-    spanish.textContent = line.spanish;
+    spanish.appendChild(buildHoverableFragment(line.spanish, {
+      spanish: line.spanish,
+      english: line.english || ""
+    }, "dialogue"));
     english.textContent = line.english || "";
     speakButton.className = "secondary-btn chat-audio-btn";
     speakButton.type = "button";
@@ -2678,7 +2936,16 @@ function renderDialogue() {
     currentDialogue.usefulPhrases.forEach((phrase) => {
       const phraseText = document.createElement("p");
       phraseText.className = "chat-text";
-      phraseText.textContent = `${phrase.spanish}${phrase.english ? ` - ${phrase.english}` : ""}${phrase.note ? ` (${phrase.note})` : ""}`;
+      phraseText.appendChild(buildHoverableFragment(phrase.spanish || "", {
+        spanish: phrase.spanish || "",
+        english: phrase.english || ""
+      }, "dialogue"));
+      if (phrase.english) {
+        phraseText.appendChild(document.createTextNode(` - ${phrase.english}`));
+      }
+      if (phrase.note) {
+        phraseText.appendChild(document.createTextNode(` (${phrase.note})`));
+      }
       phrasePanel.appendChild(phraseText);
     });
 
@@ -2703,6 +2970,9 @@ function renderSavedDialogues() {
     const meta = document.createElement("p");
     const actionRow = document.createElement("div");
     const loadButton = document.createElement("button");
+    const renameButton = document.createElement("button");
+    const duplicateButton = document.createElement("button");
+    const playlistButton = document.createElement("button");
     const removeButton = document.createElement("button");
 
     listItem.className = "favourite-item saved-conversation-item";
@@ -2718,6 +2988,18 @@ function renderSavedDialogues() {
       renderDialogue();
       dialogueStatus.textContent = "Saved dialogue loaded.";
     });
+    renameButton.className = "secondary-btn";
+    renameButton.type = "button";
+    renameButton.textContent = "Rename";
+    renameButton.addEventListener("click", () => renameSavedDialogue(dialogue.id));
+    duplicateButton.className = "secondary-btn";
+    duplicateButton.type = "button";
+    duplicateButton.textContent = "Duplicate";
+    duplicateButton.addEventListener("click", () => duplicateSavedDialogue(dialogue.id));
+    playlistButton.className = "secondary-btn";
+    playlistButton.type = "button";
+    playlistButton.textContent = "Add all to playlist";
+    playlistButton.addEventListener("click", () => addDialogueToSelectedPlaylist(dialogue));
     removeButton.className = "delete-btn";
     removeButton.type = "button";
     removeButton.textContent = "Remove";
@@ -2729,6 +3011,9 @@ function renderSavedDialogues() {
     });
 
     actionRow.appendChild(loadButton);
+    actionRow.appendChild(renameButton);
+    actionRow.appendChild(duplicateButton);
+    actionRow.appendChild(playlistButton);
     actionRow.appendChild(removeButton);
     textWrapper.appendChild(title);
     textWrapper.appendChild(meta);
@@ -2736,6 +3021,88 @@ function renderSavedDialogues() {
     listItem.appendChild(textWrapper);
     savedDialoguesList.appendChild(listItem);
   });
+}
+
+function renameSavedDialogue(dialogueId) {
+  const dialogue = savedDialogues.find((item) => item.id === dialogueId);
+  if (!dialogue) {
+    return;
+  }
+  const nextTitle = prompt("New dialogue name", dialogue.title || "Saved dialogue");
+  if (!nextTitle?.trim()) {
+    return;
+  }
+  dialogue.title = nextTitle.trim();
+  if (currentDialogue?.id === dialogue.id) {
+    currentDialogue.title = dialogue.title;
+    saveCurrentDialogueState();
+    renderDialogue();
+  }
+  saveDialogues();
+  renderSavedDialogues();
+  dialogueStatus.textContent = "Dialogue renamed.";
+}
+
+function duplicateSavedDialogue(dialogueId) {
+  const dialogue = savedDialogues.find((item) => item.id === dialogueId);
+  if (!dialogue) {
+    return;
+  }
+  savedDialogues.unshift({
+    ...dialogue,
+    id: createConversationId(),
+    title: `${dialogue.title || "Saved dialogue"} copy`,
+    savedAt: new Date().toISOString(),
+    lines: (dialogue.lines || []).map((line) => ({ ...line }))
+  });
+  saveDialogues();
+  renderSavedDialogues();
+  dialogueStatus.textContent = "Dialogue duplicated.";
+}
+
+function addDialogueToSelectedPlaylist(dialogue) {
+  const playlist = getSelectedPlaylist();
+  if (!playlist) {
+    alert("Create or choose a playlist first.");
+    return;
+  }
+  let addedCount = 0;
+  (dialogue.lines || []).forEach((line) => {
+    if (!line.spanish || playlist.sentences.some((item) => item.spanish === line.spanish)) {
+      return;
+    }
+    playlist.sentences.push(withCurrentLanguage({
+      spanish: line.spanish,
+      english: line.english || "",
+      difficulty: dialogue.level || "intermediate",
+      topic: dialogue.topic || "dialogue",
+      tone: dialogue.tone || "informal",
+      source: "dialogue",
+      generated: true,
+      ai: true
+    }));
+    addedCount += 1;
+  });
+  savePlaylists();
+  renderPlaylists();
+  dialogueStatus.textContent = `${addedCount} dialogue lines added to "${playlist.name}".`;
+}
+
+function deleteOldSavedDialogues() {
+  const languageDialogues = getCurrentLanguageItems(savedDialogues);
+  if (languageDialogues.length <= 10) {
+    dialogueStatus.textContent = "You have 10 or fewer saved dialogues, so nothing was deleted.";
+    return;
+  }
+  const keepIds = new Set(languageDialogues
+    .slice()
+    .sort((first, second) => new Date(second.savedAt || second.generatedAt || 0) - new Date(first.savedAt || first.generatedAt || 0))
+    .slice(0, 10)
+    .map((dialogue) => dialogue.id));
+  savedDialogues = savedDialogues.filter((dialogue) => getSavedItemLanguage(dialogue) !== targetLanguage || keepIds.has(dialogue.id));
+  saveDialogues();
+  renderSavedDialogues();
+  dialogueStatus.textContent = "Kept the 10 newest dialogues and deleted older ones.";
 }
 
 // This helper returns the corrected version of the conversation.
@@ -2791,7 +3158,11 @@ function renderConversationReview() {
   }
 
   const reviewItems = buildConversationReviewItems();
+  const hasLanguageMix = detectConversationLanguageMix(chatHistory);
   conversationReviewList.innerHTML = "";
+  if (repairConversationLanguageBtn) {
+    repairConversationLanguageBtn.classList.toggle("hidden", !hasLanguageMix);
+  }
 
   if (!reviewItems.length) {
     conversationReviewSummary.textContent = "Start a chat first, then come back here to review it.";
@@ -2800,7 +3171,7 @@ function renderConversationReview() {
   }
 
   const correctionCount = reviewItems.filter((item) => item.changed).length;
-  conversationReviewSummary.textContent = `${reviewItems.length} turns | ${correctionCount} more-native user version${correctionCount === 1 ? "" : "s"} | ${getTargetLanguageProfile().label}`;
+  conversationReviewSummary.textContent = `${reviewItems.length} turns | ${correctionCount} more-native user version${correctionCount === 1 ? "" : "s"} | ${getTargetLanguageProfile().label}${hasLanguageMix ? " | possible language mix found" : ""}`;
 
   reviewItems.forEach((item, index) => {
     const row = document.createElement("div");
@@ -2846,6 +3217,126 @@ function renderConversationReview() {
   });
 }
 
+function detectConversationLanguageMix(messages = chatHistory) {
+  if (targetLanguage === "spanish") {
+    return false;
+  }
+
+  return messages.some((message) => {
+    const targetText = `${message.spanish || message.text || ""} ${message.correctionSpanish || ""}`.toLowerCase();
+
+    if (!targetText.trim()) {
+      return false;
+    }
+
+    if (targetLanguage === "english") {
+      return /[Â¿Â¡]|\b(vivo|tengo|quiero|porque|tambien|tambiÃ©n|hermana|padres|espaÃ±ol|espanol|seguimos)\b/i.test(targetText);
+    }
+
+    return /[Â¿Â¡]|\b(vivo|tengo|quiero|porque|tambien|tambiÃ©n|hermana|padres|espaÃ±ol|espanol|seguimos)\b/i.test(targetText);
+  });
+}
+
+async function repairConversationLanguageMix() {
+  if (!chatHistory.length) {
+    alert("Start a chat first.");
+    return;
+  }
+
+  if (!detectConversationLanguageMix(chatHistory)) {
+    chatStatus.textContent = "No obvious language mix found in this conversation.";
+    return;
+  }
+
+  repairConversationLanguageBtn.disabled = true;
+  repairConversationLanguageBtn.textContent = "Repairing...";
+  chatStatus.textContent = `Repairing mixed-language turns so they stay in ${getTargetLanguageProfile().label}...`;
+
+  try {
+    const responseData = await callAiLanguageCoach({
+      mode: "conversation-repair",
+      targetLanguage,
+      history: chatHistory.map((message) => ({
+        role: message.role,
+        spanish: message.spanish || message.text || "",
+        english: message.english || "",
+        correctionSpanish: message.correctionSpanish || "",
+        correctionEnglish: message.correctionEnglish || "",
+        feedback: message.feedback || ""
+      }))
+    });
+    const repairedMessages = Array.isArray(responseData.messages) ? responseData.messages : [];
+
+    if (!repairedMessages.length) {
+      throw new Error("No repaired messages returned.");
+    }
+
+    chatHistory = chatHistory.map((message, index) => ({
+      ...message,
+      ...(repairedMessages[index] || {}),
+      targetLanguage
+    }));
+    saveCurrentChatState();
+    renderChatMessages();
+    renderConversationReview();
+    chatStatus.textContent = "Conversation language mix repaired.";
+  } catch (error) {
+    chatStatus.textContent = `Could not repair the conversation. ${formatAiErrorMessage(error.message)}`;
+  } finally {
+    repairConversationLanguageBtn.disabled = false;
+    repairConversationLanguageBtn.textContent = "Repair language mix";
+  }
+}
+
+function renderDeepConversationReview(review) {
+  if (!conversationReviewPanel || !conversationReviewList || !conversationReviewSummary) {
+    return;
+  }
+
+  conversationReviewList.innerHTML = "";
+  conversationReviewSummary.textContent = review?.summary || "In-depth review ready.";
+
+  const sections = [
+    ["Strengths", review?.strengths],
+    ["Main fixes", review?.mainFixes],
+    ["Natural phrases to reuse", review?.naturalPhrases],
+    ["Grammar or wording patterns", review?.patterns],
+    ["Practice drills", review?.drills],
+    ["Next conversation goal", review?.nextGoal ? [review.nextGoal] : []]
+  ];
+
+  sections.forEach(([sectionTitle, items]) => {
+    if (!Array.isArray(items) || !items.length) {
+      return;
+    }
+
+    const section = document.createElement("div");
+    const title = document.createElement("p");
+    const list = document.createElement("ul");
+
+    section.className = "conversation-review-item deep-review-section";
+    title.className = "section-label";
+    title.textContent = sectionTitle;
+    list.className = "deep-review-list";
+
+    items.forEach((item) => {
+      const listItem = document.createElement("li");
+      if (typeof item === "string") {
+        listItem.textContent = item;
+      } else {
+        const main = item.native || item.fix || item.phrase || item.point || item.drill || "";
+        const detail = item.explanation || item.english || item.note || item.example || "";
+        listItem.textContent = detail ? `${main} - ${detail}` : main;
+      }
+      list.appendChild(listItem);
+    });
+
+    section.appendChild(title);
+    section.appendChild(list);
+    conversationReviewList.appendChild(section);
+  });
+}
+
 function showConversationReview() {
   if (!conversationReviewPanel) {
     return;
@@ -2855,6 +3346,48 @@ function showConversationReview() {
   conversationReviewPanel.classList.remove("hidden");
   chatStatus.textContent = "Conversation review opened.";
   conversationReviewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function showDeepConversationReview() {
+  if (!conversationReviewPanel || !chatHistory.length) {
+    alert("Start a chat first.");
+    return;
+  }
+
+  conversationReviewPanel.classList.remove("hidden");
+  conversationReviewSummary.textContent = "Running in-depth AI review...";
+  conversationReviewList.innerHTML = '<p class="empty-message">Checking fluency, repeated patterns, useful phrases, and next practice steps.</p>';
+  chatStatus.textContent = "Running in-depth conversation review with the higher-quality AI model...";
+  deepReviewConversationBtn.disabled = true;
+  deepReviewConversationBtn.textContent = "Reviewing...";
+
+  try {
+    const responseData = await callAiLanguageCoach({
+      mode: "conversation-review",
+      targetLanguage,
+      topic: chatTopicSelect.value,
+      tone: chatToneSelect.value,
+      goal: chatGoalSelect.value,
+      history: chatHistory.map((message) => ({
+        role: message.role,
+        spanish: message.spanish || message.text || "",
+        english: message.english || "",
+        correctionSpanish: message.correctionSpanish || "",
+        correctionEnglish: message.correctionEnglish || "",
+        feedback: message.feedback || ""
+      }))
+    });
+
+    renderDeepConversationReview(responseData.review || responseData);
+    chatStatus.textContent = "In-depth conversation review ready.";
+    conversationReviewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (error) {
+    conversationReviewSummary.textContent = `Could not run the in-depth review. ${formatAiErrorMessage(error.message)}`;
+    chatStatus.textContent = conversationReviewSummary.textContent;
+  } finally {
+    deepReviewConversationBtn.disabled = false;
+    deepReviewConversationBtn.textContent = "In-depth AI review";
+  }
 }
 
 function hideConversationReview() {
@@ -3040,6 +3573,11 @@ function getTargetLanguageProfile() {
   return targetLanguageProfiles[targetLanguage] || targetLanguageProfiles.spanish;
 }
 
+function getLearningDirectionLabel() {
+  const profile = getTargetLanguageProfile();
+  return `I speak ${profile.sourceLabel} -> learning ${profile.label}`;
+}
+
 function getSavedItemLanguage(item) {
   return item?.targetLanguage || item?.language || "spanish";
 }
@@ -3140,6 +3678,10 @@ function applyTargetLanguagePreference() {
     targetLanguageSelect.value = targetLanguage;
   }
 
+  if (difficultySelect && difficultyCalibration[targetLanguage]?.level) {
+    difficultySelect.value = difficultyCalibration[targetLanguage].level;
+  }
+
   if (appEyebrow) {
     const flag = appEyebrow.querySelector(".language-flag");
     appEyebrow.textContent = "";
@@ -3155,7 +3697,7 @@ function applyTargetLanguagePreference() {
   }
 
   if (appIntro) {
-    appIntro.textContent = `Practise ${profile.phrase} with random example sentences, English translations, and speech buttons.`;
+    appIntro.textContent = `Practise ${profile.phrase} with random example sentences, ${profile.translationLabel} translations, and speech buttons.`;
   }
 
   document.title = `${profile.label} Sentence Generator`;
@@ -3171,20 +3713,36 @@ function applyTargetLanguagePreference() {
     speakSpanishBtn.textContent = `Speak ${profile.label}`;
   }
 
+  if (speakEnglishBtn) {
+    speakEnglishBtn.textContent = `Speak ${profile.translationLabel}`;
+  }
+
   if (copySentenceBtn) {
     copySentenceBtn.textContent = `Copy ${profile.label}`;
   }
 
+  if (learningDirectionNote) {
+    learningDirectionNote.textContent = `${getLearningDirectionLabel()}. Translations, word hints, chat prompts, call transcription, and saved files follow this direction.`;
+  }
+
   if (batchStatus && (!batchStatus.textContent.trim() || batchStatus.textContent.includes("Generate a batch to view"))) {
-    batchStatus.textContent = `Generate a batch to view ${profile.label} and English side by side.`;
+    batchStatus.textContent = `Generate a batch to view ${profile.label} and ${profile.translationLabel} side by side.`;
   }
 
   if (favouritesSearchInput) {
-    favouritesSearchInput.placeholder = `Search ${profile.label} or English`;
+    favouritesSearchInput.placeholder = `Search ${profile.label} or ${profile.translationLabel}`;
   }
 
   if (customToneLabel) {
     customToneLabel.textContent = `${profile.label} style`;
+  }
+
+  if (customEnglishLabel) {
+    customEnglishLabel.textContent = `Write a sentence in ${profile.sourceLabel}`;
+  }
+
+  if (customEnglishInput) {
+    customEnglishInput.placeholder = `For example: ${profile.example}`;
   }
 
   if (translateCustomBtn) {
@@ -3197,6 +3755,10 @@ function applyTargetLanguagePreference() {
 
   if (customSpanishOutput && !latestCustomSentence) {
     customSpanishOutput.textContent = `Your ${profile.label} sentence will appear here.`;
+  }
+
+  if (customEnglishOutput && !latestCustomSentence) {
+    customEnglishOutput.textContent = `Your ${profile.sourceLabel} sentence will stay visible here too.`;
   }
 
   if (customStatus && (!customStatus.textContent.trim() || customStatus.textContent.includes("Best for short everyday sentences"))) {
@@ -3214,7 +3776,7 @@ function applyTargetLanguagePreference() {
   }
 
   if (chatInput) {
-    chatInput.placeholder = `Write in English or simple ${profile.label}. For example: ${profile.example}`;
+    chatInput.placeholder = `Write in ${profile.sourceLabel} or simple ${profile.label}. For example: ${profile.example}`;
   }
 
   if (chatStatus && (!chatStatus.textContent.trim() || chatStatus.textContent.includes("Start a chat to practise"))) {
@@ -3241,8 +3803,10 @@ function saveTargetLanguagePreference() {
   }
 
   targetLanguage = nextLanguage;
+  spanishVoiceChoice = languageVoiceChoices[targetLanguage] || "primary";
   loadActiveChatStateForLanguage(targetLanguage);
   applyTargetLanguagePreference();
+  applySpanishVoicePreference();
   refreshLanguageScopedViews();
 
   if (chatStatus) {
@@ -3250,6 +3814,92 @@ function saveTargetLanguagePreference() {
       ? `${getTargetLanguageProfile().label} chat restored.`
       : `${getTargetLanguageProfile().label} selected. Start a chat when you're ready.`;
   }
+}
+
+function applyQuickSetupLanguage(language) {
+  if (!targetLanguageProfiles[language]) {
+    return;
+  }
+
+  if (targetLanguageSelect) {
+    targetLanguageSelect.value = language;
+  }
+
+  saveTargetLanguagePreference();
+  localStorage.setItem("spanishSentenceSetupComplete", "true");
+  if (firstRunSetup) {
+    firstRunSetup.classList.add("hidden");
+  }
+  showStatusMessage(`${getLearningDirectionLabel()} selected.`);
+}
+
+function applyFirstRunSetupVisibility() {
+  if (!firstRunSetup) {
+    return;
+  }
+
+  const setupComplete = localStorage.getItem("spanishSentenceSetupComplete") === "true";
+  firstRunSetup.classList.toggle("hidden", setupComplete);
+}
+
+function applySetupPreset(preset) {
+  const presets = {
+    travel: { topic: "travel", goal: "small-talk", scenario: "roleplay" },
+    daily: { topic: "daily life", goal: "natural-flow", scenario: "casual" },
+    shadowing: { topic: "daily life", goal: "natural-flow", scenario: "quick-fire" },
+    work: { topic: "work", goal: "small-talk", scenario: "roleplay" }
+  };
+  const presetConfig = presets[preset];
+
+  if (!presetConfig) {
+    return;
+  }
+
+  if (topicSelect) {
+    topicSelect.value = presetConfig.topic;
+  }
+  if (chatTopicSelect) {
+    chatTopicSelect.value = presetConfig.topic;
+  }
+  if (chatGoalSelect) {
+    chatGoalSelect.value = presetConfig.goal;
+  }
+  if (chatScenarioSelect) {
+    chatScenarioSelect.value = presetConfig.scenario;
+  }
+  if (shadowGapSelect && preset === "shadowing") {
+    shadowGapSelect.value = "3";
+    localStorage.setItem("spanishSentenceShadowGap", "3");
+  }
+
+  localStorage.setItem("spanishSentenceSetupComplete", "true");
+  applyFirstRunSetupVisibility();
+  showStatusMessage(`${capitalize(preset)} preset applied.`);
+}
+
+function reviewLastCallSummary() {
+  if (!lastCallSummaryChatHistory.length) {
+    alert("No recent call summary to review.");
+    return;
+  }
+
+  chatHistory = lastCallSummaryChatHistory.map((message) => ({ ...message }));
+  saveCurrentChatState();
+  renderChatMessages();
+  showDeepConversationReview();
+}
+
+function saveLastCallSummaryConversation() {
+  if (!lastCallSummaryChatHistory.length) {
+    alert("No recent call to save.");
+    return;
+  }
+
+  chatHistory = lastCallSummaryChatHistory.map((message) => ({ ...message }));
+  if (!activeConversationId) {
+    activeConversationId = createConversationId();
+  }
+  saveCurrentConversation();
 }
 
 function applyCallPausePreference() {
@@ -3286,10 +3936,14 @@ function getCallPauseTiming() {
 
 // This helper keeps the selected ElevenLabs voice in sync with the page.
 function applySpanishVoicePreference() {
+  spanishVoiceChoice = languageVoiceChoices[targetLanguage] || spanishVoiceChoice || "primary";
+
   if (spanishVoiceSelect) {
     spanishVoiceSelect.value = spanishVoiceChoice;
   }
 
+  languageVoiceChoices[targetLanguage] = spanishVoiceChoice;
+  localStorage.setItem("spanishSentenceVoiceChoicesByLanguage", JSON.stringify(languageVoiceChoices));
   localStorage.setItem("spanishSentenceVoiceChoice", spanishVoiceChoice);
 }
 
@@ -3305,6 +3959,7 @@ function getSelectedSpanishVoice() {
 // This function saves the selected ElevenLabs voice option.
 function saveSpanishVoicePreference() {
   spanishVoiceChoice = getSelectedSpanishVoice();
+  languageVoiceChoices[targetLanguage] = spanishVoiceChoice;
   applySpanishVoicePreference();
 }
 
@@ -3421,7 +4076,8 @@ async function transcribeRecordedChatAudio(audioBlob) {
     body: JSON.stringify({
       audioBase64,
       mimeType: audioBlob.type || "audio/webm",
-      fileName: `chat-mic-audio.${fileExtension}`
+      fileName: `chat-mic-audio.${fileExtension}`,
+      targetLanguage
     })
   });
 
@@ -4067,8 +4723,25 @@ async function startCallMode() {
 
   clearMixedLanguageChatIfNeeded();
 
+  let shouldWaitForOpeningAudio = false;
+  chatAutoSpeakCheckbox.checked = true;
+
   if (chatHistory.length === 0) {
-    await startChat({ fromCall: true });
+    shouldWaitForOpeningAudio = Boolean(await startChat({
+      fromCall: true,
+      forceSpeakOpening: true,
+      onOpeningSpoken: () => {
+        if (!isCallModeActive) {
+          return;
+        }
+
+        isCallReplying = false;
+        stopCallBargeInMonitor();
+        interruptCallBtn.classList.add("hidden");
+        setChatStatus("Your turn. Speak naturally, then pause.");
+        restartCallListening(300);
+      }
+    }));
   }
 
   isCallModeActive = true;
@@ -4079,15 +4752,55 @@ async function startCallMode() {
   startCallBtn.classList.add("hidden");
   endCallBtn.classList.remove("hidden");
   interruptCallBtn.classList.add("hidden");
-  chatAutoSpeakCheckbox.checked = true;
   setChatStatus("Call mode started. Speak naturally after the coach finishes.");
   updateCallFocusLayout();
-  restartCallListening(200);
+
+  if (!shouldWaitForOpeningAudio) {
+    restartCallListening(200);
+  }
 }
 
 // This helper clears the active chat without trying to stop call mode again.
 function resetActiveChatAfterCall() {
   clearActiveChatState();
+}
+
+function renderCallSummary(durationSeconds, savedConversation = null) {
+  if (!callSummaryPanel) {
+    return;
+  }
+
+  const turns = getCorrectedConversationTurns();
+  const corrections = chatHistory.filter((message) => message.role === "user" && message.correctionSpanish).slice(-4);
+  lastCallSummaryChatHistory = chatHistory.map((message) => ({ ...message }));
+  callSummaryPanel.classList.remove("hidden");
+
+  if (callSummaryTitle) {
+    callSummaryTitle.textContent = savedConversation ? "Saved call" : "Last call";
+  }
+  if (callSummaryDuration) {
+    callSummaryDuration.textContent = formatChatDuration(durationSeconds);
+  }
+  if (callSummaryTurns) {
+    callSummaryTurns.textContent = turns.length;
+  }
+  if (callSummaryCorrections) {
+    callSummaryCorrections.textContent = corrections.length;
+  }
+  if (callSummaryPhrases) {
+    callSummaryPhrases.innerHTML = "";
+    if (!corrections.length) {
+      const item = document.createElement("li");
+      item.textContent = "No corrected phrases in this call yet.";
+      callSummaryPhrases.appendChild(item);
+    } else {
+      corrections.forEach((message) => {
+        const item = document.createElement("li");
+        item.textContent = `${message.correctionSpanish} - ${message.correctionEnglish || message.feedback || "native version"}`;
+        callSummaryPhrases.appendChild(item);
+      });
+    }
+  }
 }
 
 // This function stops the hands-free voice chat loop.
@@ -4098,6 +4811,7 @@ function stopCallMode(message = "Call mode ended.", options = {}) {
   const savedConversation = shouldAutoSave && chatHistory.length
     ? saveCurrentConversation({ silent: true })
     : null;
+  const shouldShowSummary = chatHistory.length > 0;
 
   isCallModeActive = false;
   isCallReplying = false;
@@ -4137,11 +4851,17 @@ function stopCallMode(message = "Call mode ended.", options = {}) {
   chatInput.value = "";
 
   if (shouldAutoSave) {
+    if (shouldShowSummary) {
+      renderCallSummary(callDurationSeconds, savedConversation);
+    }
     resetActiveChatAfterCall();
     setChatStatus(savedConversation
       ? `Call saved and chat cleared. Call length: ${callDurationText}. Ready for the next call.`
       : `Call ended. Call length: ${callDurationText}. Ready for the next call.`);
   } else {
+    if (shouldShowSummary) {
+      renderCallSummary(callDurationSeconds, savedConversation);
+    }
     setChatStatus(`${message} Call length: ${callDurationText}.`);
   }
 
@@ -4317,10 +5037,10 @@ function normaliseWord(word) {
     .replace(/[^a-z]/g, "");
 }
 
-// This helper finds the English meaning for one Spanish word.
+// This helper finds the support-language meaning for one target-language word.
 function getWordTranslation(word) {
   if (targetLanguage !== "spanish") {
-    return "Loading English hint";
+    return `Loading ${getTargetLanguageProfile().translationLabel} hint`;
   }
 
   const cleanWord = normaliseWord(word);
@@ -4344,7 +5064,7 @@ function getMissingWordHints(includeAllVisibleWords = false) {
       return;
     }
 
-    if (includeAllVisibleWords || hint === "Hint coming soon" || hint === "English hint not added yet" || hint === "Loading English hint") {
+    if (includeAllVisibleWords || isPlaceholderWordHint(hint)) {
       missingWords.set(cleanWord, wordSpan.textContent.trim().replace(/[.,!?¿¡;:]+$/g, ""));
     }
   });
@@ -4443,7 +5163,7 @@ function setCurrentSentence(sentence, sourceLabel) {
   wordHintRequestId += 1;
   improveMissingWordHintsWithAi(currentSentence, wordHintRequestId);
   currentSentence.grammarTags = inferGrammarTags(currentSentence);
-  sentenceMeta.textContent = `${capitalize(currentSentence.difficulty)} | ${capitalize(currentSentence.topic)} | ${capitalize(currentSentence.tone)} | ${formatGrammarTags(currentSentence)} | Hover words for English hints | ${sourceLabel}`;
+  sentenceMeta.textContent = `${capitalize(currentSentence.difficulty)} | ${capitalize(currentSentence.topic)} | ${capitalize(currentSentence.tone)} | ${formatGrammarTags(currentSentence)} | Hover words for ${getTargetLanguageProfile().translationLabel} hints | ${sourceLabel}`;
   applySentenceDisplayPreference();
   answerMarked = false;
   updateTranslationDisplay();
@@ -4479,7 +5199,7 @@ function buildOfflineCustomSentence() {
   }
 
   if (!englishInput) {
-    alert("Write an English sentence first.");
+    alert(`Write a ${getTargetLanguageProfile().sourceLabel} sentence first.`);
     return null;
   }
 
@@ -4533,7 +5253,7 @@ async function buildAiCustomSentence() {
   const englishInput = customEnglishInput.value.trim();
 
   if (!englishInput) {
-    alert("Write an English sentence first.");
+    alert(`Write a ${getTargetLanguageProfile().sourceLabel} sentence first.`);
     return null;
   }
 
@@ -4878,6 +5598,10 @@ async function buildAiChatOpening(options = {}) {
 // This function starts a fresh chat.
 async function startChat(options = {}) {
   const fromCall = Boolean(options.fromCall);
+  const forceSpeakOpening = Boolean(options.forceSpeakOpening);
+  const onOpeningSpoken = typeof options.onOpeningSpoken === "function"
+    ? options.onOpeningSpoken
+    : null;
 
   if (isCallModeActive) {
     stopCallMode("Call mode ended. New chat started.");
@@ -4917,17 +5641,21 @@ async function startChat(options = {}) {
   }
 
   if (!opening) {
-    return;
+    return false;
   }
 
   lastCoachReply = opening;
   addChatMessage("coach", opening.spanish, opening.english);
-  if (chatAutoSpeakCheckbox.checked) {
-    playSpanishAudio(opening.spanish, "Chat opening");
+  if (chatAutoSpeakCheckbox.checked || forceSpeakOpening) {
+    playSpanishAudio(opening.spanish, "Chat opening", onOpeningSpoken, { progressive: false });
+  } else if (onOpeningSpoken) {
+    onOpeningSpoken();
   }
   if (!chatStatus.textContent.includes("built-in opening")) {
-    chatStatus.textContent = `Chat started: ${getChatScenarioLabel()} | Goal: ${getChatGoalLabel()}. Reply in English or simple ${getTargetLanguageProfile().label}.`;
+    chatStatus.textContent = `Chat started: ${getChatScenarioLabel()} | Goal: ${getChatGoalLabel()}. Reply in ${getTargetLanguageProfile().sourceLabel} or simple ${getTargetLanguageProfile().label}.`;
   }
+
+  return true;
 }
 
 // This function saves the current conversation for later.
@@ -5166,6 +5894,7 @@ async function sendChatMessage(options = {}) {
       lastUserMessage.correctionEnglish = coachReply.correctionEnglish || "";
       lastUserMessage.feedback = coachReply.feedback || "";
       lastUserMessage.hideNativeAlternative = false;
+      rememberMistakePattern(lastUserMessage);
     }
   }
 
@@ -6028,7 +6757,7 @@ function removeConversationPlaylistItem(conversationId) {
 }
 
 // This function turns a Spanish sentence into hoverable words.
-function buildHoverableFragment(text, exampleSentence = null) {
+function buildHoverableFragment(text, exampleSentence = null, source = "sentence") {
   const fragment = document.createDocumentFragment();
   const parts = text.split(" ");
   const example = exampleSentence || { spanish: text, english: "" };
@@ -6041,9 +6770,10 @@ function buildHoverableFragment(text, exampleSentence = null) {
     wordSpan.setAttribute("data-translation", getWordTranslation(part));
     wordSpan.dataset.example = example.spanish || text;
     wordSpan.dataset.exampleEnglish = example.english || "";
-    wordSpan.title = "Click to save this word";
-    wordSpan.addEventListener("click", () => {
-      saveWordFromElement(wordSpan, "sentence");
+    wordSpan.title = "Click for word options";
+    wordSpan.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showWordActionPanel(wordSpan, source);
     });
     fragment.appendChild(wordSpan);
 
@@ -7564,7 +8294,7 @@ async function generateSentence() {
     showStatusMessage(
       quizModeCheckbox.checked
         ? "Quiz mode is on. Try to guess the meaning first."
-        : `Hover over a ${getTargetLanguageProfile().label} word to see an English hint.`
+        : `Hover over a ${getTargetLanguageProfile().label} word to see a ${getTargetLanguageProfile().translationLabel} hint.`
     );
   }
 }
@@ -7587,7 +8317,7 @@ function renderBatchSentences() {
   }
 
   if (!hasBatchSentences) {
-    batchStatus.textContent = `Generate a batch to view ${getTargetLanguageProfile().label} and English side by side.`;
+    batchStatus.textContent = `Generate a batch to view ${getTargetLanguageProfile().label} and ${getTargetLanguageProfile().translationLabel} side by side.`;
     return;
   }
 
@@ -7818,10 +8548,10 @@ function downloadBatchPdf() {
     </head>
     <body>
       <h1>${escapeHtml(title)}</h1>
-      <p class="meta">${currentBatchSentences.length} sentences | ${escapeHtml(getTargetLanguageProfile().label)} left, English right</p>
+      <p class="meta">${currentBatchSentences.length} sentences | ${escapeHtml(getTargetLanguageProfile().label)} left, ${escapeHtml(getTargetLanguageProfile().translationLabel)} right</p>
       <table>
         <thead>
-          <tr><th class="number">#</th><th>${escapeHtml(getTargetLanguageProfile().label)}</th><th>English</th></tr>
+          <tr><th class="number">#</th><th>${escapeHtml(getTargetLanguageProfile().label)}</th><th>${escapeHtml(getTargetLanguageProfile().translationLabel)}</th></tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
@@ -8005,6 +8735,7 @@ function exportPracticeBackup() {
       quizScore,
       recallSentences,
       playlists,
+      playlistFolders,
       savedBatches,
       savedWords,
       savedDialogues,
@@ -8105,8 +8836,59 @@ function savePlaylists() {
   localStorage.setItem("spanishSentencePlaylists", JSON.stringify(playlists));
 }
 
+function savePlaylistFolders() {
+  localStorage.setItem("spanishSentencePlaylistFolders", JSON.stringify(playlistFolders));
+  localStorage.setItem("spanishSentenceSelectedPlaylistFolder", selectedPlaylistFolder);
+}
+
+function getPlaylistFolderOptions() {
+  const folderSet = new Set(["General", ...playlistFolders, ...playlists.map((playlist) => playlist.folder || "General")]);
+  return Array.from(folderSet).filter(Boolean).sort((first, second) => first.localeCompare(second));
+}
+
+function renderPlaylistFolders() {
+  if (!playlistFolderSelect) {
+    return;
+  }
+  const previousValue = selectedPlaylistFolder || playlistFolderSelect.value || "all";
+  playlistFolderSelect.innerHTML = "";
+  const allOption = document.createElement("option");
+  allOption.value = "all";
+  allOption.textContent = "All folders";
+  playlistFolderSelect.appendChild(allOption);
+  getPlaylistFolderOptions().forEach((folder) => {
+    const option = document.createElement("option");
+    option.value = folder;
+    option.textContent = folder;
+    playlistFolderSelect.appendChild(option);
+  });
+  const hasPrevious = Array.from(playlistFolderSelect.options).some((option) => option.value === previousValue);
+  playlistFolderSelect.value = hasPrevious ? previousValue : "all";
+  selectedPlaylistFolder = playlistFolderSelect.value;
+}
+
+function createPlaylistFolder() {
+  const folderName = playlistFolderNameInput?.value.trim();
+  if (!folderName) {
+    alert("Type a folder name first.");
+    return;
+  }
+  if (!playlistFolders.includes(folderName)) {
+    playlistFolders.push(folderName);
+  }
+  selectedPlaylistFolder = folderName;
+  if (playlistFolderNameInput) {
+    playlistFolderNameInput.value = "";
+  }
+  savePlaylistFolders();
+  renderPlaylistFolders();
+  renderPlaylists();
+  showStatusMessage(`Playlist folder created: ${folderName}`);
+}
+
 function saveSavedBatches() {
   localStorage.setItem("spanishSentenceSavedBatches", JSON.stringify(savedBatches));
+  renderTodayDashboard();
 }
 
 function formatSavedBatchDate(dateText) {
@@ -8141,6 +8923,7 @@ function ensureBatchPlaylist(batch) {
       targetLanguage: getSavedItemLanguage(batch),
       name: batch.title,
       source: "batch",
+      folder: "Generated batches",
       batchId: batch.id,
       sentences: []
     };
@@ -8151,6 +8934,7 @@ function ensureBatchPlaylist(batch) {
   playlist.targetLanguage = getSavedItemLanguage(batch);
   playlist.name = batch.title;
   playlist.source = "batch";
+  playlist.folder = playlist.folder || "Generated batches";
   playlist.batchId = batch.id;
   playlist.sentences = batch.sentences.map((sentence) => ({
     ...sentence,
@@ -8331,7 +9115,9 @@ function getSelectedPlaylist() {
 // This function draws the playlist dropdown and sentence list.
 function renderPlaylists() {
   const previousValue = playlistSelect.value;
-  const languagePlaylists = getCurrentLanguageItems(playlists);
+  renderPlaylistFolders();
+  const languagePlaylists = getCurrentLanguageItems(playlists)
+    .filter((playlist) => selectedPlaylistFolder === "all" || (playlist.folder || "General") === selectedPlaylistFolder);
   playlistSelect.innerHTML = "";
 
   if (languagePlaylists.length === 0) {
@@ -8346,7 +9132,7 @@ function renderPlaylists() {
   languagePlaylists.forEach((playlist) => {
     const option = document.createElement("option");
     option.value = playlist.id;
-    option.textContent = `${playlist.name} (${playlist.sentences.length})`;
+    option.textContent = `${playlist.name} (${playlist.folder || "General"} - ${playlist.sentences.length})`;
     playlistSelect.appendChild(option);
   });
 
@@ -8465,6 +9251,7 @@ function createPlaylist() {
     id: createId(),
     targetLanguage,
     name,
+    folder: selectedPlaylistFolder === "all" ? "General" : selectedPlaylistFolder,
     sentences: []
   });
 
@@ -8524,6 +9311,158 @@ function deleteSelectedPlaylist() {
   savePlaylists();
   renderPlaylists();
   showStatusMessage("Playlist deleted.");
+}
+
+function buildDailyReviewQueue() {
+  const wordItems = getCurrentLanguageItems(savedWords)
+    .map(withWordSchedule)
+    .filter(isWordDue)
+    .slice(0, 8)
+    .map((word) => ({ type: "word", word }));
+  const recallItems = getCurrentLanguageItems(recallSentences)
+    .map(withRecallSchedule)
+    .filter(isRecallDue)
+    .slice(0, 8)
+    .map((sentence) => ({ type: "recall", sentence }));
+  const playlistItems = getCurrentLanguageItems(playlists)
+    .flatMap((playlist) => (playlist.sentences || []).slice(0, 4).map((sentence) => ({ type: "playlist", playlist, sentence })))
+    .slice(0, 8);
+
+  dailyReviewQueue = [...wordItems, ...recallItems, ...playlistItems];
+  dailyReviewIndex = 0;
+  renderDailyReview();
+}
+
+function renderTodayDashboard() {
+  const dueWords = getCurrentLanguageItems(savedWords).map(withWordSchedule).filter(isWordDue).length;
+  const dueRecall = getCurrentLanguageItems(recallSentences).map(withRecallSchedule).filter(isRecallDue).length;
+  const batchCount = getCurrentLanguageItems(savedBatches).length;
+  const patternCount = getLanguageMistakePatterns().length;
+
+  if (todayWordsDue) {
+    todayWordsDue.textContent = dueWords;
+  }
+  if (todayRecallDue) {
+    todayRecallDue.textContent = dueRecall;
+  }
+  if (todaySavedBatches) {
+    todaySavedBatches.textContent = batchCount;
+  }
+  if (todayMistakePatterns) {
+    todayMistakePatterns.textContent = patternCount;
+  }
+  if (todaySuggestion) {
+    if (dueWords || dueRecall) {
+      todaySuggestion.textContent = `Start with ${dueWords + dueRecall} due review item${dueWords + dueRecall === 1 ? "" : "s"}, then use a playlist or call practice.`;
+    } else if (patternCount) {
+      todaySuggestion.textContent = "No due cards right now. Review your recurring mistake patterns or start a short call.";
+    } else {
+      todaySuggestion.textContent = "No urgent reviews. Generate a set, start a dialogue, or do a short call.";
+    }
+  }
+}
+
+function renderDailyReview() {
+  if (!dailyReviewSummary || !dailyReviewCard) {
+    return;
+  }
+
+  if (!dailyReviewQueue.length) {
+    renderTodayDashboard();
+    dailyReviewSummary.textContent = "No review queue built yet.";
+    dailyReviewCard.innerHTML = '<p class="empty-message">Press Build today&apos;s queue to start a focused practice session.</p>';
+    return;
+  }
+
+  const item = dailyReviewQueue[Math.min(dailyReviewIndex, dailyReviewQueue.length - 1)];
+  renderTodayDashboard();
+  dailyReviewSummary.textContent = `${dailyReviewIndex + 1} of ${dailyReviewQueue.length} | Words, recall, and playlist practice mixed together.`;
+  dailyReviewCard.innerHTML = "";
+
+  const label = document.createElement("p");
+  const title = document.createElement("h3");
+  const detail = document.createElement("p");
+  const actions = document.createElement("div");
+  const goodButton = document.createElement("button");
+  const hardButton = document.createElement("button");
+
+  label.className = "section-label";
+  detail.className = "sentence-meta";
+  actions.className = "actions";
+  goodButton.className = "secondary-btn";
+  hardButton.className = "secondary-btn";
+
+  if (item.type === "word") {
+    label.textContent = "Word SRS";
+    title.textContent = item.word.word;
+    detail.textContent = `${item.word.meaning || "Meaning saved from context"} | ${item.word.exampleSpanish || "No example sentence saved."}`;
+    goodButton.textContent = "Good";
+    hardButton.textContent = "Again";
+    goodButton.addEventListener("click", () => {
+      markWordReview(item.word.id, 4);
+      nextDailyReviewItem();
+    });
+    hardButton.addEventListener("click", () => {
+      markWordReview(item.word.id, 0);
+      nextDailyReviewItem();
+    });
+  } else if (item.type === "recall") {
+    label.textContent = "Sentence recall";
+    title.textContent = item.sentence.english;
+    detail.textContent = "Try to say the target-language sentence before revealing it.";
+    goodButton.textContent = "Remembered";
+    hardButton.textContent = "Missed";
+    goodButton.addEventListener("click", () => {
+      markRecallReview(item.sentence.spanish, true);
+      nextDailyReviewItem();
+    });
+    hardButton.addEventListener("click", () => {
+      markRecallReview(item.sentence.spanish, false);
+      detail.textContent = item.sentence.spanish;
+    });
+  } else {
+    label.textContent = `Playlist: ${item.playlist.name}`;
+    title.textContent = item.sentence.spanish;
+    detail.textContent = item.sentence.english || "";
+    goodButton.textContent = "Done";
+    hardButton.textContent = "Play again";
+    goodButton.addEventListener("click", nextDailyReviewItem);
+    hardButton.addEventListener("click", playCurrentDailyReviewItem);
+  }
+
+  actions.appendChild(goodButton);
+  actions.appendChild(hardButton);
+  dailyReviewCard.appendChild(label);
+  dailyReviewCard.appendChild(title);
+  dailyReviewCard.appendChild(detail);
+  dailyReviewCard.appendChild(actions);
+}
+
+function nextDailyReviewItem() {
+  if (!dailyReviewQueue.length) {
+    buildDailyReviewQueue();
+    return;
+  }
+  dailyReviewIndex += 1;
+  if (dailyReviewIndex >= dailyReviewQueue.length) {
+    dailyReviewSummary.textContent = `Review complete: ${dailyReviewQueue.length} items.`;
+    dailyReviewCard.innerHTML = '<p class="empty-message">Nice work. Build a new queue when you want another mixed session.</p>';
+    return;
+  }
+  renderDailyReview();
+}
+
+function playCurrentDailyReviewItem() {
+  const item = dailyReviewQueue[dailyReviewIndex];
+  if (!item) {
+    return;
+  }
+  const text = item.type === "word"
+    ? item.word.exampleSpanish || item.word.word
+    : item.sentence?.spanish || "";
+  if (text) {
+    playSpanishAudio(text, "Daily review item");
+  }
 }
 
 // This helper plays one playlist sentence without continuing through the playlist.
@@ -8951,6 +9890,7 @@ function saveFavourites() {
 // This function saves recall practice sentences in localStorage.
 function saveRecallSentences() {
   localStorage.setItem("spanishSentenceRecall", JSON.stringify(recallSentences));
+  renderTodayDashboard();
 }
 
 // This helper adds spaced-repetition fields to older recall items.
@@ -9204,6 +10144,90 @@ function deleteSavedWord(wordId) {
   renderSavedWords();
 }
 
+function setDiagnostics(items) {
+  if (!diagnosticsList) {
+    return;
+  }
+
+  diagnosticsList.innerHTML = "";
+  items.forEach((item) => {
+    const row = document.createElement("li");
+    row.className = item.ok ? "diagnostic-ok" : "diagnostic-warn";
+    row.textContent = `${item.ok ? "OK" : "Check"}: ${item.label}`;
+    diagnosticsList.appendChild(row);
+  });
+}
+
+async function checkBackendConfig(endpoint, payload, successStatuses = [400]) {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  const data = await response.json().catch(() => ({}));
+  return {
+    ok: successStatuses.includes(response.status),
+    details: data.details || data.error || response.statusText
+  };
+}
+
+async function runConnectionDiagnostics() {
+  const results = [
+    {
+      ok: Boolean(navigator.mediaDevices?.getUserMedia && window.MediaRecorder),
+      label: "Browser supports microphone recording"
+    },
+    {
+      ok: Boolean(window.speechSynthesis),
+      label: "Browser fallback speech is available"
+    },
+    {
+      ok: Boolean(document.querySelector('script[src*="script.js?v=63"]')),
+      label: "Latest app script is loaded"
+    }
+  ];
+
+  setDiagnostics(results);
+  runDiagnosticsBtn.disabled = true;
+  runDiagnosticsBtn.textContent = "Checking...";
+
+  try {
+    const openAiCheck = await checkBackendConfig("/api/language-coach", { mode: "diagnostic" }, [400]);
+    results.push({
+      ok: openAiCheck.ok,
+      label: openAiCheck.ok ? "OpenAI backend key is reachable" : `OpenAI backend issue: ${openAiCheck.details}`
+    });
+  } catch (error) {
+    results.push({ ok: false, label: "OpenAI backend could not be reached" });
+  }
+
+  try {
+    const ttsCheck = await checkBackendConfig("/api/generate-spanish-audio", { text: "", targetLanguage, voice: getSelectedSpanishVoice() }, [400]);
+    results.push({
+      ok: ttsCheck.ok,
+      label: ttsCheck.ok ? "ElevenLabs text-to-speech key is reachable" : `ElevenLabs TTS issue: ${ttsCheck.details}`
+    });
+  } catch (error) {
+    results.push({ ok: false, label: "ElevenLabs text-to-speech backend could not be reached" });
+  }
+
+  try {
+    const sttCheck = await checkBackendConfig("/api/transcribe-chat-audio", { audioBase64: "", targetLanguage }, [400]);
+    results.push({
+      ok: sttCheck.ok,
+      label: sttCheck.ok ? "ElevenLabs speech-to-text key is reachable" : `ElevenLabs STT issue: ${sttCheck.details}`
+    });
+  } catch (error) {
+    results.push({ ok: false, label: "ElevenLabs speech-to-text backend could not be reached" });
+  }
+
+  setDiagnostics(results);
+  runDiagnosticsBtn.disabled = false;
+  runDiagnosticsBtn.textContent = "Run connection check";
+}
+
 // This function draws the saved-word spaced repetition list.
 function renderSavedWords() {
   if (!wordRecallList || !wordRecallSummary || !wordRecallEmptyMessage) {
@@ -9213,6 +10237,18 @@ function renderSavedWords() {
   wordRecallList.innerHTML = "";
   savedWords = savedWords.map(withWordSchedule);
   const languageWords = getCurrentLanguageItems(savedWords).filter((wordCard) => wordCard.normalisedWord);
+  const languageCounts = Object.keys(targetLanguageProfiles)
+    .map((languageKey) => {
+      const count = savedWords.filter((wordCard) => getSavedItemLanguage(wordCard) === languageKey && withWordSchedule(wordCard).normalisedWord).length;
+      return count ? `${targetLanguageProfiles[languageKey].label}: ${count}` : "";
+    })
+    .filter(Boolean);
+
+  if (wordLanguageSummary) {
+    wordLanguageSummary.textContent = languageCounts.length
+      ? `Saved by direction: ${languageCounts.join(" | ")}`
+      : "Saved words are separated by learning direction.";
+  }
 
   if (!languageWords.length) {
     wordRecallEmptyMessage.style.display = "block";
@@ -9418,6 +10454,16 @@ if (saveBatchFavouritesBtn) {
 if (addBatchPlaylistBtn) {
   addBatchPlaylistBtn.addEventListener("click", addBatchToPlaylist);
 }
+if (createPlaylistFolderBtn) {
+  createPlaylistFolderBtn.addEventListener("click", createPlaylistFolder);
+}
+if (playlistFolderSelect) {
+  playlistFolderSelect.addEventListener("change", () => {
+    selectedPlaylistFolder = playlistFolderSelect.value;
+    savePlaylistFolders();
+    renderPlaylists();
+  });
+}
 
 speakSpanishBtn.addEventListener("click", () => {
   if (!currentSentence) {
@@ -9437,7 +10483,7 @@ speakEnglishBtn.addEventListener("click", () => {
   }
 
   stopRadioMode();
-  speakText(currentSentence.english, "en-GB");
+  speakText(currentSentence.english, getTargetLanguageProfile().translationSpeechCode || "en-GB");
   incrementPracticeStat("spoken");
 });
 
@@ -9471,8 +10517,41 @@ if (targetLanguageSelect) {
     showStatusMessage(`${getTargetLanguageProfile().label} selected.`);
   });
 }
+setupLanguageButtons.forEach((button) => {
+  button.addEventListener("click", () => applyQuickSetupLanguage(button.dataset.setupLanguage));
+});
+setupPresetButtons.forEach((button) => {
+  button.addEventListener("click", () => applySetupPreset(button.dataset.setupPreset));
+});
+if (finishSetupBtn) {
+  finishSetupBtn.addEventListener("click", () => {
+    localStorage.setItem("spanishSentenceSetupComplete", "true");
+    applyFirstRunSetupVisibility();
+  });
+}
+if (tooEasyBtn) {
+  tooEasyBtn.addEventListener("click", () => applyDifficultyCalibration("too-easy"));
+}
+if (levelRightBtn) {
+  levelRightBtn.addEventListener("click", () => applyDifficultyCalibration("about-right"));
+}
+if (tooHardBtn) {
+  tooHardBtn.addEventListener("click", () => applyDifficultyCalibration("too-hard"));
+}
+if (runDiagnosticsBtn) {
+  runDiagnosticsBtn.addEventListener("click", runConnectionDiagnostics);
+}
 if (testVoiceBtn) {
   testVoiceBtn.addEventListener("click", testSelectedVoice);
+}
+if (repairConversationLanguageBtn) {
+  repairConversationLanguageBtn.addEventListener("click", repairConversationLanguageMix);
+}
+if (callSummaryReviewBtn) {
+  callSummaryReviewBtn.addEventListener("click", reviewLastCallSummary);
+}
+if (callSummarySaveBtn) {
+  callSummarySaveBtn.addEventListener("click", saveLastCallSummaryConversation);
 }
 if (callPauseModeSelect) {
   callPauseModeSelect.addEventListener("change", () => {
@@ -9506,6 +10585,9 @@ dialogueAudioPlayer.addEventListener("ended", () => {
 });
 downloadDialogueMp3Btn.addEventListener("click", downloadDialogueMp3);
 clearDialogueBtn.addEventListener("click", clearDialogue);
+if (deleteOldDialoguesBtn) {
+  deleteOldDialoguesBtn.addEventListener("click", deleteOldSavedDialogues);
+}
 if (loadYoutubeVideoBtn) {
   loadYoutubeVideoBtn.addEventListener("click", loadYouTubeVideo);
 }
@@ -9547,6 +10629,9 @@ saveConversationBtn.addEventListener("click", saveCurrentConversation);
 downloadChatPdfBtn.addEventListener("click", downloadCorrectedConversationPdf);
 downloadChatMp3sBtn.addEventListener("click", downloadCorrectedConversationMp3s);
 reviewConversationBtn.addEventListener("click", showConversationReview);
+if (deepReviewConversationBtn) {
+  deepReviewConversationBtn.addEventListener("click", showDeepConversationReview);
+}
 hideConversationReviewBtn.addEventListener("click", hideConversationReview);
 playFullChatBtn.addEventListener("click", playFullConversation);
 stopFullChatBtn.addEventListener("click", () => stopFullConversationPlayback());
@@ -9648,6 +10733,21 @@ playlistSelect.addEventListener("change", renderSelectedPlaylist);
 if (shadowGapSelect) {
   shadowGapSelect.addEventListener("change", saveShadowGapPreference);
 }
+if (buildDailyReviewBtn) {
+  buildDailyReviewBtn.addEventListener("click", buildDailyReviewQueue);
+}
+if (startDailyReviewBtn) {
+  startDailyReviewBtn.addEventListener("click", () => {
+    buildDailyReviewQueue();
+    showPage("review-page");
+  });
+}
+if (nextDailyReviewBtn) {
+  nextDailyReviewBtn.addEventListener("click", nextDailyReviewItem);
+}
+if (playDailyReviewBtn) {
+  playDailyReviewBtn.addEventListener("click", playCurrentDailyReviewItem);
+}
 
 quizModeCheckbox.addEventListener("change", () => {
   if (!currentSentence) {
@@ -9711,6 +10811,7 @@ loadVoices();
 applyThemePreference();
 applyTargetLanguagePreference();
 applySpanishVoicePreference();
+applyFirstRunSetupVisibility();
 applyCallPausePreference();
 if (chatInput) {
   chatInput.value = getStoredChatValue("spanishSentenceChatDraft") || "";
@@ -9719,6 +10820,7 @@ if (shadowGapSelect) {
   shadowGapSelect.value = localStorage.getItem("spanishSentenceShadowGap") || "0";
 }
 renderPracticeStats();
+renderTodayDashboard();
 renderBatchSentences();
 renderSavedBatches();
 renderGeneratorTopics();
@@ -9747,7 +10849,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=12").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=16").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
@@ -9774,6 +10876,7 @@ pageTabs.forEach((tab) => {
 renderFavourites();
 renderRecallSentences();
 renderSavedWords();
+renderDailyReview();
 renderPlaylists();
 renderChatMessages();
 renderSavedConversations();

@@ -14,7 +14,6 @@ const { handler: languageCoachHandler } = require("./netlify/functions/language-
 const { handler: generateSpanishAudioHandler } = require("./netlify/functions/generate-spanish-audio.js");
 const { handler: generateConversationAudioHandler } = require("./netlify/functions/generate-conversation-audio.js");
 const { handler: transcribeChatAudioHandler } = require("./netlify/functions/transcribe-chat-audio.js");
-const { handler: youtubeTranscriptHandler } = require("./netlify/functions/youtube-transcript.js");
 
 const mimeTypes = {
   ".html": "text/html; charset=utf-8",
@@ -33,8 +32,7 @@ const apiHandlers = {
   "/api/language-coach": languageCoachHandler,
   "/api/generate-spanish-audio": generateSpanishAudioHandler,
   "/api/generate-conversation-audio": generateConversationAudioHandler,
-  "/api/transcribe-chat-audio": transcribeChatAudioHandler,
-  "/api/youtube-transcript": youtubeTranscriptHandler
+  "/api/transcribe-chat-audio": transcribeChatAudioHandler
 };
 
 function classifyElevenLabsStreamError(statusCode, errorText) {
@@ -68,6 +66,12 @@ function classifyElevenLabsStreamError(statusCode, errorText) {
 }
 
 function getElevenLabsVoiceId(voiceChoice, targetLanguage = "spanish") {
+  if (targetLanguage === "english") {
+    return voiceChoice === "alternative"
+      ? process.env.ELEVENLABS_ENGLISH_ALT_VOICE_ID || process.env.ELEVENLABS_ENGLISH_VOICE_ID || process.env.ELEVENLABS_ALT_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
+      : process.env.ELEVENLABS_ENGLISH_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
+  }
+
   if (targetLanguage === "french") {
     return voiceChoice === "alternative"
       ? process.env.ELEVENLABS_FRENCH_ALT_VOICE_ID || process.env.ELEVENLABS_FRENCH_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"

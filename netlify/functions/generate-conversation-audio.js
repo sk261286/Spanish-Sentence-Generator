@@ -36,6 +36,12 @@ function buildConversationText(turns) {
 }
 
 function getVoiceId(voiceChoice, targetLanguage = "spanish") {
+  if (targetLanguage === "english") {
+    return voiceChoice === "alternative"
+      ? process.env.ELEVENLABS_ENGLISH_ALT_VOICE_ID || process.env.ELEVENLABS_ENGLISH_VOICE_ID || process.env.ELEVENLABS_ALT_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
+      : process.env.ELEVENLABS_ENGLISH_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
+  }
+
   if (targetLanguage === "french") {
     return voiceChoice === "alternative"
       ? process.env.ELEVENLABS_FRENCH_ALT_VOICE_ID || process.env.ELEVENLABS_FRENCH_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"

@@ -29,9 +29,10 @@ Rules:
 - If the first version sounds unnatural, rewrite it before returning it.`;
 
 const LANGUAGE_PROFILES = {
-  spanish: { label: "Spanish", natural: "natural Spanish from Spain", bannedCheck: true },
-  french: { label: "French", natural: "natural French from France", bannedCheck: false },
-  italian: { label: "Italian", natural: "natural Italian from Italy", bannedCheck: false }
+  spanish: { label: "Spanish", natural: "natural Spanish from Spain", translationLabel: "English", bannedCheck: true },
+  english: { label: "English", natural: "natural British English", translationLabel: "Spanish", bannedCheck: false },
+  french: { label: "French", natural: "natural French from France", translationLabel: "English", bannedCheck: false },
+  italian: { label: "Italian", natural: "natural Italian from Italy", translationLabel: "English", bannedCheck: false }
 };
 
 function getLanguageProfile(targetLanguage) {
@@ -216,7 +217,7 @@ async function generateSentenceWithQualityCheck(apiKey, model, difficulty, topic
     questions: "Generate a natural question a person might actually ask.",
     opinions: "Focus on opinions. Use phrases such as creo que, me parece que, prefiero, or para mí.",
     subjunctive: "Focus on subjunctive practice. Use a natural trigger such as espero que, es importante que, aunque, or para que.",
-    idioms: "Use one natural Spain-Spanish idiomatic expression, but keep it learner-friendly."
+    idioms: `Use one natural ${language.label} idiomatic expression, but keep it learner-friendly.`
   };
   const focusInstruction = focusInstructions[focus] || focusInstructions.mixed;
   const recentSentenceText = Array.isArray(recentSentences) && recentSentences.length
@@ -231,7 +232,7 @@ Rules:
 - ${topicInstruction}
 - ${toneInstruction}
 - Focus: ${focusInstruction}
-- Return one English translation.
+- Return one ${language.translationLabel} translation in the "english" legacy field.
 - Return 1 to 3 grammarTags explaining the main skill being practised, such as "Past tense", "Question", "Opinion", "Subjunctive", "Idiom", "Connector", "Reflexive verb", or "Future plans".
 - Avoid repeating these recent sentences, their wording, and their grammar pattern:
 ${recentSentenceText}
@@ -267,7 +268,7 @@ Rewrite this into fully ${language.natural}.
 Original Spanish:
 ${sentence.spanish}
 
-English translation:
+${language.translationLabel} translation:
 ${sentence.english}
 
 Problems found:

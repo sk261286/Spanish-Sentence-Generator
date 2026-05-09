@@ -20,14 +20,35 @@ Rules:
 const LANGUAGE_PROFILES = {
   spanish: {
     label: "Spanish",
+    translationLabel: "English",
+    sourceLabel: "English",
+    explanationLabel: "English",
     place: "Spain",
     natural: "natural Spanish from Spain",
     person: "a real Spanish person from Spain",
     teacher: "a native Spanish teacher from Spain",
     bannedCheck: true
   },
+  english: {
+    label: "English",
+    translationLabel: "Spanish",
+    sourceLabel: "Spanish",
+    explanationLabel: "Spanish",
+    place: "England",
+    natural: "natural British English",
+    person: "a real English person from England",
+    teacher: "a native English teacher from England",
+    bannedCheck: false,
+    forbiddenPatterns: [
+      /\b(vivo|mis padres|mi hermana|tienes razon|tienes razÃ³n|espanol|espaÃ±ol|seguimos|llevais|llevÃ¡is|vosotros|porque|tambien|tambiÃ©n|quiero|tengo)\b/i,
+      /[Â¿Â¡]/
+    ]
+  },
   french: {
     label: "French",
+    translationLabel: "English",
+    sourceLabel: "English",
+    explanationLabel: "English",
     place: "France",
     natural: "natural French from France",
     person: "a real French person from France",
@@ -40,6 +61,9 @@ const LANGUAGE_PROFILES = {
   },
   italian: {
     label: "Italian",
+    translationLabel: "English",
+    sourceLabel: "English",
+    explanationLabel: "English",
     place: "Italy",
     natural: "natural Italian from Italy",
     person: "a real Italian person from Italy",
@@ -73,7 +97,7 @@ function getModelForMode(mode, isCallMode = false) {
     return callModel;
   }
 
-  if (mode === "chat" || mode === "chat-opening" || mode === "custom") {
+  if (mode === "chat" || mode === "chat-opening" || mode === "custom" || mode === "conversation-review" || mode === "conversation-repair") {
     return conversationModel;
   }
 
@@ -239,7 +263,7 @@ async function handleCustomMode(apiKey, model, requestBody) {
   const prompt = `
 Translate this learner sentence into ${language.natural}.
 
-English sentence:
+${language.sourceLabel} sentence:
 ${requestBody.english}
 
 Rules:
@@ -248,14 +272,14 @@ Rules:
 - Tone: ${requestBody.tone || "informal"}
 - Return the meaning naturally in ${language.label}.
 - If the first version sounds unnatural, rewrite it before returning it.
-- Also return a short feedback note explaining the more native ${language.label} choice.
+- Also return a short feedback note in ${language.explanationLabel} explaining the more native ${language.label} choice.
 - Return 1 to 3 grammarTags explaining the main skill being practised.
 - Reply with JSON only.
 
 Use this JSON shape:
 {
   "spanish": "string",
-  "english": "string",
+  "english": "${language.translationLabel} translation string",
   "difficulty": "string",
   "topic": "string",
   "tone": "string",
@@ -268,6 +292,10 @@ Use this JSON shape:
 
   if (language.bannedCheck && hasBannedWords(sentence.spanish || "")) {
     throw new Error("The AI returned banned wording.");
+  }
+
+  if (hasWrongLanguageMarkers(sentence.spanish || "", language)) {
+    throw new Error(`The AI mixed languages instead of staying in ${language.label}.`);
   }
 
   return {
@@ -327,7 +355,7 @@ Main goal:
 
 Learner alternative rules:
 - Always give a more natural ${language.label} way to say the learner's message.
-- If the learner wrote in English, translate their meaning into ${language.natural}.
+- If the learner wrote in ${language.sourceLabel}, translate their meaning into ${language.natural}.
 - If the learner wrote in ${language.label}, rewrite it so it sounds more native and conversational.
 - If their ${language.label} is already good, still offer a common native alternative with the same meaning.
 - Keep any feedback short and practical.
@@ -349,9 +377,9 @@ Reply rules:
 - It should usually be 1 or 2 short sentences.
 - It should feel like a WhatsApp/audio conversation with a friendly native speaker.
 - Include at most one question, and only if it feels natural.
-- The English should translate the main ${language.label} reply.
+- The "english" legacy field should translate the main ${language.label} reply into ${language.translationLabel}.
 - correctionSpanish should be the natural ${language.label} alternative for the learner's message.
-- correctionEnglish should translate correctionSpanish back into English.
+- correctionEnglish should translate correctionSpanish back into ${language.translationLabel}.
 - Reply with JSON only.
 
 Use this JSON shape:
@@ -445,6 +473,7 @@ Rules:
 - Use ${language.natural}.
 - Do not use Spanish unless the selected target language is Spanish.
 - Do not mix languages.
+- The "english" legacy field must be a ${language.translationLabel} translation of the opening.
 - Keep it short: 1 or 2 sentences.
 - End with one easy thing the learner can reply to.
 - Reply with JSON only.
@@ -501,12 +530,12 @@ async function handleWordHintsMode(apiKey, model, requestBody) {
   }
 
   const prompt = `
-Create short English hover hints for selected ${language.label} words.
+Create short ${language.translationLabel} hover hints for selected ${language.label} words.
 
 ${language.label} sentence:
 ${requestBody.spanish}
 
-Full English translation:
+Full ${language.translationLabel} translation:
 ${requestBody.english || ""}
 
 Words needing hints:
@@ -514,15 +543,15 @@ ${words.map((word) => `- ${word}`).join("\n")}
 
 Rules:
 - Explain each word in this sentence's context.
-- Keep each hint short: usually 1 to 5 English words.
-- Use learner-friendly English, not grammar jargon unless useful.
+- Keep each hint short: usually 1 to 5 ${language.translationLabel} words.
+- Use learner-friendly ${language.translationLabel}, not grammar jargon unless useful.
 - If a word is a conjugated verb, give the meaning in context, for example "becomes" or "I work".
 - Return JSON only.
 
 Use this JSON shape:
 {
   "hints": {
-    "${language.label} word": "short English hint"
+    "${language.label} word": "short ${language.translationLabel} hint"
   }
 }
 `.trim();
@@ -535,35 +564,120 @@ Use this JSON shape:
   return { hints };
 }
 
-async function handleVideoLineMode(apiKey, model, requestBody) {
+async function handleConversationReviewMode(apiKey, model, requestBody) {
   const language = getLanguageProfile(requestBody.targetLanguage);
-  const line = String(requestBody.line || "").trim();
-
-  if (!line) {
-    return { translation: "" };
-  }
+  const historyText = Array.isArray(requestBody.history)
+    ? requestBody.history
+        .map((item, index) => {
+          const role = item.role === "coach" ? "Coach" : item.role === "assistant" ? "Coach" : "Learner";
+          const parts = [
+            `${index + 1}. ${role}: ${item.spanish || ""}`,
+            item.english ? `${language.translationLabel}: ${item.english}` : "",
+            item.correctionSpanish ? `Native version: ${item.correctionSpanish}` : "",
+            item.feedback ? `Quick feedback: ${item.feedback}` : ""
+          ].filter(Boolean);
+          return parts.join("\n");
+        })
+        .join("\n\n")
+    : "";
 
   const prompt = `
-Translate this ${language.label} video transcript line into natural English.
+Give an in-depth but practical review of this ${language.label} learning conversation.
 
-Line:
-${line}
+Target language: ${language.natural}
+Topic: ${requestBody.topic || "general conversation"}
+Tone: ${requestBody.tone || "informal"}
+Practice goal: ${requestBody.goal || "natural-flow"}
+
+Conversation:
+${historyText || "No conversation provided."}
 
 Rules:
-- Keep the meaning faithful to the transcript.
-- Use natural English.
-- Return JSON only.
+- Use the higher-quality review style: specific, useful, and focused on what the learner can improve next.
+- Do not rewrite the whole conversation.
+- Focus on repeated learner patterns, natural wording, grammar, fluency, and useful phrases.
+- Keep explanations in ${language.explanationLabel}.
+- Keep target-language examples only in ${language.label}.
+- If the selected language is not Spanish, do not use Spanish.
+- Reply with JSON only.
 
 Use this JSON shape:
 {
-  "translation": "English translation"
+  "review": {
+    "summary": "string",
+    "strengths": ["string"],
+    "mainFixes": [
+      {
+        "point": "string",
+        "fix": "string",
+        "explanation": "string"
+      }
+    ],
+    "naturalPhrases": [
+      {
+        "phrase": "string",
+        "english": "string",
+        "note": "string"
+      }
+    ],
+    "patterns": ["string"],
+    "drills": ["string"],
+    "nextGoal": "string"
+  }
 }
 `.trim();
 
   const result = await callOpenAi(apiKey, model, prompt);
   return {
-    translation: typeof result?.translation === "string" ? result.translation : ""
+    review: result.review || result
   };
+}
+
+async function handleConversationRepairMode(apiKey, model, requestBody) {
+  const language = getLanguageProfile(requestBody.targetLanguage);
+  const history = Array.isArray(requestBody.history) ? requestBody.history.slice(0, 80) : [];
+  const prompt = `
+Repair this conversation so all target-language fields stay in ${language.natural}.
+
+Conversation JSON:
+${JSON.stringify(history)}
+
+Rules:
+- Keep the same number of messages and the same order.
+- Preserve each role.
+- Rewrite "spanish" and "correctionSpanish" fields into ${language.natural}.
+- "spanish" and "correctionSpanish" are legacy field names. Their values must be ${language.label}, not necessarily Spanish.
+- Translate "english" and "correctionEnglish" into ${language.translationLabel}.
+- Keep feedback short and practical in ${language.explanationLabel}.
+- Do not include Spanish unless the selected target language is Spanish.
+- Reply with JSON only.
+
+Use this JSON shape:
+{
+  "messages": [
+    {
+      "role": "user or coach",
+      "spanish": "string",
+      "english": "string",
+      "correctionSpanish": "string",
+      "correctionEnglish": "string",
+      "feedback": "string"
+    }
+  ]
+}
+`.trim();
+
+  const result = await callOpenAi(apiKey, model, prompt);
+  const messages = Array.isArray(result.messages) ? result.messages : [];
+
+  if (messages.some((message) =>
+    hasWrongLanguageMarkers(message.spanish || "", language) ||
+    hasWrongLanguageMarkers(message.correctionSpanish || "", language)
+  )) {
+    throw new Error(`The repaired conversation still mixed languages instead of staying in ${language.label}.`);
+  }
+
+  return { messages };
 }
 
 async function handleDialogueMode(apiKey, model, requestBody) {
@@ -585,8 +699,8 @@ Rules:
 - Make it sound like a real spoken conversation, not a textbook script.
 - Keep each line short enough to practise aloud.
 - Include useful everyday phrases the learner may want to save.
-- Add an English translation for every Spanish line.
-- Speaker names should be short and natural, for example "A" and "B" or two Spanish names.
+- Add a ${language.translationLabel} translation for every ${language.label} line in the "english" legacy field.
+- Speaker names should be short and natural, for example "A" and "B" or two names that fit ${language.place}.
 - Do not include narration outside the dialogue.
 - Return 2 to 4 useful phrase notes.
 - Reply with JSON only.
@@ -619,7 +733,11 @@ Use this JSON shape:
   const lines = Array.isArray(dialogue.lines) ? dialogue.lines.slice(0, 20) : [];
   const usefulPhrases = Array.isArray(dialogue.usefulPhrases) ? dialogue.usefulPhrases.slice(0, 4) : [];
 
-  if (!lines.length || lines.some((line) => !line.spanish || (language.bannedCheck && hasBannedWords(line.spanish)))) {
+  if (!lines.length || lines.some((line) =>
+    !line.spanish ||
+    hasWrongLanguageMarkers(line.spanish, language) ||
+    (language.bannedCheck && hasBannedWords(line.spanish))
+  )) {
     throw new Error("The AI returned an invalid dialogue.");
   }
 
@@ -630,85 +748,6 @@ Use this JSON shape:
       setting: dialogue.setting || requestBody.setting || "casual",
       level: dialogue.level || requestBody.level || "intermediate",
       tone: dialogue.tone || requestBody.tone || "informal",
-      lines: lines.map((line, index) => ({
-        speaker: line.speaker || (index % 2 === 0 ? "A" : "B"),
-        spanish: line.spanish,
-        english: line.english || ""
-      })),
-      usefulPhrases: usefulPhrases.map((phrase) => ({
-        spanish: phrase.spanish || "",
-        english: phrase.english || "",
-        note: phrase.note || ""
-      })).filter((phrase) => phrase.spanish)
-    }
-  };
-}
-
-async function handleVideoDialogueMode(apiKey, model, requestBody) {
-  const language = getLanguageProfile(requestBody.targetLanguage);
-  const requestedLineCount = Math.min(14, Math.max(6, Number(requestBody.turnCount) || 10));
-  const transcript = String(requestBody.transcript || "").trim().slice(0, 6000);
-
-  if (!transcript) {
-    throw new Error("No video transcript was provided.");
-  }
-
-  const prompt = `
-Create a natural two-person learner dialogue in ${language.natural} about this YouTube video transcript.
-
-Transcript excerpt:
-${transcript}
-
-Rules:
-- Use ${language.natural} only for the dialogue lines.
-- Make it feel like two people discussing what the video said, similar to a short NotebookLM-style audio overview.
-- Do not invent major facts that are not supported by the transcript.
-- Keep the discussion useful for a language learner: natural phrasing, clear reactions, and a few practical takeaways.
-- Keep each line short enough to practise aloud.
-- Add an English translation for every ${language.label} line.
-- Number of lines: ${requestedLineCount}
-- Return 2 to 4 useful phrase notes from the discussion.
-- Reply with JSON only.
-
-Use this JSON shape:
-{
-  "title": "string",
-  "topic": "video discussion",
-  "setting": "video overview",
-  "level": "intermediate",
-  "tone": "informal",
-  "lines": [
-    {
-      "speaker": "string",
-      "spanish": "string",
-      "english": "string"
-    }
-  ],
-  "usefulPhrases": [
-    {
-      "spanish": "string",
-      "english": "string",
-      "note": "string"
-    }
-  ]
-}
-`.trim();
-
-  const dialogue = await callOpenAi(apiKey, model, prompt);
-  const lines = Array.isArray(dialogue.lines) ? dialogue.lines.slice(0, requestedLineCount) : [];
-  const usefulPhrases = Array.isArray(dialogue.usefulPhrases) ? dialogue.usefulPhrases.slice(0, 4) : [];
-
-  if (!lines.length || lines.some((line) => !line.spanish || (language.bannedCheck && hasBannedWords(line.spanish)))) {
-    throw new Error("The AI returned an invalid video discussion.");
-  }
-
-  return {
-    dialogue: {
-      title: dialogue.title || `${language.label} video discussion`,
-      topic: dialogue.topic || "video discussion",
-      setting: dialogue.setting || "video overview",
-      level: dialogue.level || "intermediate",
-      tone: dialogue.tone || "informal",
       lines: lines.map((line, index) => ({
         speaker: line.speaker || (index % 2 === 0 ? "A" : "B"),
         spanish: line.spanish,
@@ -752,10 +791,10 @@ async function handler(event) {
       result = await handleChatMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "word-hints") {
       result = await handleWordHintsMode(apiKey, model, requestBody);
-    } else if (requestBody.mode === "video-line") {
-      result = await handleVideoLineMode(apiKey, model, requestBody);
-    } else if (requestBody.mode === "video-dialogue") {
-      result = await handleVideoDialogueMode(apiKey, model, requestBody);
+    } else if (requestBody.mode === "conversation-review") {
+      result = await handleConversationReviewMode(apiKey, model, requestBody);
+    } else if (requestBody.mode === "conversation-repair") {
+      result = await handleConversationRepairMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "dialogue") {
       result = await handleDialogueMode(apiKey, model, requestBody);
     } else {
