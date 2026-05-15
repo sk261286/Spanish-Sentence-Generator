@@ -65,7 +65,7 @@ export default async function handler(request) {
   if (!apiKey) {
     return Response.json({
       error: "ELEVENLABS_API_KEY is missing.",
-      details: "Add ELEVENLABS_API_KEY on the server before using Spanish audio."
+      details: "Add ELEVENLABS_API_KEY on the server before using high-quality voice audio."
     }, { status: 500 });
   }
 

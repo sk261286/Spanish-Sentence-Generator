@@ -70,7 +70,7 @@ async function handler(event) {
       statusCode: 500,
       body: JSON.stringify({
         error: "ELEVENLABS_API_KEY is missing.",
-        details: "Add ELEVENLABS_API_KEY on the server before using Spanish audio."
+        details: "Add ELEVENLABS_API_KEY on the server before using high-quality voice audio."
       })
     };
   }
@@ -149,7 +149,7 @@ async function handler(event) {
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: "Could not generate Spanish audio.",
+        error: "Could not generate voice audio.",
         details: error.message
       })
     };

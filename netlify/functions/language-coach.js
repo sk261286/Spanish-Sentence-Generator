@@ -680,6 +680,57 @@ Use this JSON shape:
   return { messages };
 }
 
+async function handleWordExamplesMode(apiKey, model, requestBody) {
+  const language = getLanguageProfile(requestBody.targetLanguage);
+  const requestedCount = Math.min(8, Math.max(3, Number(requestBody.count) || 5));
+  const prompt = `
+Create ${requestedCount} natural example sentences for a saved vocabulary word.
+
+Target language: ${language.natural}
+Word or phrase: ${requestBody.word || ""}
+Meaning/context: ${requestBody.meaning || "unknown"}
+Learner's saved example: ${requestBody.example || "none"}
+Topic: ${requestBody.topic || "daily life"}
+
+Rules:
+- Use ${language.natural} only for the target-language sentence.
+- Make every example sound like something a real person would say.
+- Keep the examples short enough to shadow aloud.
+- Include the word naturally, or a clearly inflected form if grammar requires it.
+- Put the ${language.translationLabel} translation in the "english" legacy field.
+- Do not include Spanish unless the selected target language is Spanish.
+- Reply with JSON only.
+
+Use this JSON shape:
+{
+  "examples": [
+    {
+      "spanish": "string",
+      "english": "string"
+    }
+  ]
+}
+`.trim();
+
+  const result = await callOpenAi(apiKey, model, prompt);
+  const examples = Array.isArray(result.examples) ? result.examples.slice(0, requestedCount) : [];
+
+  if (!examples.length || examples.some((example) =>
+    !example.spanish ||
+    hasWrongLanguageMarkers(example.spanish, language) ||
+    (language.bannedCheck && hasBannedWords(example.spanish))
+  )) {
+    throw new Error("The AI returned invalid word examples.");
+  }
+
+  return {
+    examples: examples.map((example) => ({
+      spanish: example.spanish,
+      english: example.english || ""
+    }))
+  };
+}
+
 async function handleDialogueMode(apiKey, model, requestBody) {
   const language = getLanguageProfile(requestBody.targetLanguage);
   const requestedLineCount = Math.min(20, Math.max(4, Number(requestBody.turnCount) || 8));
@@ -795,6 +846,8 @@ async function handler(event) {
       result = await handleConversationReviewMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "conversation-repair") {
       result = await handleConversationRepairMode(apiKey, model, requestBody);
+    } else if (requestBody.mode === "word-examples") {
+      result = await handleWordExamplesMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "dialogue") {
       result = await handleDialogueMode(apiKey, model, requestBody);
     } else {
