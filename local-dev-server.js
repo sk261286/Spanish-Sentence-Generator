@@ -67,18 +67,42 @@ function classifyElevenLabsStreamError(statusCode, errorText) {
 
 function getElevenLabsVoiceId(voiceChoice, targetLanguage = "spanish") {
   if (targetLanguage === "english") {
+    if (voiceChoice === "english-mlso") {
+      return process.env.ELEVENLABS_ENGLISH_MLSO_VOICE_ID || "MLSOvrM2Tyi3okEfyOiI";
+    }
+
+    if (voiceChoice === "english-female-lcmy") {
+      return process.env.ELEVENLABS_ENGLISH_FEMALE_LCMY_VOICE_ID || "lcMyyd2HUfFzxdCaC4Ta";
+    }
+
     return voiceChoice === "alternative"
       ? process.env.ELEVENLABS_ENGLISH_ALT_VOICE_ID || process.env.ELEVENLABS_ENGLISH_VOICE_ID || process.env.ELEVENLABS_ALT_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
       : process.env.ELEVENLABS_ENGLISH_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
   }
 
   if (targetLanguage === "french") {
+    if (voiceChoice === "french-male") {
+      return process.env.ELEVENLABS_FRENCH_MALE_VOICE_ID || "fMikjf4u2qBd4gPl7yuw";
+    }
+
+    if (voiceChoice === "french-female") {
+      return process.env.ELEVENLABS_FRENCH_FEMALE_VOICE_ID || "lvQdCgwZfBuOzxyV5pxu";
+    }
+
     return voiceChoice === "alternative"
       ? process.env.ELEVENLABS_FRENCH_ALT_VOICE_ID || process.env.ELEVENLABS_FRENCH_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
       : process.env.ELEVENLABS_FRENCH_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
   }
 
   if (targetLanguage === "italian") {
+    if (voiceChoice === "italian-male") {
+      return process.env.ELEVENLABS_ITALIAN_MALE_VOICE_ID || "DTGwzA4YLrWB1FAT6Uas";
+    }
+
+    if (voiceChoice === "italian-female") {
+      return process.env.ELEVENLABS_ITALIAN_FEMALE_VOICE_ID || "O6T26EHdsgsDb06fVwd6";
+    }
+
     return voiceChoice === "alternative"
       ? process.env.ELEVENLABS_ITALIAN_ALT_VOICE_ID || process.env.ELEVENLABS_ITALIAN_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
       : process.env.ELEVENLABS_ITALIAN_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
@@ -241,7 +265,7 @@ async function handleStreamingSpanishAudio(req, res) {
     res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
     res.end(JSON.stringify({
       error: "ELEVENLABS_API_KEY is missing.",
-      details: "Add ELEVENLABS_API_KEY on the server before using Spanish audio."
+      details: "Add ELEVENLABS_API_KEY on the server before using high-quality voice audio."
     }));
     return;
   }
@@ -288,6 +312,7 @@ async function handleStreamingSpanishAudio(req, res) {
 
     res.writeHead(200, {
       "Content-Type": "audio/mpeg",
+      "X-ElevenLabs-Voice-Id": voiceId,
       "Cache-Control": "no-store"
     });
 

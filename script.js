@@ -1916,7 +1916,7 @@ let fullConversationPlayback = {
   audioUrl: ""
 };
 let lastCallSummaryChatHistory = [];
-const SPANISH_AUDIO_CACHE_VERSION = "v4";
+const SPANISH_AUDIO_CACHE_VERSION = "v5";
 
 const targetLanguageProfiles = {
   spanish: {
@@ -4506,6 +4506,14 @@ function getAllowedVoiceChoicesForLanguage(language = targetLanguage) {
 
   if (language === "english") {
     choices.push("english-mlso", "english-female-lcmy");
+  }
+
+  if (language === "french") {
+    choices.push("french-male", "french-female");
+  }
+
+  if (language === "italian") {
+    choices.push("italian-male", "italian-female");
   }
 
   return choices;
@@ -13382,7 +13390,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=49").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=50").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });

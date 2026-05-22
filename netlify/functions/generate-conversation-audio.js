@@ -51,12 +51,28 @@ function getVoiceId(voiceChoice, targetLanguage = "spanish") {
   }
 
   if (targetLanguage === "french") {
+    if (voiceChoice === "french-male") {
+      return process.env.ELEVENLABS_FRENCH_MALE_VOICE_ID || "fMikjf4u2qBd4gPl7yuw";
+    }
+
+    if (voiceChoice === "french-female") {
+      return process.env.ELEVENLABS_FRENCH_FEMALE_VOICE_ID || "lvQdCgwZfBuOzxyV5pxu";
+    }
+
     return voiceChoice === "alternative"
       ? process.env.ELEVENLABS_FRENCH_ALT_VOICE_ID || process.env.ELEVENLABS_FRENCH_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
       : process.env.ELEVENLABS_FRENCH_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
   }
 
   if (targetLanguage === "italian") {
+    if (voiceChoice === "italian-male") {
+      return process.env.ELEVENLABS_ITALIAN_MALE_VOICE_ID || "DTGwzA4YLrWB1FAT6Uas";
+    }
+
+    if (voiceChoice === "italian-female") {
+      return process.env.ELEVENLABS_ITALIAN_FEMALE_VOICE_ID || "O6T26EHdsgsDb06fVwd6";
+    }
+
     return voiceChoice === "alternative"
       ? process.env.ELEVENLABS_ITALIAN_ALT_VOICE_ID || process.env.ELEVENLABS_ITALIAN_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
       : process.env.ELEVENLABS_ITALIAN_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
