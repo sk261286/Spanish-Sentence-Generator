@@ -132,6 +132,51 @@ function hasBannedWords(spanishText) {
   return BANNED_WORDS.some((word) => lowerText.includes(word));
 }
 
+function looksLikeSpanish(text) {
+  const lowerText = String(text || "").toLowerCase();
+  const spanishMarkers = [
+    "¿",
+    "¡",
+    "ñ",
+    "á",
+    "é",
+    "í",
+    "ó",
+    "ú",
+    " que ",
+    " de ",
+    " el ",
+    " la ",
+    " los ",
+    " las ",
+    " una ",
+    " un ",
+    " tengo ",
+    " voy ",
+    " quiero ",
+    " necesito "
+  ];
+
+  return spanishMarkers.filter((marker) => ` ${lowerText} `.includes(marker)).length >= 2;
+}
+
+function validateTargetLanguage(sentence, language, targetLanguage) {
+  const targetText = String(sentence?.spanish || "").trim();
+  const translationText = String(sentence?.english || "").trim();
+
+  if (!targetText || !translationText) {
+    const error = new Error("The AI sentence was missing required fields.");
+    error.publicMessage = "The AI did not return a complete sentence and translation.";
+    throw error;
+  }
+
+  if (targetLanguage === "english" && looksLikeSpanish(targetText)) {
+    const error = new Error("The AI returned Spanish in the target sentence field.");
+    error.publicMessage = "The AI returned Spanish instead of English. Please try again.";
+    throw error;
+  }
+}
+
 async function callOpenAi(apiKey, model, userPrompt) {
   let openAiResponse;
 
@@ -232,6 +277,8 @@ Rules:
 - ${topicInstruction}
 - ${toneInstruction}
 - Focus: ${focusInstruction}
+- IMPORTANT: the JSON key names are legacy names. The "spanish" field must contain the target-language sentence in ${language.label}. The "english" field must contain the ${language.translationLabel} translation.
+- For English mode, the "spanish" field MUST be English, and the "english" field MUST be Spanish.
 - Return one ${language.translationLabel} translation in the "english" legacy field.
 - Return 1 to 3 grammarTags explaining the main skill being practised, such as "Past tense", "Question", "Opinion", "Subjunctive", "Idiom", "Connector", "Reflexive verb", or "Future plans".
 - Avoid repeating these recent sentences, their wording, and their grammar pattern:
@@ -259,6 +306,7 @@ Use this JSON shape:
 `.trim();
 
   let sentence = await callOpenAi(apiKey, model, generationPrompt);
+  validateTargetLanguage(sentence, language, targetLanguage);
   const problems = language.bannedCheck ? findQualityProblems(sentence.spanish || "") : [];
 
   if (language.bannedCheck && (problems.length || hasBannedWords(sentence.spanish || ""))) {
@@ -293,6 +341,7 @@ Quality rules:
 `.trim();
 
     sentence = await callOpenAi(apiKey, model, rewritePrompt);
+    validateTargetLanguage(sentence, language, targetLanguage);
   }
 
   if (language.bannedCheck && hasBannedWords(sentence.spanish || "")) {

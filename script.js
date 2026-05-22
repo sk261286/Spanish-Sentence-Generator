@@ -1524,6 +1524,12 @@ const mobileStartCallBtn = document.getElementById("mobile-start-call-btn");
 const mobileGenerateSetBtn = document.getElementById("mobile-generate-set-btn");
 const mobileReviewTodayBtn = document.getElementById("mobile-review-today-btn");
 const mobileOpenPlaylistBtn = document.getElementById("mobile-open-playlist-btn");
+const homeContinueCard = document.getElementById("home-continue-card");
+const homeContinueTitle = document.getElementById("home-continue-title");
+const homeContinueDetail = document.getElementById("home-continue-detail");
+const homeContinuePrimaryBtn = document.getElementById("home-continue-primary-btn");
+const homeContinueSecondaryBtn = document.getElementById("home-continue-secondary-btn");
+const lessonPackButtons = document.querySelectorAll("[data-lesson-pack]");
 const appModeToggleBtn = document.getElementById("app-mode-toggle-btn");
 const themeToggleBtn = document.getElementById("theme-toggle-btn");
 const targetLanguageSelect = document.getElementById("target-language-select");
@@ -1564,6 +1570,8 @@ const librarySearchInput = document.getElementById("library-search-input");
 const batchMp3Panel = document.getElementById("batch-mp3-panel");
 const batchMp3Player = document.getElementById("batch-mp3-player");
 const batchMp3Link = document.getElementById("batch-mp3-link");
+const batchSpeedSelect = document.getElementById("batch-speed-select");
+const batchLoopBtn = document.getElementById("batch-loop-btn");
 const speakSpanishBtn = document.getElementById("speak-spanish-btn");
 const speakEnglishBtn = document.getElementById("speak-english-btn");
 const tooEasyBtn = document.getElementById("too-easy-btn");
@@ -1614,8 +1622,12 @@ const todayMistakePatterns = document.getElementById("today-mistake-patterns");
 const todayStreakCount = document.getElementById("today-streak-count");
 const todayWeekGenerated = document.getElementById("today-week-generated");
 const todayWeekSpoken = document.getElementById("today-week-spoken");
+const todayWeekSaved = document.getElementById("today-week-saved");
+const todayCallMinutes = document.getElementById("today-call-minutes");
 const todaySuggestion = document.getElementById("today-suggestion");
 const languageDashboardGrid = document.getElementById("language-dashboard-grid");
+const mistakePatternList = document.getElementById("mistake-pattern-list");
+const startMistakeReviewBtn = document.getElementById("start-mistake-review-btn");
 const dailyReviewCard = document.getElementById("daily-review-card");
 const buildDailyReviewBtn = document.getElementById("build-daily-review-btn");
 const buildSmartReviewBtn = document.getElementById("build-smart-review-btn");
@@ -1638,6 +1650,8 @@ const pauseRadioBtn = document.getElementById("pause-radio-btn");
 const nextRadioBtn = document.getElementById("next-radio-btn");
 const radioPlayerControls = document.getElementById("radio-player-controls");
 const radioPlaybackProgress = document.getElementById("radio-playback-progress");
+const radioSpeedSelect = document.getElementById("radio-speed-select");
+const radioLoopBtn = document.getElementById("radio-loop-btn");
 const downloadPlaylistMp3Btn = document.getElementById("download-playlist-mp3-btn");
 const deletePlaylistBtn = document.getElementById("delete-playlist-btn");
 const exportPracticeBtn = document.getElementById("export-practice-btn");
@@ -1649,6 +1663,8 @@ const playlistEmptyMessage = document.getElementById("playlist-empty-message");
 const playlistMp3Panel = document.getElementById("playlist-mp3-panel");
 const playlistMp3Player = document.getElementById("playlist-mp3-player");
 const playlistMp3Link = document.getElementById("playlist-mp3-link");
+const playlistSpeedSelect = document.getElementById("playlist-speed-select");
+const playlistLoopBtn = document.getElementById("playlist-loop-btn");
 const customEnglishInput = document.getElementById("custom-english-input");
 const customEnglishLabel = document.querySelector('label[for="custom-english-input"]');
 const customToneLabel = document.getElementById("custom-tone-label");
@@ -1656,6 +1672,7 @@ const customToneSelect = document.getElementById("custom-tone");
 const customTopicSelect = document.getElementById("custom-topic");
 const customDifficultySelect = document.getElementById("custom-difficulty");
 const translateCustomBtn = document.getElementById("translate-custom-btn");
+const playCustomSentenceBtn = document.getElementById("play-custom-sentence-btn");
 const saveCustomBtn = document.getElementById("save-custom-btn");
 const addCustomToPlaylistBtn = document.getElementById("add-custom-to-playlist-btn");
 const customResultCard = document.getElementById("custom-result-card");
@@ -1681,6 +1698,9 @@ const pauseDialogueBtn = document.getElementById("pause-dialogue-btn");
 const nextDialogueBtn = document.getElementById("next-dialogue-btn");
 const dialoguePlaybackProgress = document.getElementById("dialogue-playback-progress");
 const dialogueAudioPlayer = document.getElementById("dialogue-audio-player");
+const dialogueMp3Link = document.getElementById("dialogue-mp3-link");
+const dialogueSpeedSelect = document.getElementById("dialogue-speed-select");
+const dialogueLoopBtn = document.getElementById("dialogue-loop-btn");
 const dialogueStatus = document.getElementById("dialogue-status");
 const dialogueResult = document.getElementById("dialogue-result");
 const dialogueTitle = document.getElementById("dialogue-title");
@@ -1729,6 +1749,7 @@ const callSummaryTurns = document.getElementById("call-summary-turns");
 const callSummaryCorrections = document.getElementById("call-summary-corrections");
 const callSummaryScore = document.getElementById("call-summary-score");
 const callSummaryPhrases = document.getElementById("call-summary-phrases");
+const callSummaryNextStep = document.getElementById("call-summary-next-step");
 const callSummaryReviewBtn = document.getElementById("call-summary-review-btn");
 const callSummarySaveBtn = document.getElementById("call-summary-save-btn");
 const speakChatReplyBtn = document.getElementById("speak-chat-reply-btn");
@@ -1753,6 +1774,8 @@ const nextConversationTurnBtn = document.getElementById("next-conversation-turn-
 const conversationPlaybackProgress = document.getElementById("conversation-playback-progress");
 const fullConversationAudioPlayer = document.getElementById("full-conversation-audio-player");
 const conversationMp3Link = document.getElementById("conversation-mp3-link");
+const conversationSpeedSelect = document.getElementById("conversation-speed-select");
+const conversationLoopBtn = document.getElementById("conversation-loop-btn");
 const playConversationPlaylistBtn = document.getElementById("play-conversation-playlist-btn");
 const stopConversationPlaylistBtn = document.getElementById("stop-conversation-playlist-btn");
 const conversationPlaylistList = document.getElementById("conversation-playlist-list");
@@ -1777,6 +1800,7 @@ const chatStatus = document.getElementById("chat-status");
 const chatCard = document.querySelector(".chat-card");
 const globalLibrarySearchInput = document.getElementById("global-library-search-input");
 const libraryHubGrid = document.getElementById("library-hub-grid");
+const libraryTabButtons = document.querySelectorAll("[data-library-filter]");
 const pageTabs = document.querySelectorAll(".page-tab");
 const navMore = document.querySelector(".nav-more");
 const actionMenus = document.querySelectorAll(".action-menu");
@@ -1796,6 +1820,16 @@ const nowPlayingBar = document.getElementById("now-playing-bar");
 const nowPlayingTitle = document.getElementById("now-playing-title");
 const nowPlayingDetail = document.getElementById("now-playing-detail");
 const nowPlayingStopBtn = document.getElementById("now-playing-stop-btn");
+const queueSpeedSelect = document.getElementById("queue-speed-select");
+const queueLoopBtn = document.getElementById("queue-loop-btn");
+const queuePrevBtn = document.getElementById("queue-prev-btn");
+const queueNextBtn = document.getElementById("queue-next-btn");
+const queueToggleBtn = document.getElementById("queue-toggle-btn");
+const audioQueuePanel = document.getElementById("audio-queue-panel");
+const audioQueueList = document.getElementById("audio-queue-list");
+const clearAudioQueueBtn = document.getElementById("clear-audio-queue-btn");
+const queueCurrentSentenceBtn = document.getElementById("queue-current-sentence-btn");
+const queueSelectedPlaylistBtn = document.getElementById("queue-selected-playlist-btn");
 const mobileBottomNavButtons = document.querySelectorAll("[data-mobile-nav-page]");
 
 // Keep the chat action labels aligned with the "best version" behavior.
@@ -1868,6 +1902,7 @@ let spanishAudioEndedCallback = null;
 let spanishAudioPlaybackId = 0;
 let batchMp3ObjectUrl = "";
 let playlistMp3ObjectUrl = "";
+let dialogueMp3ObjectUrl = "";
 let wordHintRequestId = 0;
 let activeWordActionPanel = null;
 let aiWordHintCache = JSON.parse(localStorage.getItem("spanishSentenceAiWordHints")) || {};
@@ -1881,7 +1916,7 @@ let fullConversationPlayback = {
   audioUrl: ""
 };
 let lastCallSummaryChatHistory = [];
-const SPANISH_AUDIO_CACHE_VERSION = "v3";
+const SPANISH_AUDIO_CACHE_VERSION = "v4";
 
 const targetLanguageProfiles = {
   spanish: {
@@ -1975,6 +2010,10 @@ let savedConversations = JSON.parse(localStorage.getItem("spanishSentenceSavedCo
 let conversationFolders = JSON.parse(localStorage.getItem("spanishSentenceConversationFolders")) || ["General", "Daily life", "Calls", "Grammar practice"];
 let selectedConversationFolder = localStorage.getItem("spanishSentenceSelectedConversationFolder") || "all";
 let conversationPlaylist = JSON.parse(localStorage.getItem("spanishSentenceConversationPlaylist")) || [];
+let libraryFilter = localStorage.getItem("spanishSentenceLibraryFilter") || "all";
+let audioQueue = [];
+let audioQueueIndex = -1;
+let isAudioQueuePlaying = false;
 let activeConversationId = localStorage.getItem(getChatStorageKey("spanishSentenceActiveConversationId")) || "";
 let activeChatTitle = localStorage.getItem(getChatStorageKey("spanishSentenceChatTitle")) || "";
 let chatStartedAt = Number(localStorage.getItem(getChatStorageKey("spanishSentenceChatStartedAt"))) || 0;
@@ -1987,6 +2026,7 @@ let wordFilterMode = localStorage.getItem("spanishSentenceWordFilterMode") || "a
 let appDisplayMode = localStorage.getItem("spanishSentenceAppDisplayMode") || "simple";
 let activeWordDetailId = "";
 let librarySearchText = "";
+let homeContinuePrimaryAction = null;
 let undoAction = null;
 let undoTimer = null;
 
@@ -2361,7 +2401,8 @@ function getChatScenarioLabel(scenario = chatScenarioSelect.value) {
   const labels = {
     casual: "Casual conversation",
     "catch-up": "Catching up with a friend",
-    roleplay: "Real-life roleplay",
+    roleplay: "Role play mode",
+    debate: "Debate mode",
     opinions: "Opinions and preferences",
     story: "Tell me about your day",
     "quick-fire": "Quick questions"
@@ -2375,7 +2416,8 @@ function getChatScenarioInstruction(scenario = chatScenarioSelect.value) {
   const instructions = {
     casual: "Have a relaxed everyday chat, like two people talking naturally over coffee.",
     "catch-up": "Act like a friendly Spanish person catching up with the learner after not seeing them for a bit.",
-    roleplay: "Start a realistic situation-based roleplay connected to the selected topic. Do not explain the roleplay; just speak as the person in the situation.",
+    roleplay: "Run a realistic role play connected to the selected topic. Choose a clear role for yourself and stay in character. Do not explain the exercise; speak as the person in the situation.",
+    debate: "Run a friendly debate about the selected topic. Take a clear but reasonable position, challenge the learner gently, ask them to defend their view, and keep it conversational rather than aggressive.",
     opinions: "Ask natural opinion questions and react like a real person, without sounding like a classroom debate.",
     story: "Invite the learner to tell you about their day, then follow up with natural curiosity.",
     "quick-fire": "Ask short, natural questions one at a time, like a lively quick chat."
@@ -2442,6 +2484,41 @@ function getChatGoalInstruction(goal = chatGoalSelect.value) {
   };
 
   return instructions[goal] || instructions["natural-flow"];
+}
+
+function getChatReplyVariationInstruction(fromCall = false) {
+  const variations = [
+    "Start with a concrete reaction to one detail the learner mentioned, then continue naturally.",
+    "Share a tiny personal-sounding opinion before asking anything.",
+    "Build on the learner's idea with one practical detail or example.",
+    "Make the reply feel like a casual audio message, with a natural conversational rhythm.",
+    "If asking a question, ask it after a useful comment rather than immediately.",
+    "Use a different sentence shape from the previous turn and avoid a generic agreement opener."
+  ];
+  const callVariations = [
+    "Keep it spoken-friendly, but include one concrete reaction or detail.",
+    "Answer naturally in one smooth spoken turn, without sounding clipped or simplified.",
+    "Sound like a real person responding aloud, not a scripted tutor."
+  ];
+  const pool = fromCall ? variations.concat(callVariations) : variations;
+
+  return pickRandom(pool);
+}
+
+function getChatOpeningVariationInstruction(fromCall = false) {
+  const variations = [
+    "Open with a concrete everyday hook connected to the topic.",
+    "Begin like a real person starting a casual chat, not with a generic greeting.",
+    "Use a small situational detail to make the conversation feel lived-in.",
+    "Start with a natural comment first, then give the learner an easy way to reply."
+  ];
+  const callVariations = [
+    "Make it easy to answer aloud after hearing it once.",
+    "Keep the opening spoken-friendly while still sounding natural and specific."
+  ];
+  const pool = fromCall ? variations.concat(callVariations) : variations;
+
+  return pickRandom(pool);
 }
 
 // This helper creates skill tags that explain why a sentence is useful practice.
@@ -3038,6 +3115,7 @@ function renderDialogue() {
   }
 
   dialogueResult.innerHTML = "";
+  updateExportActionVisibility();
 
   if (!currentDialogue || !Array.isArray(currentDialogue.lines) || !currentDialogue.lines.length) {
     dialogueResult.innerHTML = '<p class="empty-message">No dialogue generated yet.</p>';
@@ -3083,7 +3161,7 @@ function renderDialogue() {
     playlistButton.type = "button";
     playlistButton.textContent = "Playlist";
     playlistButton.addEventListener("click", () => {
-      const added = addSentenceToSelectedPlaylist({
+      choosePlaylistForSentence({
         targetLanguage,
         spanish: line.spanish,
         english: line.english || "",
@@ -3093,11 +3171,9 @@ function renderDialogue() {
         source: "dialogue",
         generated: true,
         ai: true
+      }, (playlist) => {
+        dialogueStatus.textContent = `Dialogue line added to "${playlist.name}".`;
       });
-
-      if (added) {
-        dialogueStatus.textContent = "Dialogue line added to the selected playlist.";
-      }
     });
 
     textWrapper.appendChild(speaker);
@@ -3261,7 +3337,7 @@ function duplicateSavedDialogue(dialogueId) {
 }
 
 function addDialogueToSelectedPlaylist(dialogue) {
-  const playlist = getSelectedPlaylist();
+  const playlist = choosePlaylistFromPrompt();
   if (!playlist) {
     alert("Create or choose a playlist first.");
     return;
@@ -3945,36 +4021,49 @@ function getLibraryHubStats() {
       label: "Sentence sets",
       count: getCurrentLanguageItems(savedBatches).length,
       detail: "Generated batches saved automatically",
+      group: "practice",
       page: "generator-page"
     },
     {
       label: "Dialogues",
       count: getCurrentLanguageItems(savedDialogues).length,
-      detail: "AI dialogues and video-style discussions",
+      detail: "Generated practice conversations",
+      group: "practice",
       page: "dialogue-page"
     },
     {
       label: "Conversations",
       count: getCurrentLanguageItems(savedConversations).length,
       detail: `${getConversationFolderOptions().length} folders`,
+      group: "practice",
       page: "chat-page"
     },
     {
       label: "Audio playlists",
       count: languagePlaylists.reduce((total, playlist) => total + (playlist.sentences || []).length, 0),
       detail: `${languagePlaylists.length} playlists`,
+      group: "audio",
       page: "radio-page"
     },
     {
       label: "Review sentences",
       count: getCurrentLanguageItems(recallSentences).length,
       detail: "Active recall queue",
+      group: "review",
       page: "recall-page"
+    },
+    {
+      label: "Mistake patterns",
+      count: getLanguageMistakePatterns().length,
+      detail: "Recurring chat and call fixes",
+      group: "review",
+      page: "review-page"
     },
     {
       label: "Vocabulary",
       count: getCurrentLanguageItems(savedWords).length,
       detail: "Saved words and SRS examples",
+      group: "review",
       page: "words-page"
     }
   ];
@@ -3986,7 +4075,15 @@ function renderLibraryHub() {
   }
 
   const searchText = getLibrarySearchText();
-  const cards = getLibraryHubStats().filter((item) => !searchText || `${item.label} ${item.detail}`.toLowerCase().includes(searchText));
+  libraryTabButtons.forEach((button) => {
+    button.classList.toggle("active", (button.dataset.libraryFilter || "all") === libraryFilter);
+  });
+
+  const cards = getLibraryHubStats().filter((item) => {
+    const matchesFilter = libraryFilter === "all" || item.group === libraryFilter;
+    const matchesSearch = !searchText || `${item.label} ${item.detail}`.toLowerCase().includes(searchText);
+    return matchesFilter && matchesSearch;
+  });
   libraryHubGrid.innerHTML = "";
 
   if (!cards.length) {
@@ -4312,6 +4409,40 @@ function applySetupPreset(preset) {
   showStatusMessage(`${capitalize(preset)} preset applied.`);
 }
 
+function applyLessonPack(pack) {
+  const packs = {
+    cafe: { topic: "food", goal: "ordering", scenario: "roleplay", tone: "informal", page: "chat-page", status: "Cafe role play loaded." },
+    gym: { topic: "gym/fitness", goal: "natural-flow", scenario: "casual", tone: "informal", page: "chat-page", status: "Gym chat loaded." },
+    weekend: { topic: "daily life", goal: "future-plans", scenario: "catch-up", tone: "informal", page: "chat-page", status: "Weekend plans chat loaded." },
+    debate: { topic: "daily life", goal: "opinions", scenario: "debate", tone: "informal", page: "chat-page", status: "Friendly debate loaded." },
+    travel: { topic: "travel", goal: "small-talk", scenario: "roleplay", tone: "informal", page: "chat-page", status: "Travel role play loaded." }
+  };
+  const config = packs[pack];
+
+  if (!config) {
+    return;
+  }
+
+  if (topicSelect) {
+    topicSelect.value = config.topic;
+  }
+  if (chatTopicSelect) {
+    chatTopicSelect.value = config.topic;
+  }
+  if (chatGoalSelect) {
+    chatGoalSelect.value = config.goal;
+  }
+  if (chatScenarioSelect) {
+    chatScenarioSelect.value = config.scenario;
+  }
+  if (chatToneSelect) {
+    chatToneSelect.value = config.tone;
+  }
+  showPage(config.page);
+  chatStatus.textContent = `${config.status} Press Start chat or Start call.`;
+  showStatusMessage(config.status);
+}
+
 function reviewLastCallSummary() {
   if (!lastCallSummaryChatHistory.length) {
     alert("No recent call summary to review.");
@@ -4370,8 +4501,38 @@ function getCallPauseTiming() {
 }
 
 // This helper keeps the selected ElevenLabs voice in sync with the page.
+function getAllowedVoiceChoicesForLanguage(language = targetLanguage) {
+  const choices = ["primary", "alternative"];
+
+  if (language === "english") {
+    choices.push("english-mlso", "english-female-lcmy");
+  }
+
+  return choices;
+}
+
+function normaliseVoiceChoiceForLanguage(voiceChoice, language = targetLanguage) {
+  const allowedChoices = getAllowedVoiceChoicesForLanguage(language);
+  return allowedChoices.includes(voiceChoice) ? voiceChoice : "primary";
+}
+
+function updateVoiceOptionsForLanguage() {
+  if (!spanishVoiceSelect) {
+    return;
+  }
+
+  const allowedChoices = new Set(getAllowedVoiceChoicesForLanguage());
+
+  Array.from(spanishVoiceSelect.options).forEach((option) => {
+    const isAllowed = allowedChoices.has(option.value);
+    option.hidden = !isAllowed;
+    option.disabled = !isAllowed;
+  });
+}
+
 function applySpanishVoicePreference() {
-  spanishVoiceChoice = languageVoiceChoices[targetLanguage] || spanishVoiceChoice || "primary";
+  updateVoiceOptionsForLanguage();
+  spanishVoiceChoice = normaliseVoiceChoiceForLanguage(languageVoiceChoices[targetLanguage] || spanishVoiceChoice || "primary");
 
   if (spanishVoiceSelect) {
     spanishVoiceSelect.value = spanishVoiceChoice;
@@ -4385,10 +4546,10 @@ function applySpanishVoicePreference() {
 // This helper returns the voice option to send to the audio backend.
 function getSelectedSpanishVoice() {
   if (!spanishVoiceSelect) {
-    return spanishVoiceChoice || "primary";
+    return normaliseVoiceChoiceForLanguage(spanishVoiceChoice || "primary");
   }
 
-  return spanishVoiceSelect.value || "primary";
+  return normaliseVoiceChoiceForLanguage(spanishVoiceSelect.value || "primary");
 }
 
 // This function saves the selected ElevenLabs voice option.
@@ -5193,6 +5354,17 @@ async function startCallMode() {
   let shouldWaitForOpeningAudio = false;
   chatAutoSpeakCheckbox.checked = true;
 
+  isCallModeActive = true;
+  isCallReplying = false;
+  startCallTimer();
+  callReplyPlaybackId += 1;
+  callTurnRequestId += 1;
+  startCallBtn.classList.add("hidden");
+  endCallBtn.classList.remove("hidden");
+  interruptCallBtn.classList.add("hidden");
+  setChatStatus("Call mode started. Preparing the opening...");
+  updateCallFocusLayout();
+
   if (chatHistory.length === 0) {
     shouldWaitForOpeningAudio = Boolean(await startChat({
       fromCall: true,
@@ -5211,15 +5383,11 @@ async function startCallMode() {
     }));
   }
 
-  isCallModeActive = true;
-  isCallReplying = false;
-  startCallTimer();
-  callReplyPlaybackId += 1;
-  callTurnRequestId += 1;
-  startCallBtn.classList.add("hidden");
-  endCallBtn.classList.remove("hidden");
-  interruptCallBtn.classList.add("hidden");
-  setChatStatus("Call mode started. Speak naturally after the coach finishes.");
+  if (shouldWaitForOpeningAudio) {
+    setChatStatus("Call mode started. Speak naturally after the coach finishes.");
+  } else {
+    setChatStatus("Call mode started. Speak naturally, then pause.");
+  }
   updateCallFocusLayout();
 
   if (!shouldWaitForOpeningAudio) {
@@ -5296,6 +5464,18 @@ function renderCallSummary(durationSeconds, savedConversation = null) {
         item.textContent = `Weak phrase: ${message.correctionSpanish} - ${message.correctionEnglish || message.feedback || "native version"}`;
         callSummaryPhrases.appendChild(item);
       });
+    }
+  }
+
+  if (callSummaryNextStep) {
+    if (corrections.length) {
+      callSummaryNextStep.textContent = `Next: replay the call, then recall ${corrections.length} native version${corrections.length === 1 ? "" : "s"}.`;
+    } else if (durationSeconds < 120) {
+      callSummaryNextStep.textContent = "Next: try another two-minute call so the coach has more language to review.";
+    } else if (score >= 80) {
+      callSummaryNextStep.textContent = "Next: raise the difficulty or try debate mode to stretch the conversation.";
+    } else {
+      callSummaryNextStep.textContent = "Next: save two useful replies to a playlist and replay them once.";
     }
   }
 }
@@ -5868,6 +6048,7 @@ function addChatMessage(role, spanish, english = "") {
 function renderChatMessages() {
   chatMessages.innerHTML = "";
   updateChatLanguageBadge();
+  updateExportActionVisibility();
 
   if (chatHistory.length === 0) {
     const emptyBubble = document.createElement("div");
@@ -5887,27 +6068,53 @@ function renderChatMessages() {
     const header = document.createElement("div");
     const role = document.createElement("p");
     const text = document.createElement("p");
+    const messageActions = document.createElement("div");
+    const speakButton = document.createElement("button");
+    const playlistButton = document.createElement("button");
+    const sentenceFromMessage = {
+      targetLanguage,
+      spanish: messageSpanish,
+      english: messageEnglish,
+      difficulty: message.difficulty || "intermediate",
+      topic: message.topic || chatTopicSelect.value,
+      tone: message.tone || chatToneSelect.value,
+      focus: "mixed",
+      source: message.role === "coach" ? "chat-reply" : "chat-message",
+      generated: false,
+      custom: true
+    };
 
     bubble.className = `chat-bubble ${message.role === "coach" ? "coach" : "user"}`;
     header.className = "chat-bubble-header";
     role.className = "chat-role";
     text.className = "chat-text";
+    messageActions.className = "actions chat-inline-actions";
     role.textContent = message.role === "coach" ? "Coach" : "You";
     setHoverableTargetText(text, messageSpanish, { spanish: messageSpanish, english: messageEnglish }, "chat");
     header.appendChild(role);
 
-    if (message.role === "coach") {
-      const speakButton = document.createElement("button");
-      speakButton.className = "secondary-btn chat-audio-btn";
-      speakButton.textContent = "Speak";
-      speakButton.addEventListener("click", () => {
-        playSpanishAudio(messageSpanish, "Chat reply");
+    speakButton.className = "secondary-btn chat-audio-btn";
+    playlistButton.className = "secondary-btn chat-audio-btn";
+    speakButton.type = "button";
+    playlistButton.type = "button";
+    speakButton.textContent = "Speak";
+    playlistButton.textContent = "Playlist";
+    speakButton.addEventListener("click", () => {
+      playSpanishAudio(messageSpanish, message.role === "coach" ? "Chat reply" : "Your chat sentence");
+    });
+    playlistButton.addEventListener("click", () => {
+      choosePlaylistForSentence(sentenceFromMessage, (playlist) => {
+        chatStatus.textContent = `Chat sentence added to "${playlist.name}".`;
       });
-      header.appendChild(speakButton);
-    }
+    });
+    messageActions.appendChild(speakButton);
+    messageActions.appendChild(playlistButton);
 
     bubble.appendChild(header);
     bubble.appendChild(text);
+    if (messageSpanish) {
+      bubble.appendChild(messageActions);
+    }
 
     if (messageEnglish) {
       const englishText = document.createElement("p");
@@ -5952,6 +6159,35 @@ function renderChatMessages() {
           correctionEnglishText.textContent = correctionEnglish;
           bubble.appendChild(correctionEnglishText);
         }
+
+        const correctionActions = document.createElement("div");
+        const correctionSpeakButton = document.createElement("button");
+        const correctionPlaylistButton = document.createElement("button");
+        const correctionSentence = {
+          ...sentenceFromMessage,
+          spanish: correctionSpanish,
+          english: correctionEnglish || messageEnglish || "More native chat version",
+          source: "chat-correction"
+        };
+
+        correctionActions.className = "actions chat-inline-actions";
+        correctionSpeakButton.className = "secondary-btn chat-audio-btn";
+        correctionPlaylistButton.className = "secondary-btn chat-audio-btn";
+        correctionSpeakButton.type = "button";
+        correctionPlaylistButton.type = "button";
+        correctionSpeakButton.textContent = "Speak";
+        correctionPlaylistButton.textContent = "Playlist";
+        correctionSpeakButton.addEventListener("click", () => {
+          playSpanishAudio(correctionSpanish, "More native version");
+        });
+        correctionPlaylistButton.addEventListener("click", () => {
+          choosePlaylistForSentence(correctionSentence, (playlist) => {
+            chatStatus.textContent = `More native version added to "${playlist.name}".`;
+          });
+        });
+        correctionActions.appendChild(correctionSpeakButton);
+        correctionActions.appendChild(correctionPlaylistButton);
+        bubble.appendChild(correctionActions);
       }
     }
 
@@ -6061,6 +6297,9 @@ function buildLocalChatOpening() {
     roleplay: informal
       ? [{ spanish: `Vale, imagina que estamos hablando sobre ${topic}. ¿Qué necesitas?`, english: `Okay, imagine we are talking about ${topic}. What do you need?` }]
       : [{ spanish: `De acuerdo, estamos en una situación sobre ${topic}. ¿Qué necesita?`, english: `Alright, we are in a situation about ${topic}. What do you need?` }],
+    debate: informal
+      ? [{ spanish: `Venga, debatimos un poco sobre ${topic}: yo defiendo una postura y tÃº me llevas la contraria. Â¿QuÃ© opinas?`, english: `Come on, let's debate a bit about ${topic}: I will defend one side and you disagree with me. What do you think?` }]
+      : [{ spanish: `Vamos a debatir un poco sobre ${topic}: yo defenderÃ© una postura y usted puede rebatirme. Â¿CuÃ¡l es su opiniÃ³n?`, english: `Let's debate a bit about ${topic}: I will defend one side and you can argue against me. What is your opinion?` }],
     opinions: informal
       ? [{ spanish: `A ver, sobre ${topic}, ¿qué prefieres normalmente?`, english: `So, about ${topic}, what do you normally prefer?` }]
       : [{ spanish: `Sobre ${topic}, ¿qué suele preferir normalmente?`, english: `About ${topic}, what do you usually prefer?` }],
@@ -6089,7 +6328,8 @@ async function buildAiChatOpening(options = {}) {
     personality: chatPersonalitySelect.value,
     personalityInstruction: getChatPersonalityInstruction(),
     goal: chatGoalSelect.value,
-    goalInstruction: getChatGoalInstruction()
+    goalInstruction: getChatGoalInstruction(),
+    variationInstruction: getChatOpeningVariationInstruction(fromCall)
   });
 
   if (!responseData || !responseData.reply || !responseData.reply.spanish || !responseData.reply.english) {
@@ -6111,7 +6351,7 @@ async function startChat(options = {}) {
     ? options.onOpeningSpoken
     : null;
 
-  if (isCallModeActive) {
+  if (isCallModeActive && !fromCall) {
     stopCallMode("Call mode ended. New chat started.");
   }
 
@@ -6157,7 +6397,10 @@ async function startChat(options = {}) {
   addChatMessage("coach", opening.spanish, opening.english);
   saveCurrentConversation({ silent: true });
   if (chatAutoSpeakCheckbox.checked || forceSpeakOpening) {
-    playSpanishAudio(opening.spanish, "Chat opening", onOpeningSpoken, { progressive: false });
+    playSpanishAudio(opening.spanish, "Chat opening", onOpeningSpoken, {
+      progressive: false,
+      browserFallback: !fromCall
+    });
   } else if (onOpeningSpoken) {
     onOpeningSpoken();
   }
@@ -6295,6 +6538,7 @@ async function buildAiChatReply(userMessage, options = {}) {
     personalityInstruction: getChatPersonalityInstruction(),
     goal: chatGoalSelect.value,
     goalInstruction: getChatGoalInstruction(),
+    variationInstruction: getChatReplyVariationInstruction(fromCall),
     userMessage,
     history: recentHistory
   });
@@ -6444,7 +6688,7 @@ async function sendChatMessage(options = {}) {
         setChatStatus("Your turn. Speak naturally, then pause.");
         restartCallListening(300);
       }
-    }, { progressive: false });
+    }, { progressive: false, browserFallback: false });
   } else if (chatAutoSpeakCheckbox.checked) {
     playSpanishAudio(coachReply.spanish, "Chat reply");
   }
@@ -6605,6 +6849,52 @@ function downloadAudioBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
+function updateMediaLoopButton(loopButton, isLooping) {
+  if (!loopButton) {
+    return;
+  }
+
+  loopButton.textContent = isLooping ? "Loop on" : "Loop off";
+  loopButton.setAttribute("aria-pressed", String(Boolean(isLooping)));
+}
+
+function applyMediaPlayerOptions(player, speedSelect = null, loopButton = null) {
+  if (!player) {
+    return;
+  }
+
+  const speed = Number(speedSelect?.value || 1) || 1;
+  player.playbackRate = speed;
+  updateMediaLoopButton(loopButton, player.loop);
+}
+
+function bindMediaPlayerOptions(player, speedSelect = null, loopButton = null) {
+  if (!player) {
+    return;
+  }
+
+  if (speedSelect) {
+    speedSelect.addEventListener("change", () => applyMediaPlayerOptions(player, speedSelect, loopButton));
+  }
+
+  if (loopButton) {
+    loopButton.addEventListener("click", () => {
+      player.loop = !player.loop;
+      updateMediaLoopButton(loopButton, player.loop);
+    });
+  }
+
+  applyMediaPlayerOptions(player, speedSelect, loopButton);
+}
+
+function syncRadioAudioOptions() {
+  if (!spanishAudioPlayer) {
+    return;
+  }
+
+  applyMediaPlayerOptions(spanishAudioPlayer, radioSpeedSelect, radioLoopBtn);
+}
+
 // This helper keeps a prepared MP3 available for mobile browsers.
 function showPreparedMp3(panel, player, link, objectUrlName, blob, filename) {
   if (!panel || !player || !link) {
@@ -6619,20 +6909,31 @@ function showPreparedMp3(panel, player, link, objectUrlName, blob, filename) {
     URL.revokeObjectURL(batchMp3ObjectUrl);
   }
 
+  if (objectUrlName === "dialogue" && dialogueMp3ObjectUrl) {
+    URL.revokeObjectURL(dialogueMp3ObjectUrl);
+  }
+
   const objectUrl = URL.createObjectURL(blob);
 
   if (objectUrlName === "playlist") {
     playlistMp3ObjectUrl = objectUrl;
+  } else if (objectUrlName === "dialogue") {
+    dialogueMp3ObjectUrl = objectUrl;
   } else {
     batchMp3ObjectUrl = objectUrl;
   }
 
   player.src = objectUrl;
+  applyMediaPlayerOptions(player,
+    objectUrlName === "playlist" ? playlistSpeedSelect : objectUrlName === "dialogue" ? dialogueSpeedSelect : batchSpeedSelect,
+    objectUrlName === "playlist" ? playlistLoopBtn : objectUrlName === "dialogue" ? dialogueLoopBtn : batchLoopBtn
+  );
   link.href = objectUrl;
   link.download = filename;
   link.textContent = `Save MP3 (${filename})`;
   link.classList.remove("hidden");
   panel.classList.remove("hidden");
+  return objectUrl;
 }
 
 // This helper keeps a prepared batch MP3 available for mobile browsers.
@@ -6643,6 +6944,42 @@ function showBatchMp3Ready(blob, filename) {
 // This helper keeps a prepared playlist MP3 available for mobile browsers.
 function showPlaylistMp3Ready(blob, filename) {
   showPreparedMp3(playlistMp3Panel, playlistMp3Player, playlistMp3Link, "playlist", blob, filename);
+}
+
+function showDialogueMp3Ready(blob, filename) {
+  return showPreparedMp3(dialoguePlaybackControls, dialogueAudioPlayer, dialogueMp3Link, "dialogue", blob, filename);
+}
+
+function showConversationMp3Ready(blob, filename, turns = []) {
+  stopRadioMode();
+  stopFullConversationPlayback("");
+
+  fullConversationPlayback = {
+    isPlaying: true,
+    isPaused: true,
+    index: 0,
+    turns,
+    playbackId: fullConversationPlayback.playbackId + 1,
+    audioUrl: URL.createObjectURL(blob),
+    filename
+  };
+
+  fullConversationAudioPlayer.src = fullConversationPlayback.audioUrl;
+  applyMediaPlayerOptions(fullConversationAudioPlayer, conversationSpeedSelect, conversationLoopBtn);
+
+  if (conversationMp3Link) {
+    conversationMp3Link.href = fullConversationPlayback.audioUrl;
+    conversationMp3Link.download = filename;
+    conversationMp3Link.textContent = `Save MP3 (${filename})`;
+    conversationMp3Link.classList.remove("hidden");
+  }
+
+  conversationPlaybackControls.classList.remove("hidden");
+  fullConversationAudioPlayer.classList.remove("hidden");
+  playFullChatBtn.classList.add("hidden");
+  stopFullChatBtn.classList.remove("hidden");
+  fullConversationAudioPlayer.load();
+  updateConversationPlaybackControls();
 }
 
 // This helper formats audio time for the full-conversation media player.
@@ -6729,9 +7066,12 @@ async function downloadCorrectedConversationMp3s() {
   const filename = `${getConversationExportBaseName()}-full.mp3`;
 
   try {
-    const audioBlob = await fetchConversationAudioBlob(turns);
+    const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
+      chatStatus.textContent = `Preparing full conversation audio part ${chunkNumber} of ${totalChunks}...`;
+    });
+    showConversationMp3Ready(audioBlob, filename, turns);
     downloadAudioBlob(audioBlob, filename);
-    chatStatus.textContent = `Full conversation MP3 downloaded as ${filename}.`;
+    chatStatus.textContent = `Full conversation MP3 ready. If your phone did not download it automatically, use Save MP3.`;
   } catch (error) {
     chatStatus.textContent = `Could not download the full MP3. ${error.message}`;
   } finally {
@@ -6829,6 +7169,7 @@ function downloadDialoguePdf() {
   }
 
   const title = currentDialogue.title || `${getTargetLanguageProfile().label} dialogue`;
+  const profile = getTargetLanguageProfile();
   const printableWindow = window.open("", "_blank");
 
   if (!printableWindow) {
@@ -6837,22 +7178,43 @@ function downloadDialoguePdf() {
   }
 
   const rows = currentDialogue.lines.map((line, index) => `
-    <section class="turn">
-      <p class="role">${index + 1}. ${escapeHtml(line.speaker || "Speaker")}</p>
-      <p class="spanish">${escapeHtml(line.spanish)}</p>
-      ${line.english ? `<p class="english">${escapeHtml(line.english)}</p>` : ""}
-    </section>
+    <tr>
+      <td class="line-number">${index + 1}</td>
+      <td>
+        <p class="role">${escapeHtml(line.speaker || "Speaker")}</p>
+        <p class="target">${escapeHtml(line.spanish)}</p>
+      </td>
+      <td>
+        <p class="translation">${escapeHtml(line.english || "")}</p>
+      </td>
+    </tr>
   `).join("");
   const phrases = Array.isArray(currentDialogue.usefulPhrases) && currentDialogue.usefulPhrases.length
     ? `
       <h2>Useful phrases</h2>
-      ${currentDialogue.usefulPhrases.map((phrase) => `
-        <section class="turn">
-          <p class="spanish">${escapeHtml(phrase.spanish)}</p>
-          ${phrase.english ? `<p class="english">${escapeHtml(phrase.english)}</p>` : ""}
-          ${phrase.note ? `<p class="original">${escapeHtml(phrase.note)}</p>` : ""}
-        </section>
-      `).join("")}
+      <table>
+        <thead>
+          <tr>
+            <th class="line-number"></th>
+            <th>${escapeHtml(profile.label)}</th>
+            <th>${escapeHtml(profile.translationLabel)}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${currentDialogue.usefulPhrases.map((phrase, index) => `
+            <tr>
+              <td class="line-number">${index + 1}</td>
+              <td>
+                <p class="target">${escapeHtml(phrase.spanish)}</p>
+                ${phrase.note ? `<p class="note">${escapeHtml(phrase.note)}</p>` : ""}
+              </td>
+              <td>
+                <p class="translation">${escapeHtml(phrase.english || "")}</p>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
     `
     : "";
 
@@ -6866,17 +7228,34 @@ function downloadDialoguePdf() {
         h1 { margin: 0 0 8px; font-size: 28px; }
         h2 { margin: 28px 0 12px; font-size: 20px; }
         .meta { margin: 0 0 24px; color: #6b7280; }
-        .turn { break-inside: avoid; margin: 0 0 18px; padding-bottom: 14px; border-bottom: 1px solid #e5e7eb; }
-        .role { margin: 0 0 6px; color: #b45309; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
-        .spanish { margin: 0 0 6px; font-size: 20px; font-weight: 700; line-height: 1.45; }
-        .english, .original { margin: 0; color: #6b7280; line-height: 1.5; }
-        .original { margin-top: 6px; font-size: 13px; font-style: italic; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { padding: 10px 12px; text-align: left; color: #b45309; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 2px solid #d1d5db; }
+        td { vertical-align: top; padding: 14px 12px; border-bottom: 1px solid #e5e7eb; }
+        tr { break-inside: avoid; }
+        .line-number { width: 36px; color: #9ca3af; font-size: 12px; font-weight: 700; text-align: right; }
+        .role { margin: 0 0 6px; color: #b45309; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; }
+        .target { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.45; }
+        .translation { margin: 0; color: #4b5563; line-height: 1.55; }
+        .note { margin: 8px 0 0; color: #6b7280; font-size: 13px; font-style: italic; line-height: 1.45; }
+        @media print {
+          body { margin: 22mm 18mm; }
+          th, td { padding-left: 8px; padding-right: 8px; }
+        }
       </style>
     </head>
     <body>
       <h1>${escapeHtml(title)}</h1>
       <p class="meta">${escapeHtml(capitalize(currentDialogue.level || "intermediate"))} | ${escapeHtml(capitalize(currentDialogue.tone || "informal"))} | ${escapeHtml(currentDialogue.topic || "dialogue")}</p>
-      ${rows}
+      <table>
+        <thead>
+          <tr>
+            <th class="line-number"></th>
+            <th>${escapeHtml(profile.label)}</th>
+            <th>${escapeHtml(profile.translationLabel)}</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
       ${phrases}
       <script>
         window.onload = () => {
@@ -6905,10 +7284,19 @@ async function downloadDialogueMp3() {
   dialogueStatus.textContent = "Preparing dialogue MP3...";
 
   try {
-    const audioBlob = await fetchConversationAudioBlob(turns);
+    const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
+      dialogueStatus.textContent = `Preparing dialogue audio part ${chunkNumber} of ${totalChunks}...`;
+    });
     const filename = `${slugifyFilename(currentDialogue.title || currentDialogue.topic || "dialogue")}.mp3`;
+    const objectUrl = showDialogueMp3Ready(audioBlob, filename);
+    dialoguePlayback.isPlaying = true;
+    dialoguePlayback.audioUrl = objectUrl || dialoguePlayback.audioUrl || "";
+    dialogueAudioPlayer.load();
+    playDialogueBtn.classList.add("hidden");
+    stopDialogueBtn.classList.remove("hidden");
     downloadAudioBlob(audioBlob, filename);
-    dialogueStatus.textContent = "Dialogue MP3 downloaded.";
+    dialogueStatus.textContent = "Dialogue MP3 ready. If your phone did not download it automatically, use Save MP3.";
+    updateDialoguePlaybackControls();
   } catch (error) {
     dialogueStatus.textContent = `Could not download the dialogue MP3. ${error.message}`;
   } finally {
@@ -6950,6 +7338,15 @@ function stopDialoguePlayback(message = "Dialogue playback stopped.") {
     dialoguePlayback.audioUrl = "";
   }
 
+  dialogueMp3ObjectUrl = "";
+
+  if (dialogueMp3Link) {
+    dialogueMp3Link.classList.add("hidden");
+    dialogueMp3Link.removeAttribute("href");
+    dialogueMp3Link.removeAttribute("download");
+    dialogueMp3Link.textContent = "Save MP3";
+  }
+
   playDialogueBtn.classList.remove("hidden");
   stopDialogueBtn.classList.add("hidden");
   updateDialoguePlaybackControls();
@@ -6981,8 +7378,11 @@ async function playDialogueMedia() {
   dialogueStatus.textContent = "Preparing dialogue media player...";
 
   try {
-    const audioBlob = await fetchConversationAudioBlob(turns);
-    dialoguePlayback.audioUrl = URL.createObjectURL(audioBlob);
+    const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
+      dialogueStatus.textContent = `Preparing dialogue audio part ${chunkNumber} of ${totalChunks}...`;
+    });
+    const filename = `${slugifyFilename(currentDialogue.title || currentDialogue.topic || "dialogue")}.mp3`;
+    dialoguePlayback.audioUrl = showDialogueMp3Ready(audioBlob, filename);
     dialogueAudioPlayer.src = dialoguePlayback.audioUrl;
     dialogueAudioPlayer.load();
     await dialogueAudioPlayer.play();
@@ -7134,9 +7534,12 @@ async function loadFullConversationMedia(turns, label = "Full conversation", fro
   chatStatus.textContent = "Preparing the full conversation media player...";
 
   try {
-    const audioBlob = await fetchConversationAudioBlob(turns);
+    const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
+      chatStatus.textContent = `Preparing conversation audio part ${chunkNumber} of ${totalChunks}...`;
+    });
     fullConversationPlayback.audioUrl = URL.createObjectURL(audioBlob);
     fullConversationAudioPlayer.src = fullConversationPlayback.audioUrl;
+    applyMediaPlayerOptions(fullConversationAudioPlayer, conversationSpeedSelect, conversationLoopBtn);
     if (conversationMp3Link) {
       conversationMp3Link.href = fullConversationPlayback.audioUrl;
       conversationMp3Link.download = filename;
@@ -7691,6 +8094,7 @@ function ensureSpanishAudioPlayer() {
   spanishAudioPlayer.addEventListener("loadedmetadata", updateRadioPlaybackControls);
   spanishAudioPlayer.addEventListener("play", updateRadioPlaybackControls);
   spanishAudioPlayer.addEventListener("pause", updateRadioPlaybackControls);
+  syncRadioAudioOptions();
 
   return spanishAudioPlayer;
 }
@@ -7935,10 +8339,29 @@ async function playSpanishAudio(text, titleText = "Spanish sentence", callback =
     return;
   }
 
+  if (!options.fromQueue) {
+    audioQueue = [{
+      text,
+      title: titleText || "Audio",
+      detail: "Current audio"
+    }];
+    audioQueueIndex = 0;
+    isAudioQueuePlaying = false;
+    renderAudioQueue();
+  }
+
   stopSpanishAudioPlayback(false);
   updateNowPlaying(titleText, "Preparing high-quality voice...");
   const playbackId = spanishAudioPlaybackId;
   const player = ensureSpanishAudioPlayer();
+  if (radioState.isPlaying) {
+    syncRadioAudioOptions();
+  } else if (options.fromQueue || !callback) {
+    applyQueuePlayerOptions();
+  } else {
+    player.loop = false;
+    player.playbackRate = Number(queueSpeedSelect?.value || 1) || 1;
+  }
   spanishAudioEndedCallback = () => {
     if (playbackId !== spanishAudioPlaybackId) {
       return;
@@ -7986,6 +8409,16 @@ async function playSpanishAudio(text, titleText = "Spanish sentence", callback =
     }
 
     clearCurrentSpanishAudioUrl();
+    const shouldUseBrowserFallback = options.browserFallback !== false;
+
+    if (!shouldUseBrowserFallback) {
+      showStatusMessage(`${getTargetLanguageProfile().label} voice audio was unavailable. ${error.message}`);
+      updateNowPlaying(titleText, "High-quality voice unavailable");
+      if (typeof callback === "function") {
+        callback();
+      }
+      return;
+    }
 
     if (callback) {
       speakTextWithCallback(text, getTargetLanguageProfile().speechCode, callback);
@@ -8010,6 +8443,229 @@ function updateNowPlaying(title, detail = "Playing") {
 
 function hideNowPlaying() {
   nowPlayingBar?.classList.add("hidden");
+}
+
+function normaliseAudioQueueItem(item) {
+  if (!item) {
+    return null;
+  }
+
+  if (typeof item === "string") {
+    return {
+      text: item,
+      title: "Queued sentence",
+      detail: ""
+    };
+  }
+
+  const text = item.text || item.spanish || item.nativeText || item.sentence || "";
+
+  if (!text) {
+    return null;
+  }
+
+  return {
+    text,
+    title: item.title || item.topic || "Queued sentence",
+    detail: item.detail || item.english || item.translation || "",
+    options: item.options || {}
+  };
+}
+
+function renderAudioQueue() {
+  if (!audioQueueList) {
+    return;
+  }
+
+  audioQueueList.innerHTML = "";
+
+  if (queueToggleBtn) {
+    queueToggleBtn.textContent = `Queue (${audioQueue.length})`;
+  }
+
+  if (queuePrevBtn) {
+    queuePrevBtn.disabled = !audioQueue.length || audioQueueIndex <= 0;
+  }
+
+  if (queueNextBtn) {
+    queueNextBtn.disabled = !audioQueue.length || audioQueueIndex >= audioQueue.length - 1;
+  }
+
+  if (!audioQueue.length) {
+    const emptyItem = document.createElement("li");
+    emptyItem.className = "empty-message";
+    emptyItem.textContent = "No audio queued yet.";
+    audioQueueList.appendChild(emptyItem);
+    return;
+  }
+
+  audioQueue.forEach((item, index) => {
+    const listItem = document.createElement("li");
+    const title = document.createElement("button");
+    const detail = document.createElement("span");
+    const removeButton = document.createElement("button");
+
+    listItem.className = index === audioQueueIndex ? "active" : "";
+    title.type = "button";
+    title.className = "queue-item-title";
+    title.textContent = `${index + 1}. ${item.title}`;
+    title.addEventListener("click", () => playAudioQueueItem(index));
+    detail.textContent = item.detail || item.text;
+    removeButton.type = "button";
+    removeButton.className = "secondary-btn compact-btn";
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", () => {
+      audioQueue.splice(index, 1);
+      if (audioQueueIndex >= audioQueue.length) {
+        audioQueueIndex = audioQueue.length - 1;
+      }
+      renderAudioQueue();
+    });
+
+    listItem.appendChild(title);
+    listItem.appendChild(detail);
+    listItem.appendChild(removeButton);
+    audioQueueList.appendChild(listItem);
+  });
+}
+
+function applyQueuePlayerOptions() {
+  const player = ensureSpanishAudioPlayer();
+  const speed = Number(queueSpeedSelect?.value || 1) || 1;
+  const shouldLoop = queueLoopBtn?.getAttribute("aria-pressed") === "true";
+
+  player.playbackRate = speed;
+  player.loop = shouldLoop;
+  updateMediaLoopButton(queueLoopBtn, shouldLoop);
+}
+
+function setAudioQueue(items, startIndex = 0, autoplay = true) {
+  audioQueue = (items || []).map(normaliseAudioQueueItem).filter(Boolean);
+  audioQueueIndex = audioQueue.length ? Math.max(0, Math.min(startIndex, audioQueue.length - 1)) : -1;
+  isAudioQueuePlaying = Boolean(autoplay && audioQueue.length);
+  renderAudioQueue();
+
+  if (audioQueuePanel && audioQueue.length) {
+    audioQueuePanel.classList.remove("hidden");
+  }
+
+  if (autoplay && audioQueue.length) {
+    playAudioQueueItem(audioQueueIndex);
+  }
+}
+
+function addAudioQueueItems(items, shouldPlayIfIdle = false) {
+  const newItems = (items || []).map(normaliseAudioQueueItem).filter(Boolean);
+
+  if (!newItems.length) {
+    return;
+  }
+
+  const wasEmpty = !audioQueue.length;
+  audioQueue.push(...newItems);
+
+  if (audioQueueIndex < 0) {
+    audioQueueIndex = 0;
+  }
+
+  if (audioQueuePanel) {
+    audioQueuePanel.classList.remove("hidden");
+  }
+
+  renderAudioQueue();
+
+  if (shouldPlayIfIdle || (wasEmpty && !isAudioQueuePlaying)) {
+    playAudioQueueItem(audioQueueIndex);
+  }
+}
+
+function playAudioQueueItem(index = audioQueueIndex) {
+  if (!audioQueue.length) {
+    isAudioQueuePlaying = false;
+    renderAudioQueue();
+    return;
+  }
+
+  audioQueueIndex = Math.max(0, Math.min(index, audioQueue.length - 1));
+  const item = audioQueue[audioQueueIndex];
+  isAudioQueuePlaying = true;
+  renderAudioQueue();
+  playSpanishAudio(item.text, item.title, () => {
+    if (!isAudioQueuePlaying) {
+      return;
+    }
+
+    if (audioQueueIndex < audioQueue.length - 1) {
+      playAudioQueueItem(audioQueueIndex + 1);
+    } else {
+      isAudioQueuePlaying = false;
+      renderAudioQueue();
+    }
+  }, {
+    ...(item.options || {}),
+    fromQueue: true,
+    progressive: false
+  });
+}
+
+function playNextAudioQueueItem() {
+  if (audioQueueIndex < audioQueue.length - 1) {
+    playAudioQueueItem(audioQueueIndex + 1);
+  }
+}
+
+function playPreviousAudioQueueItem() {
+  if (audioQueueIndex > 0) {
+    playAudioQueueItem(audioQueueIndex - 1);
+  }
+}
+
+function clearAudioQueue() {
+  isAudioQueuePlaying = false;
+  audioQueue = [];
+  audioQueueIndex = -1;
+  stopSpanishAudioPlayback();
+  renderAudioQueue();
+}
+
+function toggleAudioQueuePanel() {
+  if (!audioQueuePanel) {
+    return;
+  }
+
+  audioQueuePanel.classList.toggle("hidden");
+}
+
+function addCurrentSentenceToQueue() {
+  const sentence = currentSentence || latestCustomSentence;
+
+  if (!sentence?.spanish) {
+    alert("Generate or choose a sentence first.");
+    return;
+  }
+
+  addAudioQueueItems([{
+    text: sentence.spanish,
+    title: sentence.topic || "Current sentence",
+    detail: sentence.english || ""
+  }]);
+  showStatusMessage("Current sentence added to the audio queue.");
+}
+
+function addSelectedPlaylistToQueue() {
+  const playlist = getSelectedPlaylist();
+
+  if (!playlist?.sentences?.length) {
+    alert("Choose a playlist with sentences first.");
+    return;
+  }
+
+  addAudioQueueItems(playlist.sentences.map((sentence, index) => ({
+    text: sentence.spanish,
+    title: `${playlist.name} ${index + 1}`,
+    detail: sentence.english || ""
+  })));
+  showStatusMessage(`Added "${playlist.name}" to the audio queue.`);
 }
 
 // This helper talks to the shared AI language coach backend.
@@ -8685,6 +9341,40 @@ function renderVideoWordHint(word, hint, line, index) {
 }
 
 // This function asks the Netlify backend for a fresh AI sentence.
+function looksLikeSpanishText(text) {
+  const lowerText = ` ${String(text || "").toLowerCase()} `;
+  const markers = [
+    "¿",
+    "¡",
+    "ñ",
+    "á",
+    "é",
+    "í",
+    "ó",
+    "ú",
+    " que ",
+    " de ",
+    " el ",
+    " la ",
+    " los ",
+    " las ",
+    " una ",
+    " un ",
+    " tengo ",
+    " voy ",
+    " quiero ",
+    " necesito "
+  ];
+
+  return markers.filter((marker) => lowerText.includes(marker)).length >= 2;
+}
+
+function validateAiSentenceLanguage(sentence) {
+  if (targetLanguage === "english" && looksLikeSpanishText(sentence?.spanish || "")) {
+    throw new Error("The AI returned Spanish instead of English.");
+  }
+}
+
 async function generateAiSentence() {
   let response;
 
@@ -8740,6 +9430,8 @@ async function generateAiSentence() {
     generated: true,
     ai: true
   };
+
+  validateAiSentenceLanguage(sentence);
 
   if (isTooSimilarToRecentSentence(sentence.spanish)) {
     throw new Error("The AI returned a sentence too similar to a recent one.");
@@ -8841,8 +9533,10 @@ async function generateSentence() {
       try {
         nextSentence = await generateAiSentence();
       } catch (error) {
-        if (error.message.includes("too similar")) {
-          showStatusMessage("The AI repeated itself, so asking once more for a different sentence...");
+        if (error.message.includes("too similar") || error.message.includes("instead of English")) {
+          showStatusMessage(error.message.includes("instead of English")
+            ? "The AI used the wrong language, so asking once more for an English sentence..."
+            : "The AI repeated itself, so asking once more for a different sentence...");
           nextSentence = await generateAiSentence();
         } else {
           throw error;
@@ -8905,6 +9599,8 @@ function renderBatchSentences() {
     addBatchPlaylistBtn.disabled = !hasBatchSentences;
   }
 
+  updateExportActionVisibility();
+
   if (!hasBatchSentences) {
     batchStatus.textContent = `Generate a batch to view ${getTargetLanguageProfile().label} and ${getTargetLanguageProfile().translationLabel} side by side.`;
     if (batchFocusPanel) {
@@ -8944,9 +9640,9 @@ function renderBatchSentences() {
     });
 
     playlistButton.addEventListener("click", () => {
-      if (addSentenceToSelectedPlaylist(sentence)) {
-        batchStatus.textContent = `Sentence ${index + 1} added to the selected playlist.`;
-      }
+      choosePlaylistForSentence(sentence, (playlist) => {
+        batchStatus.textContent = `Sentence ${index + 1} added to "${playlist.name}".`;
+      });
     });
 
     row.appendChild(number);
@@ -9065,7 +9761,7 @@ function addBatchToPlaylist() {
     return;
   }
 
-  const playlist = getSelectedPlaylist();
+  const playlist = choosePlaylistFromPrompt();
 
   if (!playlist) {
     alert("Create a playlist first.");
@@ -9387,9 +10083,126 @@ function saveActivePage() {
   localStorage.setItem("spanishSentenceActivePage", activePageId);
 }
 
+function setElementHidden(element, shouldHide) {
+  if (element) {
+    element.classList.toggle("hidden", Boolean(shouldHide));
+  }
+}
+
+function updateExportActionVisibility() {
+  const hasBatch = currentBatchSentences.length > 0;
+  const hasDialogue = Boolean(currentDialogue?.lines?.length);
+  const hasChat = chatHistory.some((message) => message.spanish || message.text);
+  const selectedPlaylist = getSelectedPlaylist();
+  const hasPlaylist = Boolean(selectedPlaylist?.sentences?.length);
+
+  setElementHidden(downloadBatchPdfBtn, !hasBatch);
+  setElementHidden(downloadBatchMp3Btn, !hasBatch);
+  setElementHidden(downloadDialoguePdfBtn, !hasDialogue);
+  setElementHidden(downloadDialogueMp3Btn, !hasDialogue);
+  setElementHidden(downloadChatPdfBtn, !hasChat);
+  setElementHidden(downloadChatMp3sBtn, !hasChat);
+  setElementHidden(downloadPlaylistMp3Btn, !hasPlaylist);
+}
+
+function getHomeContinueSuggestion() {
+  const dueWords = getCurrentLanguageItems(savedWords).map(withWordSchedule).filter(isWordDue).length;
+  const dueRecall = getCurrentLanguageItems(recallSentences).map(withRecallSchedule).filter(isRecallDue).length;
+
+  if (dueWords || dueRecall || getLanguageMistakePatterns().length) {
+    return {
+      title: "Review what is due today",
+      detail: `${dueWords} words due | ${dueRecall} sentence recalls | ${getLanguageMistakePatterns().length} recurring fixes`,
+      label: "Start review",
+      action: () => {
+        buildSmartReviewSession();
+        showPage("review-page");
+      }
+    };
+  }
+
+  if (chatHistory.length) {
+    return {
+      title: "Continue your current chat",
+      detail: `${chatHistory.length} messages saved in this ${getTargetLanguageProfile().label} conversation.`,
+      label: "Open chat",
+      action: () => showPage("chat-page")
+    };
+  }
+
+  if (currentDialogue?.lines?.length) {
+    return {
+      title: currentDialogue.title || "Continue your dialogue",
+      detail: `${currentDialogue.lines.length} dialogue lines ready to play, export, or save.`,
+      label: "Open dialogue",
+      action: () => showPage("dialogue-page")
+    };
+  }
+
+  if (currentBatchSentences.length) {
+    return {
+      title: "Continue your generated set",
+      detail: `${currentBatchSentences.length} generated sentences are ready.`,
+      label: "Open set",
+      action: () => showPage("generator-page")
+    };
+  }
+
+  const latestBatch = getCurrentLanguageItems(savedBatches)
+    .slice()
+    .sort((first, second) => new Date(second.createdAt || second.savedAt || 0) - new Date(first.createdAt || first.savedAt || 0))[0];
+
+  if (latestBatch) {
+    return {
+      title: latestBatch.title || "Open your latest sentence set",
+      detail: `${latestBatch.sentences?.length || 0} sentences | ${formatSavedBatchDate(latestBatch.createdAt || latestBatch.savedAt)}`,
+      label: "Open set",
+      action: () => {
+        loadSavedBatch(latestBatch.id);
+        showPage("generator-page");
+      }
+    };
+  }
+
+  const latestPlaylist = getCurrentLanguageItems(playlists).find((playlist) => playlist.sentences?.length);
+
+  if (latestPlaylist) {
+    return {
+      title: `Listen to ${latestPlaylist.name}`,
+      detail: `${latestPlaylist.sentences.length} saved sentences in this playlist.`,
+      label: "Open audio",
+      action: () => {
+        playlistSelect.value = latestPlaylist.id;
+        renderSelectedPlaylist();
+        showPage("radio-page");
+      }
+    };
+  }
+
+  return {
+    title: "Start with a short chat",
+    detail: "No pending practice yet. A two-minute chat is the fastest way to create useful review material.",
+    label: "Start chat",
+    action: () => showPage("chat-page")
+  };
+}
+
+function renderHomeContinueCard() {
+  if (!homeContinueCard) {
+    return;
+  }
+
+  const suggestion = getHomeContinueSuggestion();
+  homeContinueTitle.textContent = suggestion.title;
+  homeContinueDetail.textContent = suggestion.detail;
+  homeContinuePrimaryBtn.textContent = suggestion.label;
+  homeContinuePrimaryAction = suggestion.action;
+  homeContinueCard.classList.remove("hidden");
+}
+
 function showPage(pageId) {
   const nextPageId = document.getElementById(pageId) ? pageId : "generator-page";
-  const navPageId = nextPageId === "dialogue-page" ? "chat-page" : nextPageId;
+  const navPageId = nextPageId === "dialogue-page" ? "generator-page" : nextPageId;
   activePageId = nextPageId;
   saveActivePage();
 
@@ -9416,6 +10229,12 @@ function showPage(pageId) {
   if (nextPageId === "library-page") {
     renderLibraryHub();
   }
+
+  if (nextPageId === "home-page") {
+    renderHomeContinueCard();
+  }
+
+  updateExportActionVisibility();
 }
 
 function downloadJsonFile(data, filename) {
@@ -10064,6 +10883,7 @@ function renderSelectedPlaylist() {
   if (downloadPlaylistMp3Btn) {
     downloadPlaylistMp3Btn.disabled = !hasPlaylistSentences;
   }
+  updateExportActionVisibility();
 
   if (!playlist) {
     playlistEmptyMessage.style.display = "block";
@@ -10175,6 +10995,95 @@ function createPlaylist() {
   showStatusMessage("Playlist created.");
 }
 
+function createPlaylistWithName(name, folder = "General") {
+  const playlistName = (name || "").trim();
+
+  if (!playlistName) {
+    return null;
+  }
+
+  const existing = getCurrentLanguageItems(playlists).find((playlist) => playlist.name.toLowerCase() === playlistName.toLowerCase());
+
+  if (existing) {
+    return existing;
+  }
+
+  const playlist = {
+    id: createId(),
+    targetLanguage,
+    name: playlistName,
+    folder,
+    sentences: []
+  };
+
+  playlists.push(playlist);
+  savePlaylists();
+  renderPlaylists();
+  return playlist;
+}
+
+function addSentenceToPlaylist(sentence, playlist) {
+  if (!sentence?.spanish || !playlist) {
+    return false;
+  }
+
+  const alreadyAdded = playlist.sentences.some((item) => item.spanish === sentence.spanish);
+
+  if (alreadyAdded) {
+    alert(`This sentence is already in "${playlist.name}".`);
+    return false;
+  }
+
+  playlist.sentences.push(withCurrentLanguage(sentence));
+  savePlaylists();
+  renderPlaylists();
+  showStatusMessage(`Sentence added to "${playlist.name}".`);
+  return true;
+}
+
+function choosePlaylistFromPrompt() {
+  const languagePlaylists = getCurrentLanguageItems(playlists);
+  let selectedPlaylist = null;
+
+  if (!languagePlaylists.length) {
+    const firstName = window.prompt("No playlists yet. Name your first playlist:", "My practice playlist");
+    selectedPlaylist = createPlaylistWithName(firstName);
+  } else {
+    const options = languagePlaylists
+      .map((playlist, index) => `${index + 1}. ${playlist.name} (${(playlist.sentences || []).length})`)
+      .join("\n");
+    const answer = window.prompt(`Add this sentence to which playlist?\n\n${options}\n\nType a number, or type a new playlist name.`);
+
+    if (!answer) {
+      return false;
+    }
+
+    const selectedIndex = Number(answer.trim()) - 1;
+    selectedPlaylist = Number.isInteger(selectedIndex) && languagePlaylists[selectedIndex]
+      ? languagePlaylists[selectedIndex]
+      : createPlaylistWithName(answer.trim());
+  }
+
+  return selectedPlaylist;
+}
+
+function choosePlaylistForSentence(sentence, successCallback = null) {
+  if (!sentence?.spanish) {
+    alert("Choose or generate a sentence first.");
+    return false;
+  }
+
+  const selectedPlaylist = choosePlaylistFromPrompt();
+
+  const added = addSentenceToPlaylist(sentence, selectedPlaylist);
+
+  if (added && typeof successCallback === "function") {
+    successCallback(selectedPlaylist);
+  }
+
+  return added;
+}
+
 // This function adds one sentence to the selected playlist.
 function addSentenceToSelectedPlaylist(sentence) {
   const playlist = getSelectedPlaylist();
@@ -10184,18 +11093,7 @@ function addSentenceToSelectedPlaylist(sentence) {
     return false;
   }
 
-  const alreadyAdded = playlist.sentences.some((item) => item.spanish === sentence.spanish);
-
-  if (alreadyAdded) {
-    alert("This sentence is already in the selected playlist.");
-    return false;
-  }
-
-  playlist.sentences.push(withCurrentLanguage(sentence));
-  savePlaylists();
-  renderPlaylists();
-  showStatusMessage("Sentence added to the playlist.");
-  return true;
+  return addSentenceToPlaylist(sentence, playlist);
 }
 
 // This function removes one sentence from the selected playlist.
@@ -10426,6 +11324,12 @@ function renderTodayDashboard() {
   if (todayWeekSpoken) {
     todayWeekSpoken.textContent = weeklyTotals.spoken;
   }
+  if (todayWeekSaved) {
+    todayWeekSaved.textContent = weeklyTotals.saved;
+  }
+  if (todayCallMinutes) {
+    todayCallMinutes.textContent = Math.round(Number(getCurrentPracticeStats().callSeconds || 0) / 60);
+  }
   if (todaySuggestion) {
     const generatedGoal = Number(practiceGoals.sentences || 0);
     const callGoalSeconds = Number(practiceGoals.callMinutes || 0) * 60;
@@ -10443,7 +11347,35 @@ function renderTodayDashboard() {
       todaySuggestion.textContent = "No urgent reviews. Generate a set, start a dialogue, or do a short call.";
     }
   }
+  renderMistakePatternsPanel();
   renderLanguageDashboard();
+}
+
+function renderMistakePatternsPanel() {
+  if (!mistakePatternList) {
+    return;
+  }
+
+  const patterns = getLanguageMistakePatterns().slice(0, 5);
+  mistakePatternList.innerHTML = "";
+
+  if (startMistakeReviewBtn) {
+    startMistakeReviewBtn.disabled = !patterns.length;
+  }
+
+  if (!patterns.length) {
+    const empty = document.createElement("li");
+    empty.textContent = "No recurring fixes yet. Chat or call reviews will collect them here.";
+    mistakePatternList.appendChild(empty);
+    return;
+  }
+
+  patterns.forEach((pattern) => {
+    const item = document.createElement("li");
+    const example = pattern.example ? ` Example: ${pattern.example}` : "";
+    item.textContent = `${pattern.note || "More natural wording"} - seen ${pattern.count || 1} time${Number(pattern.count || 1) === 1 ? "" : "s"}.${example}`;
+    mistakePatternList.appendChild(item);
+  });
 }
 
 function renderDailyReview() {
@@ -11493,7 +12425,7 @@ async function checkBackendConfig(endpoint, payload, successStatuses = [400]) {
 }
 
 async function runConnectionDiagnostics() {
-  const expectedScriptVersion = "v=81";
+  const expectedScriptVersion = "v=86";
   const results = [
     {
       ok: Boolean(navigator.mediaDevices?.getUserMedia && window.MediaRecorder),
@@ -11766,6 +12698,7 @@ function renderFavourites() {
     const topicTag = document.createElement("span");
     const toneTag = document.createElement("span");
     const deleteButton = document.createElement("button");
+    const playButton = document.createElement("button");
     const playlistButton = document.createElement("button");
     const recallButton = document.createElement("button");
 
@@ -11786,10 +12719,16 @@ function renderFavourites() {
       deleteFavourite(item.spanish);
     });
 
+    playButton.textContent = "Play";
+    playButton.className = "secondary-btn";
+    playButton.addEventListener("click", () => {
+      playSpanishAudio(item.spanish, item.topic || "Saved sentence");
+    });
+
     playlistButton.textContent = "Add to playlist";
     playlistButton.className = "secondary-btn";
     playlistButton.addEventListener("click", () => {
-      addSentenceToSelectedPlaylist(item);
+      choosePlaylistForSentence(item);
     });
 
     recallButton.textContent = "Add to recall";
@@ -11804,6 +12743,7 @@ function renderFavourites() {
     textWrapper.appendChild(title);
     textWrapper.appendChild(translation);
     textWrapper.appendChild(tagRow);
+    textWrapper.appendChild(playButton);
     textWrapper.appendChild(playlistButton);
     textWrapper.appendChild(recallButton);
     listItem.appendChild(textWrapper);
@@ -11862,7 +12802,7 @@ addGeneratorToPlaylistBtn.addEventListener("click", () => {
     return;
   }
 
-  addSentenceToSelectedPlaylist(currentSentence);
+  choosePlaylistForSentence(currentSentence);
 });
 
 toggleTranslationBtn.addEventListener("click", () => {
@@ -11914,6 +12854,9 @@ if (runDiagnosticsBtn) {
 if (mainPhoneTestBtn) {
   mainPhoneTestBtn.addEventListener("click", runPhoneSetupCheck);
 }
+lessonPackButtons.forEach((button) => {
+  button.addEventListener("click", () => applyLessonPack(button.dataset.lessonPack));
+});
 if (mobileContinueChatBtn) {
   mobileContinueChatBtn.addEventListener("click", () => showPage("chat-page"));
 }
@@ -11931,12 +12874,28 @@ if (mobileGenerateSetBtn) {
 }
 if (mobileReviewTodayBtn) {
   mobileReviewTodayBtn.addEventListener("click", () => {
-    buildDailyReviewQueue();
+    buildSmartReviewSession();
     showPage("review-page");
   });
 }
 if (mobileOpenPlaylistBtn) {
   mobileOpenPlaylistBtn.addEventListener("click", () => showPage("radio-page"));
+}
+if (homeContinuePrimaryBtn) {
+  homeContinuePrimaryBtn.addEventListener("click", () => {
+    if (typeof homeContinuePrimaryAction === "function") {
+      homeContinuePrimaryAction();
+    }
+  });
+}
+if (homeContinueSecondaryBtn) {
+  homeContinueSecondaryBtn.addEventListener("click", () => {
+    buildSmartReviewSession();
+    showPage("review-page");
+  });
+}
+if (startMistakeReviewBtn) {
+  startMistakeReviewBtn.addEventListener("click", buildSmartReviewSession);
 }
 homePageTargetButtons.forEach((button) => {
   button.addEventListener("click", () => showPage(button.dataset.homePageTarget));
@@ -11960,7 +12919,40 @@ if (undoActionBtn) {
   undoActionBtn.addEventListener("click", runUndoAction);
 }
 if (nowPlayingStopBtn) {
-  nowPlayingStopBtn.addEventListener("click", () => stopSpanishAudioPlayback());
+  nowPlayingStopBtn.addEventListener("click", () => {
+    isAudioQueuePlaying = false;
+    stopSpanishAudioPlayback();
+    renderAudioQueue();
+  });
+}
+if (queueToggleBtn) {
+  queueToggleBtn.addEventListener("click", toggleAudioQueuePanel);
+}
+if (queuePrevBtn) {
+  queuePrevBtn.addEventListener("click", playPreviousAudioQueueItem);
+}
+if (queueNextBtn) {
+  queueNextBtn.addEventListener("click", playNextAudioQueueItem);
+}
+if (queueSpeedSelect) {
+  queueSpeedSelect.addEventListener("change", applyQueuePlayerOptions);
+}
+if (queueLoopBtn) {
+  queueLoopBtn.addEventListener("click", () => {
+    const player = ensureSpanishAudioPlayer();
+    player.loop = !player.loop;
+    updateMediaLoopButton(queueLoopBtn, player.loop);
+  });
+  updateMediaLoopButton(queueLoopBtn, false);
+}
+if (clearAudioQueueBtn) {
+  clearAudioQueueBtn.addEventListener("click", clearAudioQueue);
+}
+if (queueCurrentSentenceBtn) {
+  queueCurrentSentenceBtn.addEventListener("click", addCurrentSentenceToQueue);
+}
+if (queueSelectedPlaylistBtn) {
+  queueSelectedPlaylistBtn.addEventListener("click", addSelectedPlaylistToQueue);
 }
 wordFilterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -11980,6 +12972,13 @@ if (librarySearchInput) {
 if (globalLibrarySearchInput) {
   globalLibrarySearchInput.addEventListener("input", renderLibraryHub);
 }
+libraryTabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    libraryFilter = button.dataset.libraryFilter || "all";
+    localStorage.setItem("spanishSentenceLibraryFilter", libraryFilter);
+    renderLibraryHub();
+  });
+});
 if (appModeToggleBtn) {
   appModeToggleBtn.addEventListener("click", toggleAppDisplayMode);
 }
@@ -12172,11 +13171,11 @@ addChatReplyToPlaylistBtn.addEventListener("click", () => {
     return;
   }
 
-  addSentenceToSelectedPlaylist(chatSentence);
-
-  if (lastCoachReply.correctionSpanish) {
-    chatStatus.textContent = "The more native version was added to the playlist.";
-  }
+  choosePlaylistForSentence(chatSentence, (playlist) => {
+    chatStatus.textContent = lastCoachReply.correctionSpanish
+      ? `The more native version was added to "${playlist.name}".`
+      : `The last reply was added to "${playlist.name}".`;
+  });
 });
 addCurrentToPlaylistBtn.addEventListener("click", () => {
   if (!currentSentence) {
@@ -12184,7 +13183,7 @@ addCurrentToPlaylistBtn.addEventListener("click", () => {
     return;
   }
 
-  addSentenceToSelectedPlaylist(currentSentence);
+  choosePlaylistForSentence(currentSentence);
 });
 addCustomToPlaylistBtn.addEventListener("click", () => {
   if (!latestCustomSentence) {
@@ -12192,8 +13191,21 @@ addCustomToPlaylistBtn.addEventListener("click", () => {
     return;
   }
 
-  addSentenceToSelectedPlaylist(latestCustomSentence);
+  choosePlaylistForSentence(latestCustomSentence, (playlist) => {
+    customStatus.textContent = `Translated sentence added to "${playlist.name}".`;
+  });
 });
+if (playCustomSentenceBtn) {
+  playCustomSentenceBtn.addEventListener("click", () => {
+    if (!latestCustomSentence) {
+      alert("Translate a custom sentence first.");
+      return;
+    }
+
+    playSpanishAudio(latestCustomSentence.spanish, "Translated sentence");
+    customStatus.textContent = "Playing translated sentence.";
+  });
+}
 if (saveCustomBtn) {
   saveCustomBtn.addEventListener("click", () => {
     saveSentenceToFavourites(latestCustomSentence, "Translate a custom sentence first.");
@@ -12212,6 +13224,21 @@ if (nextRadioBtn) {
 }
 if (downloadPlaylistMp3Btn) {
   downloadPlaylistMp3Btn.addEventListener("click", downloadSelectedPlaylistMp3);
+}
+bindMediaPlayerOptions(batchMp3Player, batchSpeedSelect, batchLoopBtn);
+bindMediaPlayerOptions(playlistMp3Player, playlistSpeedSelect, playlistLoopBtn);
+bindMediaPlayerOptions(dialogueAudioPlayer, dialogueSpeedSelect, dialogueLoopBtn);
+bindMediaPlayerOptions(fullConversationAudioPlayer, conversationSpeedSelect, conversationLoopBtn);
+if (radioSpeedSelect) {
+  radioSpeedSelect.addEventListener("change", syncRadioAudioOptions);
+}
+if (radioLoopBtn) {
+  radioLoopBtn.addEventListener("click", () => {
+    const player = ensureSpanishAudioPlayer();
+    player.loop = !player.loop;
+    updateMediaLoopButton(radioLoopBtn, player.loop);
+  });
+  updateMediaLoopButton(radioLoopBtn, false);
 }
 deletePlaylistBtn.addEventListener("click", deleteSelectedPlaylist);
 exportPracticeBtn.addEventListener("click", exportPracticeBackup);
@@ -12242,7 +13269,7 @@ if (buildSmartReviewBtn) {
 }
 if (startDailyReviewBtn) {
   startDailyReviewBtn.addEventListener("click", () => {
-    buildDailyReviewQueue();
+    buildSmartReviewSession();
     showPage("review-page");
   });
 }
@@ -12355,7 +13382,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=32").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=49").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
@@ -12396,6 +13423,8 @@ renderChatMessages();
 renderSavedConversations();
 renderConversationPlaylist();
 renderLibraryHub();
+renderAudioQueue();
+renderHomeContinueCard();
 updateChatTimerDisplay();
 if (chatStartedAt) {
   startChatTimer(false);

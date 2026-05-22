@@ -189,6 +189,14 @@ function hasBannedWords(text) {
   return BANNED_WORDS.some((word) => lowerText.includes(word));
 }
 
+function startsWithOverusedAgreement(text) {
+  return /^((pues|ah|bueno),?\s+)?(sí|si|claro|vale|exacto|oui|d'accord|certo|sure)([\s,.:;!¡]|$)/iu.test((text || "").trim());
+}
+
+function looksLikeQuestion(text) {
+  return /[?¿]\s*$/.test((text || "").trim()) || /^(who|what|where|when|why|how|do|does|did|can|could|would|is|are|am|should|will|shall|que|qué|qui|quoi|où|ou|quando|come|dove|perché|pourquoi|est-ce|cosa)\b/i.test((text || "").trim());
+}
+
 async function callOpenAi(apiKey, model, userPrompt) {
   let openAiResponse;
 
@@ -201,7 +209,7 @@ async function callOpenAi(apiKey, model, userPrompt) {
       },
       body: JSON.stringify({
         model,
-        temperature: 0.3,
+        temperature: 0.65,
         input: [
           {
             role: "system",
@@ -333,6 +341,7 @@ Speaker personality: ${requestBody.personality || "friendly-local"}
 Personality setup: ${personalityInstruction}
 Practice goal: ${requestBody.goal || "natural-flow"}
 Goal setup: ${requestBody.goalInstruction || "Prioritise natural conversation flow."}
+Variation for this turn: ${requestBody.variationInstruction || "Use a fresh natural reply shape for this turn."}
 Call mode: ${requestBody.callMode ? "yes - keep it spoken aloud friendly, but do not simplify or shorten the quality of the answer." : "no"}
 
 Recent chat:
@@ -345,13 +354,19 @@ ${requestBody.userMessage}
 
 Main goal:
 - Reply like ${language.person}, not like a worksheet, tutor script, chatbot, or classroom exercise.
-- Sound specific, casual, and socially natural.
+- Sound specific, casual, curious, and socially natural.
 - React to what the learner actually said before asking anything new.
 - Keep the conversation moving with one natural follow-up, not a list of questions.
 - Avoid generic openings like "Hola, ¿qué tal? Cuéntame..." unless they genuinely fit.
 - Do not mention that you are an AI, a coach, or a teacher.
 - Follow the speaker personality. If it says tutor/corrector, keep the correction practical but do not make the main reply feel like a lesson.
 - Gently steer toward the practice goal, but never force it if it would make the reply unnatural.
+- Add a little personality: a brief opinion, reaction, mini anecdote, practical detail, or playful aside when it fits.
+- Vary the shape of the reply from turn to turn. Do not always use the pattern "reaction + question".
+- Pick up concrete details from the learner's message and build on them.
+- If the learner gives a short answer, help the conversation expand naturally instead of just asking another basic question.
+- If Conversation style is roleplay, stay in the scene as the other person. Do not narrate the roleplay or say "let's roleplay" after the opening.
+- If Conversation style is debate, take a clear but friendly position on the topic, challenge one point gently, invite the learner to defend their view, and keep the tone respectful and conversational.
 
 Learner alternative rules:
 - Always give a more natural ${language.label} way to say the learner's message.
@@ -374,9 +389,14 @@ Reply rules:
 - "spanish" is a legacy app field name. Its value must be ${language.natural}.
 - "correctionSpanish" is a legacy app field name. Its value must be ${language.natural}.
 - correctionSpanish should rewrite the learner's sentence in ${language.label}; spanish should reply to it as the other person in the conversation.
-- It should usually be 1 or 2 short sentences.
+- For normal chat, it should usually be 2 to 4 natural sentences.
+- For call mode, it should usually be 1 to 3 spoken-friendly sentences, but keep the same quality and specificity.
 - It should feel like a WhatsApp/audio conversation with a friendly native speaker.
 - Include at most one question, and only if it feels natural.
+- Do not repeat correctionSpanish as the main reply. The main reply must answer the learner and move the conversation forward.
+- Do not start every reply with agreement words like "sí", "pues sí", "claro", "vale", "exacto", "oui", "d'accord", "certo", or "sure".
+- If the learner did not ask a yes/no question, avoid starting the main reply with a yes/no agreement word.
+- When the learner gives a statement, the main reply must not begin with "sí", "pues sí", "ah sí", "claro", "vale", "exacto", "oui", "d'accord", "certo", or "sure"; begin with a real reaction instead.
 - The "english" legacy field should translate the main ${language.label} reply into ${language.translationLabel}.
 - correctionSpanish should be the natural ${language.label} alternative for the learner's message.
 - correctionEnglish should translate correctionSpanish back into ${language.translationLabel}.
@@ -393,6 +413,30 @@ Use this JSON shape:
 `.trim();
 
   let reply = await callOpenAi(apiKey, model, prompt);
+
+  if (startsWithOverusedAgreement(reply.spanish || "") && !looksLikeQuestion(requestBody.userMessage)) {
+    const varietyPrompt = `
+Rewrite only the main conversational reply so it does not begin with an agreement word.
+
+The learner gave a statement, so the reply should begin with a real reaction, detail, opinion, or comment.
+
+Learner message:
+${requestBody.userMessage}
+
+Current response JSON:
+${JSON.stringify(reply)}
+
+Rules:
+- Keep the same JSON shape.
+- Keep correctionSpanish, correctionEnglish, and feedback unless they genuinely need tiny cleanup.
+- The "spanish" field must be ${language.natural}.
+- The "spanish" field must answer the learner and move the conversation forward.
+- Do not start "spanish" with "sí", "pues sí", "ah sí", "claro", "vale", "exacto", "oui", "d'accord", "certo", or "sure".
+- Reply with JSON only.
+`.trim();
+
+    reply = await callOpenAi(apiKey, model, varietyPrompt);
+  }
 
   if (
     hasWrongLanguageMarkers(reply.spanish || "", language) ||
@@ -461,6 +505,7 @@ Speaker personality: ${requestBody.personality || "friendly-local"}
 Personality setup: ${personalityInstruction}
 Practice goal: ${requestBody.goal || "natural-flow"}
 Goal setup: ${requestBody.goalInstruction || "Prioritise natural conversation flow."}
+Opening variation: ${requestBody.variationInstruction || "Use a concrete, natural opening hook."}
 Call mode: ${requestBody.callMode ? "yes - make it spoken aloud friendly, but keep the same natural quality." : "no"}
 
 Rules:
@@ -470,11 +515,15 @@ Rules:
 - Do not explain the situation. Just start talking.
 - Follow the speaker personality without becoming exaggerated.
 - Set up the opening so the learner can naturally practise the selected goal.
+- Make the opening feel like the beginning of a real conversation, with a concrete hook related to the topic or situation.
+- If Conversation style is roleplay, open directly as a character in a realistic scene connected to the topic.
+- If Conversation style is debate, open with a clear friendly opinion or provocative but safe claim about the topic, then invite the learner to respond.
+- Vary openings. Do not always begin with a greeting plus "tell me about...".
 - Use ${language.natural}.
 - Do not use Spanish unless the selected target language is Spanish.
 - Do not mix languages.
 - The "english" legacy field must be a ${language.translationLabel} translation of the opening.
-- Keep it short: 1 or 2 sentences.
+- Keep it concise but interesting: usually 1 or 2 sentences.
 - End with one easy thing the learner can reply to.
 - Reply with JSON only.
 

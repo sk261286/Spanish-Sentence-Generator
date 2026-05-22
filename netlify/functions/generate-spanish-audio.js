@@ -30,6 +30,14 @@ function classifyElevenLabsError(statusCode, errorText) {
 
 function getVoiceId(voiceChoice, targetLanguage = "spanish") {
   if (targetLanguage === "english") {
+    if (voiceChoice === "english-mlso") {
+      return process.env.ELEVENLABS_ENGLISH_MLSO_VOICE_ID || "MLSOvrM2Tyi3okEfyOiI";
+    }
+
+    if (voiceChoice === "english-female-lcmy") {
+      return process.env.ELEVENLABS_ENGLISH_FEMALE_LCMY_VOICE_ID || "lcMyyd2HUfFzxdCaC4Ta";
+    }
+
     return voiceChoice === "alternative"
       ? process.env.ELEVENLABS_ENGLISH_ALT_VOICE_ID || process.env.ELEVENLABS_ENGLISH_VOICE_ID || process.env.ELEVENLABS_ALT_VOICE_ID || "ZCh4e9eZSUf41K4cmCEL"
       : process.env.ELEVENLABS_ENGLISH_VOICE_ID || process.env.ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL";
@@ -141,6 +149,7 @@ async function handler(event) {
       isBase64Encoded: true,
       headers: {
         "Content-Type": "audio/mpeg",
+        "X-ElevenLabs-Voice-Id": voiceId,
         "Cache-Control": "public, max-age=31536000, immutable"
       },
       body: Buffer.from(audioBuffer).toString("base64")

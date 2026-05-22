@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=64">
+  <link rel="stylesheet" href="style.css?v=76">
 </head>
 <body>
   <main class="app">
@@ -30,7 +30,7 @@
 
     <nav class="page-nav" aria-label="App sections">
       <button class="page-tab active" data-page-target="home-page">Home</button>
-      <button class="page-tab" data-page-target="generator-page">Practice</button>
+      <button class="page-tab" data-page-target="generator-page">Generate</button>
       <button class="page-tab" data-page-target="chat-page">Chat &amp; Call</button>
       <button class="page-tab" data-page-target="review-page">Today</button>
       <button class="page-tab" data-page-target="radio-page">Audio</button>
@@ -68,6 +68,13 @@
           <h3>Start fast</h3>
           <p class="sentence-meta">Choose one practice flow and the app will take you there.</p>
         </div>
+        <div class="lesson-pack-row" aria-label="Lesson packs">
+          <button class="secondary-btn lesson-pack-btn" type="button" data-lesson-pack="cafe">Cafe role play</button>
+          <button class="secondary-btn lesson-pack-btn" type="button" data-lesson-pack="gym">Gym chat</button>
+          <button class="secondary-btn lesson-pack-btn" type="button" data-lesson-pack="weekend">Weekend plans</button>
+          <button class="secondary-btn lesson-pack-btn" type="button" data-lesson-pack="debate">Friendly debate</button>
+          <button class="secondary-btn lesson-pack-btn" type="button" data-lesson-pack="travel">Travel survival</button>
+        </div>
         <div class="mobile-home-actions">
           <button id="mobile-continue-chat-btn" class="secondary-btn" type="button">Start chat</button>
           <button id="mobile-start-call-btn" class="secondary-btn" type="button">Start call</button>
@@ -82,9 +89,25 @@
           <button id="main-phone-test-btn" class="secondary-btn" type="button">Test phone setup</button>
         </div>
       </section>
+      <section id="home-continue-card" class="card continue-card hidden">
+        <div>
+          <p class="section-label">Continue</p>
+          <h3 id="home-continue-title">Pick up where you left off</h3>
+          <p id="home-continue-detail" class="sentence-meta">Your next useful action will appear here.</p>
+        </div>
+        <div class="actions">
+          <button id="home-continue-primary-btn" class="primary-btn" type="button">Continue</button>
+          <button id="home-continue-secondary-btn" class="secondary-btn" type="button">Review today</button>
+        </div>
+      </section>
     </section>
 
     <section id="generator-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Practice builder</p>
+      <h2>Build sentences and dialogue practice</h2>
+      <p class="sentence-meta">Generate focused sentences, make batches, or open the dialogue generator for longer practice.</p>
+    </div>
     <section class="card controls-card">
       <div id="install-banner" class="install-banner hidden">
         <div>
@@ -170,10 +193,19 @@
         </div>
         <div class="actions">
           <button id="generate-batch-btn" class="secondary-btn">Generate batch</button>
-          <button id="download-batch-pdf-btn" class="secondary-btn advanced-only">Download batch PDF</button>
-          <button id="download-batch-mp3-btn" class="secondary-btn advanced-only">Download batch MP3</button>
+          <button id="download-batch-pdf-btn" class="secondary-btn advanced-only hidden">Download batch PDF</button>
+          <button id="download-batch-mp3-btn" class="secondary-btn advanced-only hidden">Download batch MP3</button>
         </div>
       </div>
+    </section>
+
+    <section class="card linked-tool-card generator-dialogue-link">
+      <div>
+        <p class="section-label">Dialogue generator</p>
+        <h4>Create a full practice conversation</h4>
+        <p class="sentence-meta">Generate a topic-based dialogue beside your sentence tools, then play it, save it, export it, or add useful lines to a playlist.</p>
+      </div>
+      <button class="secondary-btn" type="button" data-home-page-target="dialogue-page">Open dialogue generator</button>
     </section>
 
     <section class="card practice-stats-card advanced-only" aria-label="Today's practice progress">
@@ -260,6 +292,17 @@
         </div>
       </div>
       <div id="batch-mp3-panel" class="media-player-panel batch-mp3-panel hidden">
+        <div class="media-player-options">
+          <label for="batch-speed-select">Speed</label>
+          <select id="batch-speed-select" class="media-speed-select">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+          <button id="batch-loop-btn" class="secondary-btn media-loop-btn" type="button" aria-pressed="false">Loop off</button>
+        </div>
         <audio id="batch-mp3-player" class="full-conversation-audio-player" controls preload="metadata"></audio>
         <a id="batch-mp3-link" class="secondary-btn batch-mp3-link hidden" href="#" download>Save MP3</a>
       </div>
@@ -279,6 +322,11 @@
     </section>
 
     <section id="review-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Today</p>
+      <h2>One review queue for everything due</h2>
+      <p class="sentence-meta">Words, sentence recall, recurring mistakes, recent corrections, and playlist practice all feed this session.</p>
+    </div>
     <section class="card review-card">
       <div class="favourites-header">
         <div>
@@ -286,7 +334,7 @@
           <h3>Practice dashboard</h3>
         </div>
       </div>
-      <p id="daily-review-summary" class="sentence-meta">Build a mixed session from words, recall, and playlists.</p>
+      <p id="daily-review-summary" class="sentence-meta">Start a mixed session from words, recall, corrections, and playlists.</p>
       <div id="today-dashboard" class="today-dashboard">
         <div class="today-tile">
           <span id="today-words-due">0</span>
@@ -316,8 +364,26 @@
           <span id="today-week-spoken">0</span>
           <p>Spoken this week</p>
         </div>
+        <div class="today-tile">
+          <span id="today-week-saved">0</span>
+          <p>Saved this week</p>
+        </div>
+        <div class="today-tile">
+          <span id="today-call-minutes">0</span>
+          <p>Call minutes today</p>
+        </div>
       </div>
       <p id="today-suggestion" class="sentence-meta">Build a queue to start today&apos;s work.</p>
+      <div class="mistake-pattern-panel">
+        <div class="favourites-header compact-header">
+          <div>
+            <p class="section-label">Mistakes I keep making</p>
+            <h3>Recurring fixes</h3>
+          </div>
+          <button id="start-mistake-review-btn" class="secondary-btn" type="button">Review fixes</button>
+        </div>
+        <ul id="mistake-pattern-list" class="deep-review-list"></ul>
+      </div>
       <div class="language-dashboard-panel">
         <div class="favourites-header compact-header">
           <div>
@@ -327,12 +393,12 @@
         </div>
         <div id="language-dashboard-grid" class="language-dashboard-grid"></div>
       </div>
-      <div class="actions">
-        <button id="build-daily-review-btn" class="secondary-btn">Build today&apos;s queue</button>
-        <button id="build-smart-review-btn" class="secondary-btn">Smart 10-minute session</button>
-        <button id="start-daily-review-btn" class="secondary-btn">Start review</button>
-        <button id="next-daily-review-btn" class="secondary-btn">Next item</button>
+      <div class="actions unified-review-actions">
+        <button id="start-daily-review-btn" class="primary-btn">Start today&apos;s review</button>
         <button id="play-daily-review-btn" class="secondary-btn">Play item</button>
+        <button id="next-daily-review-btn" class="secondary-btn">Next item</button>
+        <button id="build-smart-review-btn" class="secondary-btn">Rebuild smart queue</button>
+        <button id="build-daily-review-btn" class="secondary-btn quiet-action">Basic queue</button>
       </div>
       <div id="daily-review-card" class="daily-review-card">
         <p class="empty-message">Press Build today&apos;s queue to start a focused practice session.</p>
@@ -341,6 +407,11 @@
     </section>
 
     <section id="library-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Library</p>
+      <h2>Find saved practice</h2>
+      <p class="sentence-meta">Search and filter saved conversations, generated sets, dialogues, playlists, review sentences, and words.</p>
+    </div>
     <section class="card library-hub-card">
       <div class="favourites-header">
         <div>
@@ -350,11 +421,22 @@
       </div>
       <p class="sentence-meta">Use this as the home for saved sets, dialogues, conversations, playlists, review sentences, and vocabulary.</p>
       <input id="global-library-search-input" class="favourites-search" type="search" placeholder="Search library from here">
+      <div class="library-tabs" aria-label="Library filters">
+        <button class="secondary-btn library-tab-btn active" type="button" data-library-filter="all">All</button>
+        <button class="secondary-btn library-tab-btn" type="button" data-library-filter="practice">Practice</button>
+        <button class="secondary-btn library-tab-btn" type="button" data-library-filter="audio">Audio</button>
+        <button class="secondary-btn library-tab-btn" type="button" data-library-filter="review">Review</button>
+      </div>
       <div id="library-hub-grid" class="library-hub-grid"></div>
     </section>
     </section>
 
     <section id="recall-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Sentence review</p>
+      <h2>Recall full sentences</h2>
+      <p class="sentence-meta">Practise sentences you saved from chats, generators, dialogues, and playlists.</p>
+    </div>
     <section class="card favourites-card">
       <div class="favourites-header">
         <div>
@@ -375,6 +457,11 @@
     </section>
 
     <section id="words-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Vocabulary</p>
+      <h2>Review saved words</h2>
+      <p class="sentence-meta">Save words from any practice text and review them with example sentences.</p>
+    </div>
     <section class="card favourites-card">
       <div class="favourites-header">
         <div>
@@ -419,6 +506,11 @@
     </section>
 
     <section id="custom-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Translator</p>
+      <h2>Turn your sentence into natural language</h2>
+      <p class="sentence-meta">Write your own sentence and get a more native version with audio and playlist actions.</p>
+    </div>
     <section class="card custom-card">
       <div class="favourites-header">
         <div>
@@ -466,7 +558,8 @@
 
       <div class="actions">
         <button id="translate-custom-btn" class="secondary-btn">Translate to Spanish</button>
-        <button id="add-custom-to-playlist-btn" class="secondary-btn advanced-only">Add translated sentence to playlist</button>
+        <button id="play-custom-sentence-btn" class="secondary-btn" type="button">Play audio</button>
+        <button id="add-custom-to-playlist-btn" class="secondary-btn" type="button">Add to playlist</button>
       </div>
 
       <div id="custom-result-card" class="custom-result-card hidden">
@@ -481,6 +574,11 @@
     </section>
 
     <section id="dialogue-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Dialogue generator</p>
+      <h2>Create a practice conversation</h2>
+      <p class="sentence-meta">Choose a topic, generate a dialogue, then listen, export, save, or add useful lines to playlists.</p>
+    </div>
     <section class="card dialogue-card">
       <div class="favourites-header">
         <div>
@@ -538,10 +636,10 @@
 
       <div class="actions chat-save-actions">
         <button id="generate-dialogue-btn" class="secondary-btn">Generate dialogue</button>
-        <button id="download-dialogue-pdf-btn" class="secondary-btn advanced-only">Download PDF</button>
+        <button id="download-dialogue-pdf-btn" class="secondary-btn advanced-only hidden">Download PDF</button>
         <button id="play-dialogue-btn" class="secondary-btn">Open player</button>
         <button id="stop-dialogue-btn" class="secondary-btn hidden">Stop dialogue</button>
-        <button id="download-dialogue-mp3-btn" class="secondary-btn advanced-only">Download MP3</button>
+        <button id="download-dialogue-mp3-btn" class="secondary-btn advanced-only hidden">Download MP3</button>
         <button id="clear-dialogue-btn" class="secondary-btn advanced-only">Clear</button>
       </div>
 
@@ -549,8 +647,20 @@
         <button id="previous-dialogue-btn" class="secondary-btn">Back 15s</button>
         <button id="pause-dialogue-btn" class="secondary-btn">Pause</button>
         <button id="next-dialogue-btn" class="secondary-btn">Forward 15s</button>
+        <div class="media-player-options">
+          <label for="dialogue-speed-select">Speed</label>
+          <select id="dialogue-speed-select" class="media-speed-select">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+          <button id="dialogue-loop-btn" class="secondary-btn media-loop-btn" type="button" aria-pressed="false">Loop off</button>
+        </div>
         <span id="dialogue-playback-progress" class="conversation-playback-progress">Not playing</span>
         <audio id="dialogue-audio-player" class="full-conversation-audio-player" controls preload="metadata"></audio>
+        <a id="dialogue-mp3-link" class="secondary-btn batch-mp3-link hidden" href="#" download>Save MP3</a>
       </div>
 
       <p id="dialogue-status" class="sentence-meta">Choose a topic and generate a natural Spain-Spanish dialogue.</p>
@@ -571,21 +681,17 @@
     </section>
 
     <section id="chat-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Chat &amp; Call</p>
+      <h2>Practise real conversation</h2>
+      <p class="sentence-meta">Choose a topic, style, and goal, then chat or call with native rewrites and review tools.</p>
+    </div>
     <section class="card chat-card">
       <div class="favourites-header">
         <div>
           <p class="section-label">Conversation</p>
           <h3 id="chat-title">Spanish chat coach</h3>
         </div>
-      </div>
-
-      <div class="linked-tool-card">
-        <div>
-          <p class="section-label">Dialogue practice</p>
-          <h4>Generate a full practice conversation</h4>
-          <p class="sentence-meta">Create a topic-based dialogue, then play it, save it, export it, or add useful lines to a playlist.</p>
-        </div>
-        <button class="secondary-btn" type="button" data-home-page-target="dialogue-page">Open dialogue generator</button>
       </div>
 
       <div class="radio-grid">
@@ -619,7 +725,8 @@
           <select id="chat-scenario">
             <option value="casual">Casual conversation</option>
             <option value="catch-up">Catching up with a friend</option>
-            <option value="roleplay">Real-life roleplay</option>
+            <option value="roleplay">Role play mode</option>
+            <option value="debate">Debate mode</option>
             <option value="opinions">Opinions and preferences</option>
             <option value="story">Tell me about your day</option>
             <option value="quick-fire">Quick questions</option>
@@ -717,6 +824,7 @@
           </div>
         </div>
         <ul id="call-summary-phrases" class="deep-review-list"></ul>
+        <p id="call-summary-next-step" class="sentence-meta">Your next step will appear here.</p>
         <div class="actions">
           <button id="call-summary-review-btn" class="secondary-btn" type="button">In-depth review</button>
           <button id="call-summary-save-btn" class="secondary-btn" type="button">Save conversation</button>
@@ -734,8 +842,8 @@
           <summary>More</summary>
           <div class="action-menu-panel">
             <button id="speak-chat-reply-btn" class="secondary-btn">Speak last reply</button>
-            <button id="download-chat-pdf-btn" class="secondary-btn">PDF</button>
-            <button id="download-chat-mp3s-btn" class="secondary-btn">MP3</button>
+            <button id="download-chat-pdf-btn" class="secondary-btn hidden">PDF</button>
+            <button id="download-chat-mp3s-btn" class="secondary-btn hidden">MP3</button>
             <button id="deep-review-conversation-btn" class="secondary-btn">Deep review</button>
             <button id="add-full-chat-to-playlist-btn" class="secondary-btn">Add full conversation to playlist</button>
             <button id="use-chat-reply-btn" class="secondary-btn advanced-only">Use best version as sentence</button>
@@ -747,6 +855,17 @@
         <button id="previous-conversation-turn-btn" class="secondary-btn">Back 15s</button>
         <button id="pause-conversation-btn" class="secondary-btn">Pause</button>
         <button id="next-conversation-turn-btn" class="secondary-btn">Forward 15s</button>
+        <div class="media-player-options">
+          <label for="conversation-speed-select">Speed</label>
+          <select id="conversation-speed-select" class="media-speed-select">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+          <button id="conversation-loop-btn" class="secondary-btn media-loop-btn" type="button" aria-pressed="false">Loop off</button>
+        </div>
         <span id="conversation-playback-progress" class="conversation-playback-progress">Not playing</span>
         <audio id="full-conversation-audio-player" class="full-conversation-audio-player" controls preload="metadata"></audio>
         <a id="conversation-mp3-link" class="secondary-btn batch-mp3-link hidden" href="#" download>Save MP3</a>
@@ -825,6 +944,11 @@
     </section>
 
     <section id="radio-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Audio</p>
+      <h2>Listen to playlists and saved sets</h2>
+      <p class="sentence-meta">Play sentences, start from any point, loop tracks, shadow with pauses, or download full MP3s.</p>
+    </div>
     <section class="card radio-card">
       <div class="favourites-header">
         <div>
@@ -881,7 +1005,7 @@
         <button id="add-current-to-playlist-btn" class="secondary-btn">Add current sentence</button>
         <button id="play-radio-btn" class="secondary-btn">Start playlist</button>
         <button id="stop-radio-btn" class="secondary-btn">Stop playlist</button>
-        <button id="download-playlist-mp3-btn" class="secondary-btn advanced-only">Download playlist MP3</button>
+        <button id="download-playlist-mp3-btn" class="secondary-btn advanced-only hidden">Download playlist MP3</button>
         <button id="delete-playlist-btn" class="secondary-btn advanced-only">Delete playlist</button>
         <button id="export-practice-btn" class="secondary-btn advanced-only">Export practice backup</button>
         <button id="restore-backup-btn" class="secondary-btn advanced-only" type="button">Restore backup</button>
@@ -893,9 +1017,31 @@
         <button id="previous-radio-btn" class="secondary-btn">Previous</button>
         <button id="pause-radio-btn" class="secondary-btn">Pause</button>
         <button id="next-radio-btn" class="secondary-btn">Next</button>
+        <div class="media-player-options">
+          <label for="radio-speed-select">Speed</label>
+          <select id="radio-speed-select" class="media-speed-select">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+          <button id="radio-loop-btn" class="secondary-btn media-loop-btn" type="button" aria-pressed="false">Loop off</button>
+        </div>
         <span id="radio-playback-progress" class="conversation-playback-progress">Not playing</span>
       </div>
       <div id="playlist-mp3-panel" class="media-player-panel batch-mp3-panel hidden">
+        <div class="media-player-options">
+          <label for="playlist-speed-select">Speed</label>
+          <select id="playlist-speed-select" class="media-speed-select">
+            <option value="0.75">0.75x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.25">1.25x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+          </select>
+          <button id="playlist-loop-btn" class="secondary-btn media-loop-btn" type="button" aria-pressed="false">Loop off</button>
+        </div>
         <audio id="playlist-mp3-player" class="full-conversation-audio-player" controls preload="metadata"></audio>
         <a id="playlist-mp3-link" class="secondary-btn batch-mp3-link hidden" href="#" download>Save MP3</a>
       </div>
@@ -905,6 +1051,11 @@
     </section>
 
     <section id="settings-page" class="app-page">
+    <div class="page-intro">
+      <p class="section-label">Settings</p>
+      <h2>Control language, voice, display, and backups</h2>
+      <p class="sentence-meta">Use this page for setup, voice testing, import/export, and phone diagnostics.</p>
+    </div>
     <section class="card settings-card">
       <div class="favourites-header">
         <div>
@@ -932,6 +1083,8 @@
               <select id="spanish-voice-select">
                 <option value="primary">Primary voice</option>
                 <option value="alternative">Alternative voice</option>
+                <option value="english-mlso">English male voice - MLSO</option>
+                <option value="english-female-lcmy">English female voice - lcMy</option>
               </select>
             </div>
             <button id="test-voice-btn" class="secondary-btn voice-test-btn" type="button">Test voice</button>
@@ -1004,16 +1157,42 @@
       <strong id="now-playing-title">Audio</strong>
       <span id="now-playing-detail">Preparing audio...</span>
     </div>
+    <select id="queue-speed-select" class="media-speed-select" aria-label="Playback speed">
+      <option value="0.75">0.75x</option>
+      <option value="1" selected>1x</option>
+      <option value="1.25">1.25x</option>
+      <option value="1.5">1.5x</option>
+      <option value="2">2x</option>
+    </select>
+    <button id="queue-loop-btn" class="secondary-btn media-loop-btn" type="button" aria-pressed="false">Loop off</button>
+    <button id="queue-prev-btn" class="secondary-btn" type="button">Previous</button>
+    <button id="queue-next-btn" class="secondary-btn" type="button">Next</button>
+    <button id="queue-toggle-btn" class="secondary-btn" type="button">Queue</button>
     <button id="now-playing-stop-btn" class="secondary-btn" type="button">Stop</button>
+  </div>
+
+  <div id="audio-queue-panel" class="audio-queue-panel hidden" aria-live="polite">
+    <div class="favourites-header compact-header">
+      <div>
+        <p class="section-label">Audio queue</p>
+        <h3>Up next</h3>
+      </div>
+      <button id="clear-audio-queue-btn" class="secondary-btn" type="button">Clear</button>
+    </div>
+    <div class="actions">
+      <button id="queue-current-sentence-btn" class="secondary-btn" type="button">Add current sentence</button>
+      <button id="queue-selected-playlist-btn" class="secondary-btn" type="button">Add selected playlist</button>
+    </div>
+    <ol id="audio-queue-list" class="audio-queue-list"></ol>
   </div>
 
   <nav class="mobile-bottom-nav" aria-label="Phone shortcuts">
     <button type="button" data-mobile-nav-page="home-page">Home</button>
     <button type="button" data-mobile-nav-page="chat-page">Talk</button>
-    <button type="button" data-mobile-nav-page="generator-page">Practice</button>
+    <button type="button" data-mobile-nav-page="generator-page">Generate</button>
     <button type="button" data-mobile-nav-page="review-page">Review</button>
   </nav>
 
-  <script src="script.js?v=81"></script>
+  <script src="script.js?v=98"></script>
 </body>
 </html>
