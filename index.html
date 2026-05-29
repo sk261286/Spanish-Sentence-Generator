@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=77">
+  <link rel="stylesheet" href="style.css?v=85">
 </head>
 <body>
   <main class="app">
@@ -499,6 +499,7 @@
         <div class="actions">
           <button id="word-detail-play-btn" class="secondary-btn" type="button">Play example</button>
           <button id="word-detail-examples-btn" class="secondary-btn" type="button">Generate 5 examples</button>
+          <button id="word-detail-review-btn" class="secondary-btn" type="button">Review in context</button>
         </div>
         <ul id="word-detail-examples-list" class="favourites-list"></ul>
       </div>
@@ -700,21 +701,26 @@
           <input id="chat-name-input" type="text" placeholder="For example: Gym chat May 10">
         </div>
 
-        <div class="field">
-          <label for="chat-topic">Chat topic</label>
-          <select id="chat-topic">
-            <option value="daily life">Daily life</option>
-            <option value="gym/fitness">Gym / fitness</option>
+          <div class="field">
+            <label for="chat-topic">Chat topic</label>
+            <select id="chat-topic">
+              <option value="daily life">Daily life</option>
+              <option value="gym/fitness">Gym / fitness</option>
             <option value="food">Food</option>
             <option value="travel">Travel</option>
             <option value="work">Work</option>
-            <option value="sleep">Sleep</option>
-          </select>
-        </div>
+              <option value="sleep">Sleep</option>
+            </select>
+          </div>
 
-        <div class="field">
-          <label for="chat-tone">Coach style</label>
-          <select id="chat-tone">
+          <div id="debate-topic-field" class="field hidden">
+            <label for="debate-topic-input">Debate topic</label>
+            <input id="debate-topic-input" type="text" placeholder="For example: social media, remote work, school uniforms">
+          </div>
+
+          <div class="field">
+            <label for="chat-tone">Coach style</label>
+            <select id="chat-tone">
             <option value="informal">Informal</option>
             <option value="formal">Formal</option>
           </select>
@@ -1197,6 +1203,6 @@
     <button type="button" data-mobile-nav-page="review-page">Review</button>
   </nav>
 
-  <script src="script.js?v=99"></script>
+  <script src="script.js?v=107"></script>
 </body>
 </html>

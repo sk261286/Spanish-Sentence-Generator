@@ -89,15 +89,16 @@ function hasWrongLanguageMarkers(text, language) {
 }
 
 function getModelForMode(mode, isCallMode = false) {
-  const generationModel = process.env.OPENAI_GENERATION_MODEL || "gpt-5.4-mini";
-  const conversationModel = process.env.OPENAI_CONVERSATION_MODEL || "gpt-5.4";
-  const callModel = process.env.OPENAI_CALL_MODEL || "gpt-5.4-mini";
+  const defaultModel = process.env.OPENAI_MODEL || "gpt-4.1-mini";
+  const generationModel = process.env.OPENAI_GENERATION_MODEL || defaultModel;
+  const conversationModel = process.env.OPENAI_CONVERSATION_MODEL || process.env.OPENAI_REVIEW_MODEL || defaultModel;
+  const callModel = process.env.OPENAI_CALL_MODEL || defaultModel;
 
   if (isCallMode && (mode === "chat" || mode === "chat-opening")) {
     return callModel;
   }
 
-  if (mode === "chat" || mode === "chat-opening" || mode === "custom" || mode === "conversation-review" || mode === "conversation-repair") {
+  if (mode === "chat" || mode === "chat-opening" || mode === "custom" || mode === "conversation-review" || mode === "conversation-review-final" || mode === "conversation-repair") {
     return conversationModel;
   }
 
@@ -184,6 +185,50 @@ function stripCodeFences(text) {
     : text;
 }
 
+function extractJsonText(text) {
+  const cleanedText = stripCodeFences(text || "").trim();
+
+  if (!cleanedText) {
+    return "";
+  }
+
+  if (cleanedText.startsWith("{") || cleanedText.startsWith("[")) {
+    return cleanedText;
+  }
+
+  const objectStart = cleanedText.indexOf("{");
+  const objectEnd = cleanedText.lastIndexOf("}");
+  const arrayStart = cleanedText.indexOf("[");
+  const arrayEnd = cleanedText.lastIndexOf("]");
+
+  if (objectStart !== -1 && objectEnd > objectStart) {
+    return cleanedText.slice(objectStart, objectEnd + 1);
+  }
+
+  if (arrayStart !== -1 && arrayEnd > arrayStart) {
+    return cleanedText.slice(arrayStart, arrayEnd + 1);
+  }
+
+  return cleanedText;
+}
+
+function parseOpenAiJson(rawText) {
+  const jsonText = extractJsonText(rawText);
+
+  try {
+    return JSON.parse(jsonText);
+  } catch (parseError) {
+    console.error("OpenAI language coach returned invalid JSON:", {
+      message: parseError.message,
+      preview: (rawText || "").slice(0, 500)
+    });
+
+    const error = new Error("AI response was not valid JSON.");
+    error.publicMessage = "The AI returned a badly formatted response. Please try the review again.";
+    throw error;
+  }
+}
+
 function hasBannedWords(text) {
   const lowerText = (text || "").toLowerCase();
   return BANNED_WORDS.some((word) => lowerText.includes(word));
@@ -195,6 +240,11 @@ function startsWithOverusedAgreement(text) {
 
 function looksLikeQuestion(text) {
   return /[?¿]\s*$/.test((text || "").trim()) || /^(who|what|where|when|why|how|do|does|did|can|could|would|is|are|am|should|will|shall|que|qué|qui|quoi|où|ou|quando|come|dove|perché|pourquoi|est-ce|cosa)\b/i.test((text || "").trim());
+}
+
+function truncateForPrompt(text, maxLength = 700) {
+  const cleanText = String(text || "").trim();
+  return cleanText.length > maxLength ? `${cleanText.slice(0, maxLength)}...` : cleanText;
 }
 
 async function callOpenAi(apiKey, model, userPrompt) {
@@ -263,7 +313,7 @@ async function callOpenAi(apiKey, model, userPrompt) {
     throw error;
   }
 
-  return JSON.parse(stripCodeFences(rawText));
+  return parseOpenAiJson(rawText);
 }
 
 async function handleCustomMode(apiKey, model, requestBody) {
@@ -613,17 +663,95 @@ Use this JSON shape:
   return { hints };
 }
 
+async function handleWordDetailsMode(apiKey, model, requestBody) {
+  const language = getLanguageProfile(requestBody.targetLanguage);
+  const word = String(requestBody.word || "").trim().slice(0, 80);
+
+  if (!word || !requestBody.spanish) {
+    return { detail: null };
+  }
+
+  const prompt = `
+Create a learner-friendly mini dictionary entry for this ${language.label} word.
+
+Target language: ${language.natural}
+Word: ${word}
+
+Sentence where the learner clicked it:
+${requestBody.spanish}
+
+Full ${language.translationLabel} translation of that sentence:
+${requestBody.english || ""}
+
+Rules:
+- The "contextMeaning" must explain what the word means in this exact sentence.
+- Then include the main common definitions/usages of the word, not only the sentence meaning.
+- Put the sentence meaning first if it is one of the definitions.
+- Include 2 to 6 definitions where useful. Do not invent rare meanings.
+- Include 3 short natural example sentences in ${language.label}, each with a ${language.translationLabel} translation.
+- Include grammar details when useful: verbs should include infinitive/tense/person, nouns should include gender/plural where the language has them, and all words should include register/usage notes when helpful.
+- If the selected target language is not Spanish, do not use Spanish in the target-language examples.
+- Keep explanations concise and clear for a learner.
+- Return JSON only.
+
+Use this JSON shape:
+{
+  "detail": {
+    "word": "${word}",
+    "contextMeaning": "meaning in this exact sentence",
+    "definitions": [
+      {
+        "meaning": "common ${language.translationLabel} definition",
+        "partOfSpeech": "noun / verb / adjective / adverb / phrase / etc",
+        "note": "short learner note, blank if not needed"
+      }
+    ],
+    "grammar": {
+      "partOfSpeech": "noun / verb / adjective / adverb / phrase / etc",
+      "infinitive": "verb infinitive, blank if not a verb",
+      "tense": "tense/form in the clicked sentence, blank if not useful",
+      "person": "person/number in the clicked sentence, blank if not useful",
+      "gender": "noun gender, blank if not relevant",
+      "plural": "plural/singular note, blank if not useful",
+      "register": "formal / informal / neutral / colloquial, blank if not useful",
+      "usageNote": "one short learner note"
+    },
+    "examples": [
+      {
+        "target": "short ${language.label} example sentence",
+        "english": "${language.translationLabel} translation"
+      }
+    ]
+  }
+}
+`.trim();
+
+  const result = await callOpenAi(apiKey, model, prompt);
+  const detail = result.detail || result.wordDetail || result;
+
+  return {
+    detail: {
+      word: detail.word || word,
+      contextMeaning: detail.contextMeaning || "",
+      definitions: Array.isArray(detail.definitions) ? detail.definitions.slice(0, 6) : [],
+      grammar: detail.grammar && typeof detail.grammar === "object" ? detail.grammar : null,
+      examples: Array.isArray(detail.examples) ? detail.examples.slice(0, 4) : []
+    }
+  };
+}
+
 async function handleConversationReviewMode(apiKey, model, requestBody) {
   const language = getLanguageProfile(requestBody.targetLanguage);
   const historyText = Array.isArray(requestBody.history)
     ? requestBody.history
+        .slice(-60)
         .map((item, index) => {
           const role = item.role === "coach" ? "Coach" : item.role === "assistant" ? "Coach" : "Learner";
           const parts = [
-            `${index + 1}. ${role}: ${item.spanish || ""}`,
-            item.english ? `${language.translationLabel}: ${item.english}` : "",
-            item.correctionSpanish ? `Native version: ${item.correctionSpanish}` : "",
-            item.feedback ? `Quick feedback: ${item.feedback}` : ""
+            `${index + 1}. ${role}: ${truncateForPrompt(item.spanish, 700)}`,
+            item.english ? `${language.translationLabel}: ${truncateForPrompt(item.english, 350)}` : "",
+            item.correctionSpanish ? `Native version: ${truncateForPrompt(item.correctionSpanish, 500)}` : "",
+            item.feedback ? `Quick feedback: ${truncateForPrompt(item.feedback, 300)}` : ""
           ].filter(Boolean);
           return parts.join("\n");
         })
@@ -647,6 +775,88 @@ Rules:
 - Focus on repeated learner patterns, natural wording, grammar, fluency, and useful phrases.
 - Keep explanations in ${language.explanationLabel}.
 - Keep target-language examples only in ${language.label}.
+- If the selected language is not Spanish, do not use Spanish.
+- Reply with JSON only.
+
+Use this JSON shape:
+{
+  "review": {
+    "summary": "string",
+    "strengths": ["string"],
+    "mainFixes": [
+      {
+        "point": "string",
+        "fix": "string",
+        "explanation": "string"
+      }
+    ],
+    "naturalPhrases": [
+      {
+        "phrase": "string",
+        "english": "string",
+        "note": "string"
+      }
+    ],
+    "patterns": ["string"],
+    "drills": ["string"],
+    "nextGoal": "string"
+  }
+}
+`.trim();
+
+  const result = await callOpenAi(apiKey, model, prompt);
+  return {
+    review: result.review || result
+  };
+}
+
+async function handleConversationReviewFinalMode(apiKey, model, requestBody) {
+  const language = getLanguageProfile(requestBody.targetLanguage);
+  const chunkReviews = Array.isArray(requestBody.chunkReviews)
+    ? requestBody.chunkReviews.slice(0, 12)
+    : [];
+  const reviewText = chunkReviews
+    .map((chunkReview, index) => {
+      const review = chunkReview.review || chunkReview;
+      const mainFixes = Array.isArray(review.mainFixes)
+        ? review.mainFixes.map((item) => `- ${item.point || ""}: ${item.fix || ""} (${item.explanation || ""})`).join("\n")
+        : "";
+      const phrases = Array.isArray(review.naturalPhrases)
+        ? review.naturalPhrases.map((item) => `- ${item.phrase || ""}: ${item.english || ""} (${item.note || ""})`).join("\n")
+        : "";
+      return `
+Section ${index + 1}
+Summary: ${review.summary || ""}
+Strengths: ${Array.isArray(review.strengths) ? review.strengths.join("; ") : ""}
+Main fixes:
+${mainFixes}
+Natural phrases:
+${phrases}
+Patterns: ${Array.isArray(review.patterns) ? review.patterns.join("; ") : ""}
+Drills: ${Array.isArray(review.drills) ? review.drills.join("; ") : ""}
+Next goal: ${review.nextGoal || ""}
+`.trim();
+    })
+    .join("\n\n");
+
+  const prompt = `
+Combine these section reviews into one advanced, detailed review of the full ${language.label} learning conversation.
+
+Target language: ${language.natural}
+Topic: ${requestBody.topic || "general conversation"}
+Tone: ${requestBody.tone || "informal"}
+Practice goal: ${requestBody.goal || "natural-flow"}
+
+Section reviews:
+${reviewText || "No section reviews provided."}
+
+Rules:
+- Synthesize across the whole conversation, not just the final section.
+- Prioritise repeated patterns and the highest-value fixes.
+- Remove duplicates from the section reviews.
+- Keep explanations in ${language.explanationLabel}.
+- Keep target-language examples only in ${language.label}.
+- Include concrete phrases the learner can reuse.
 - If the selected language is not Spanish, do not use Spanish.
 - Reply with JSON only.
 
@@ -891,9 +1101,13 @@ async function handler(event) {
       result = await handleChatMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "word-hints") {
       result = await handleWordHintsMode(apiKey, model, requestBody);
-    } else if (requestBody.mode === "conversation-review") {
-      result = await handleConversationReviewMode(apiKey, model, requestBody);
-    } else if (requestBody.mode === "conversation-repair") {
+    } else if (requestBody.mode === "word-details") {
+      result = await handleWordDetailsMode(apiKey, model, requestBody);
+      } else if (requestBody.mode === "conversation-review") {
+        result = await handleConversationReviewMode(apiKey, model, requestBody);
+      } else if (requestBody.mode === "conversation-review-final") {
+        result = await handleConversationReviewFinalMode(apiKey, model, requestBody);
+      } else if (requestBody.mode === "conversation-repair") {
       result = await handleConversationRepairMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "word-examples") {
       result = await handleWordExamplesMode(apiKey, model, requestBody);

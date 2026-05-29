@@ -1612,6 +1612,7 @@ const wordDetailExample = document.getElementById("word-detail-example");
 const wordDetailHistory = document.getElementById("word-detail-history");
 const wordDetailPlayBtn = document.getElementById("word-detail-play-btn");
 const wordDetailExamplesBtn = document.getElementById("word-detail-examples-btn");
+const wordDetailReviewBtn = document.getElementById("word-detail-review-btn");
 const wordDetailExamplesList = document.getElementById("word-detail-examples-list");
 const closeWordDetailBtn = document.getElementById("close-word-detail-btn");
 const dailyReviewSummary = document.getElementById("daily-review-summary");
@@ -1726,6 +1727,8 @@ const videoWordHint = document.getElementById("video-word-hint");
 const chatTitle = document.getElementById("chat-title");
 const chatNameInput = document.getElementById("chat-name-input");
 const chatTopicSelect = document.getElementById("chat-topic");
+const debateTopicField = document.getElementById("debate-topic-field");
+const debateTopicInput = document.getElementById("debate-topic-input");
 const chatToneSelect = document.getElementById("chat-tone");
 const chatScenarioSelect = document.getElementById("chat-scenario");
 const chatPersonalitySelect = document.getElementById("chat-personality");
@@ -1906,6 +1909,7 @@ let dialogueMp3ObjectUrl = "";
 let wordHintRequestId = 0;
 let activeWordActionPanel = null;
 let aiWordHintCache = JSON.parse(localStorage.getItem("spanishSentenceAiWordHints")) || {};
+let aiWordDetailCache = JSON.parse(localStorage.getItem("languageCoachAiWordDetails")) || {};
 let chatTimerInterval = null;
 let fullConversationPlayback = {
   isPlaying: false,
@@ -2426,6 +2430,26 @@ function getChatScenarioInstruction(scenario = chatScenarioSelect.value) {
   return instructions[scenario] || instructions.casual;
 }
 
+function getSelectedChatTopic() {
+  const presetTopic = chatTopicSelect?.value || "daily life";
+  const manualDebateTopic = debateTopicInput?.value.trim() || "";
+
+  if (chatScenarioSelect?.value === "debate" && manualDebateTopic) {
+    return manualDebateTopic;
+  }
+
+  return presetTopic;
+}
+
+function updateDebateTopicVisibility() {
+  if (!debateTopicField || !chatScenarioSelect) {
+    return;
+  }
+
+  const isDebateMode = chatScenarioSelect.value === "debate";
+  debateTopicField.classList.toggle("hidden", !isDebateMode);
+}
+
 // This helper returns the visible label for the selected AI personality.
 function getChatPersonalityLabel(personality = chatPersonalitySelect.value) {
   const labels = {
@@ -2718,6 +2742,9 @@ function withWordSchedule(wordCard) {
     meaning: wordCard.meaning || "",
     exampleSpanish: wordCard.exampleSpanish || "",
     exampleEnglish: wordCard.exampleEnglish || "",
+    definitions: Array.isArray(wordCard.definitions) ? wordCard.definitions : [],
+    grammar: wordCard.grammar && typeof wordCard.grammar === "object" ? wordCard.grammar : null,
+    contextMeaning: wordCard.contextMeaning || wordCard.meaning || "",
     source: wordCard.source || "sentence",
     createdAt: wordCard.createdAt || nowText,
     lastReviewedAt: wordCard.lastReviewedAt || "",
@@ -2782,13 +2809,25 @@ function saveWordFromElement(wordElement, source = "sentence") {
     exampleEnglish: example.english || "",
     source
   });
+  const detailCacheKey = getWordDetailCacheKey(cleanWord, example);
+  const cachedDetail = aiWordDetailCache[detailCacheKey];
+
+  if (cachedDetail) {
+    wordCard.contextMeaning = cachedDetail.contextMeaning || wordCard.meaning;
+    wordCard.meaning = wordCard.meaning || cachedDetail.contextMeaning || "";
+    wordCard.definitions = Array.isArray(cachedDetail.definitions) ? cachedDetail.definitions : [];
+    wordCard.grammar = cachedDetail.grammar && typeof cachedDetail.grammar === "object" ? cachedDetail.grammar : null;
+  }
 
   if (existingIndex >= 0) {
     savedWords[existingIndex] = {
       ...withWordSchedule(savedWords[existingIndex]),
       meaning: wordCard.meaning || withWordSchedule(savedWords[existingIndex]).meaning,
       exampleSpanish: wordCard.exampleSpanish || withWordSchedule(savedWords[existingIndex]).exampleSpanish,
-      exampleEnglish: wordCard.exampleEnglish || withWordSchedule(savedWords[existingIndex]).exampleEnglish
+      exampleEnglish: wordCard.exampleEnglish || withWordSchedule(savedWords[existingIndex]).exampleEnglish,
+      definitions: wordCard.definitions?.length ? wordCard.definitions : withWordSchedule(savedWords[existingIndex]).definitions,
+      grammar: wordCard.grammar || withWordSchedule(savedWords[existingIndex]).grammar,
+      contextMeaning: wordCard.contextMeaning || withWordSchedule(savedWords[existingIndex]).contextMeaning
     };
     showStatusMessage(`Updated saved word: ${wordCard.word}.`);
   } else {
@@ -2805,37 +2844,199 @@ function isPlaceholderWordHint(hint) {
   return !hint || hint === "Hint coming soon" || hint.endsWith("hint not added yet") || hint.startsWith("Loading ");
 }
 
+function saveAiWordDetailCache() {
+  const cacheEntries = Object.entries(aiWordDetailCache).slice(-80);
+  aiWordDetailCache = Object.fromEntries(cacheEntries);
+  localStorage.setItem("languageCoachAiWordDetails", JSON.stringify(aiWordDetailCache));
+}
+
+function getWordDetailCacheKey(cleanWord, example) {
+  return [
+    targetLanguage,
+    cleanWord,
+    normaliseSentenceForSimilarity(example?.spanish || "")
+  ].join(":");
+}
+
+function renderWordDetailList(parent, titleText, items, renderItem) {
+  if (!items.length) {
+    return;
+  }
+
+  const section = document.createElement("div");
+  const title = document.createElement("p");
+  const list = document.createElement("ul");
+
+  section.className = "word-detail-section";
+  title.className = "word-detail-section-title";
+  list.className = "word-detail-list";
+  title.textContent = titleText;
+
+  items.forEach((item) => {
+    const listItem = document.createElement("li");
+    renderItem(listItem, item);
+    list.appendChild(listItem);
+  });
+
+  section.appendChild(title);
+  section.appendChild(list);
+  parent.appendChild(section);
+}
+
+function renderClickedWordDetails(meaningElement, detail, fallbackHint = "") {
+  const language = getTargetLanguageProfile();
+  const definitions = Array.isArray(detail?.definitions) ? detail.definitions.slice(0, 6) : [];
+  const examples = Array.isArray(detail?.examples) ? detail.examples.slice(0, 4) : [];
+  const contextMeaning = detail?.contextMeaning || definitions[0]?.meaning || fallbackHint;
+
+  meaningElement.textContent = "";
+
+  const contextBlock = document.createElement("div");
+  const contextLabel = document.createElement("p");
+  const contextText = document.createElement("p");
+  contextBlock.className = "word-detail-section";
+  contextLabel.className = "word-detail-section-title";
+  contextText.className = "word-detail-context";
+  contextLabel.textContent = "In this sentence";
+  contextText.textContent = contextMeaning || `No ${language.translationLabel} meaning returned yet.`;
+  contextBlock.appendChild(contextLabel);
+  contextBlock.appendChild(contextText);
+  meaningElement.appendChild(contextBlock);
+
+  renderWordGrammarSummary(meaningElement, detail?.grammar);
+
+  renderWordDetailList(meaningElement, "Common meanings", definitions, (listItem, item) => {
+    const meaning = document.createElement("span");
+    const meta = document.createElement("span");
+    meaning.textContent = item.meaning || "";
+    meta.className = "word-detail-meta";
+    meta.textContent = [item.partOfSpeech, item.note].filter(Boolean).join(" - ");
+    listItem.appendChild(meaning);
+    if (meta.textContent) {
+      listItem.appendChild(meta);
+    }
+  });
+
+  renderWordDetailList(meaningElement, "Examples", examples, (listItem, item) => {
+    const targetText = document.createElement("span");
+    const supportText = document.createElement("span");
+    targetText.className = "word-detail-example-target";
+    supportText.className = "word-detail-meta";
+    targetText.textContent = item.target || item.spanish || "";
+    supportText.textContent = item.english || item.translation || "";
+    listItem.appendChild(targetText);
+    if (supportText.textContent) {
+      listItem.appendChild(supportText);
+    }
+  });
+}
+
+function getWordGrammarFacts(grammar) {
+  if (!grammar || typeof grammar !== "object") {
+    return [];
+  }
+
+  return [
+    ["Part of speech", grammar.partOfSpeech],
+    ["Infinitive", grammar.infinitive],
+    ["Tense", grammar.tense],
+    ["Person", grammar.person],
+    ["Noun gender", grammar.gender],
+    ["Plural", grammar.plural],
+    ["Register", grammar.register],
+    ["Usage", grammar.usageNote]
+  ].filter(([, value]) => value);
+}
+
+function renderWordGrammarSummary(parent, grammar) {
+  const facts = getWordGrammarFacts(grammar);
+
+  if (!facts.length) {
+    return;
+  }
+
+  const section = document.createElement("div");
+  const title = document.createElement("p");
+  const grid = document.createElement("div");
+
+  section.className = "word-detail-section";
+  title.className = "word-detail-section-title";
+  grid.className = "word-grammar-grid";
+  title.textContent = "Grammar";
+
+  facts.forEach(([label, value]) => {
+    const chip = document.createElement("span");
+    chip.className = "word-grammar-chip";
+    chip.textContent = `${label}: ${value}`;
+    grid.appendChild(chip);
+  });
+
+  section.appendChild(title);
+  section.appendChild(grid);
+  parent.appendChild(section);
+}
+
 async function improveClickedWordHint(wordElement, meaningElement) {
   const currentHint = wordElement.getAttribute("data-translation") || "";
   const example = getWordExampleFromElement(wordElement);
   const cleanWord = normaliseWord(wordElement.textContent || "");
+  const displayWord = wordElement.textContent.trim().replace(/[.,!?¿¡;:]+$/g, "");
 
-  if (!cleanWord || !isPlaceholderWordHint(currentHint) || !example.spanish) {
+  if (!cleanWord || !example.spanish) {
     return;
   }
 
-  meaningElement.textContent = "Finding a better hint...";
+  const cacheKey = getWordDetailCacheKey(cleanWord, example);
+
+  if (aiWordDetailCache[cacheKey]) {
+    const cachedDetail = aiWordDetailCache[cacheKey];
+    if (cachedDetail.contextMeaning) {
+      wordElement.setAttribute("data-translation", cachedDetail.contextMeaning);
+    }
+    renderClickedWordDetails(meaningElement, cachedDetail, currentHint);
+    return;
+  }
+
+  meaningElement.textContent = "Loading definitions and examples...";
 
   try {
     const responseData = await callAiLanguageCoach({
-      mode: "word-hints",
+      mode: "word-details",
       targetLanguage,
       spanish: example.spanish,
       english: example.english || "",
-      words: [wordElement.textContent.trim().replace(/[.,!?¿¡;:]+$/g, "")]
+      word: displayWord
     });
-    const hints = responseData.hints || {};
-    const hint = hints[cleanWord] || hints[wordElement.textContent.trim()] || Object.values(hints)[0];
+    const detail = responseData.detail || responseData.wordDetail || {};
+    const firstDefinition = Array.isArray(detail.definitions) ? detail.definitions[0] : null;
+    const contextMeaning = detail.contextMeaning || firstDefinition?.meaning || "";
 
-    if (!hint) {
-      meaningElement.textContent = "No hint returned yet.";
+    if (!contextMeaning && !Array.isArray(detail.definitions)) {
+      meaningElement.textContent = currentHint && !isPlaceholderWordHint(currentHint)
+        ? currentHint
+        : "No definitions returned yet.";
       return;
     }
 
-    wordElement.setAttribute("data-translation", hint);
-    meaningElement.textContent = hint;
+  const normalisedDetail = {
+      word: detail.word || displayWord,
+      contextMeaning,
+      definitions: Array.isArray(detail.definitions) ? detail.definitions : [],
+      grammar: detail.grammar && typeof detail.grammar === "object" ? detail.grammar : null,
+      examples: Array.isArray(detail.examples) ? detail.examples : []
+    };
+
+    if (contextMeaning) {
+      wordElement.setAttribute("data-translation", contextMeaning);
+    }
+
+    aiWordDetailCache[cacheKey] = normalisedDetail;
+    saveAiWordDetailCache();
+    renderClickedWordDetails(meaningElement, normalisedDetail, currentHint);
   } catch (error) {
-    meaningElement.textContent = "No hint available yet. You can still save the word with its example.";
+    meaningElement.textContent = currentHint && !isPlaceholderWordHint(currentHint)
+      ? currentHint
+      : "No definitions available yet. You can still save the word with its example.";
   }
 }
 
@@ -2867,7 +3068,7 @@ function showWordActionPanel(wordElement, source = "sentence") {
   const header = document.createElement("div");
   const title = document.createElement("p");
   const closeButton = document.createElement("button");
-  const meaning = document.createElement("p");
+  const meaning = document.createElement("div");
   const exampleText = document.createElement("p");
   const actions = document.createElement("div");
   const saveButton = document.createElement("button");
@@ -3613,6 +3814,67 @@ function renderDeepConversationReview(review) {
   });
 }
 
+function truncateReviewText(text, maxLength = 700) {
+  const cleanText = String(text || "").trim();
+  return cleanText.length > maxLength ? `${cleanText.slice(0, maxLength)}...` : cleanText;
+}
+
+function buildConversationReviewHistory() {
+  return chatHistory.map((message) => ({
+    role: message.role,
+    spanish: truncateReviewText(message.spanish || message.text || "", 700),
+    english: truncateReviewText(message.english || "", 350),
+    correctionSpanish: truncateReviewText(message.correctionSpanish || "", 500),
+    correctionEnglish: truncateReviewText(message.correctionEnglish || "", 350),
+    feedback: truncateReviewText(message.feedback || "", 300)
+  }));
+}
+
+function chunkReviewHistory(history, chunkSize = 18) {
+  const chunks = [];
+
+  for (let index = 0; index < history.length; index += chunkSize) {
+    chunks.push(history.slice(index, index + chunkSize));
+  }
+
+  return chunks;
+}
+
+async function runChunkedConversationReview(reviewHistory) {
+  const chunks = chunkReviewHistory(reviewHistory);
+  const chunkReviews = [];
+
+  for (let index = 0; index < chunks.length; index += 1) {
+    conversationReviewSummary.textContent = `Reviewing section ${index + 1} of ${chunks.length}...`;
+    chatStatus.textContent = conversationReviewSummary.textContent;
+
+    const responseData = await callAiLanguageCoach({
+      mode: "conversation-review",
+      targetLanguage,
+      topic: getSelectedChatTopic(),
+      tone: chatToneSelect.value,
+      goal: chatGoalSelect.value,
+      history: chunks[index]
+    });
+
+    chunkReviews.push(responseData.review || responseData);
+  }
+
+  conversationReviewSummary.textContent = "Combining section reviews into one full analysis...";
+  chatStatus.textContent = conversationReviewSummary.textContent;
+
+  const finalReview = await callAiLanguageCoach({
+    mode: "conversation-review-final",
+    targetLanguage,
+    topic: getSelectedChatTopic(),
+    tone: chatToneSelect.value,
+    goal: chatGoalSelect.value,
+    chunkReviews
+  });
+
+  return finalReview.review || finalReview;
+}
+
 function showConversationReview() {
   if (!conversationReviewPanel) {
     return;
@@ -3638,23 +3900,19 @@ async function showDeepConversationReview() {
   deepReviewConversationBtn.textContent = "Reviewing...";
 
   try {
-    const responseData = await callAiLanguageCoach({
-      mode: "conversation-review",
-      targetLanguage,
-      topic: chatTopicSelect.value,
-      tone: chatToneSelect.value,
-      goal: chatGoalSelect.value,
-      history: chatHistory.map((message) => ({
-        role: message.role,
-        spanish: message.spanish || message.text || "",
-        english: message.english || "",
-        correctionSpanish: message.correctionSpanish || "",
-        correctionEnglish: message.correctionEnglish || "",
-        feedback: message.feedback || ""
-      }))
-    });
+    const reviewHistory = buildConversationReviewHistory();
+    const reviewResponse = reviewHistory.length > 24
+      ? { review: await runChunkedConversationReview(reviewHistory) }
+      : await callAiLanguageCoach({
+          mode: "conversation-review",
+          targetLanguage,
+          topic: getSelectedChatTopic(),
+          tone: chatToneSelect.value,
+          goal: chatGoalSelect.value,
+          history: reviewHistory
+        });
 
-    renderDeepConversationReview(responseData.review || responseData);
+    renderDeepConversationReview(reviewResponse.review || reviewResponse);
     chatStatus.textContent = "In-depth conversation review ready.";
     conversationReviewPanel.scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (error) {
@@ -3777,7 +4035,9 @@ function buildConversationPlaylistItem() {
       hour: "2-digit",
       minute: "2-digit"
     })}`,
-    topic: chatTopicSelect.value,
+      topic: getSelectedChatTopic(),
+      baseTopic: chatTopicSelect.value,
+      debateTopic: debateTopicInput?.value.trim() || "",
     tone: chatToneSelect.value,
     scenario: chatScenarioSelect.value,
     personality: chatPersonalitySelect.value,
@@ -4484,16 +4744,16 @@ function saveCallPausePreference() {
 function getCallPauseTiming() {
   const timings = {
     fast: {
-      silenceAfterSpeechMs: 1350,
-      recognitionSendDelayMs: 350
-    },
-    normal: {
       silenceAfterSpeechMs: 1900,
       recognitionSendDelayMs: 650
     },
-    thinking: {
-      silenceAfterSpeechMs: 2700,
+    normal: {
+      silenceAfterSpeechMs: 3200,
       recognitionSendDelayMs: 1000
+    },
+    thinking: {
+      silenceAfterSpeechMs: 4800,
+      recognitionSendDelayMs: 1400
     }
   };
 
@@ -5067,7 +5327,7 @@ function setupCallRecognition() {
 
   callRecognition = new SpeechRecognitionClass();
   callRecognition.lang = "en-GB";
-  callRecognition.continuous = false;
+  callRecognition.continuous = true;
   callRecognition.interimResults = true;
   callRecognition.maxAlternatives = 1;
 
@@ -5164,8 +5424,8 @@ async function startRecordedCallListening() {
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   const silenceStartedAt = { value: 0 };
   const pauseTiming = getCallPauseTiming();
-  const maxTurnLengthMs = 20000;
-  const noSpeechTimeoutMs = 9000;
+  const maxTurnLengthMs = 45000;
+  const noSpeechTimeoutMs = 12000;
   const silenceAfterSpeechMs = pauseTiming.silenceAfterSpeechMs;
   const speechThreshold = 0.028;
 
@@ -5273,13 +5533,19 @@ async function startRecordedCallListening() {
       }
 
       if (Date.now() - silenceStartedAt.value > silenceAfterSpeechMs) {
-        setChatStatus("Processing your call turn...");
+        setChatStatus("Processing your call turn after your pause...");
         stopRecorderIfActive();
         return;
       }
     }
 
-    if ((!callHeardSpeech && elapsedMs > noSpeechTimeoutMs) || elapsedMs > maxTurnLengthMs) {
+    if (!callHeardSpeech && elapsedMs > noSpeechTimeoutMs) {
+      stopRecorderIfActive();
+      return;
+    }
+
+    if (elapsedMs > maxTurnLengthMs) {
+      setChatStatus("Processing this longer call turn...");
       stopRecorderIfActive();
       return;
     }
@@ -5359,6 +5625,12 @@ async function startCallMode() {
 
   clearMixedLanguageChatIfNeeded();
 
+  if (chatHistory.length) {
+    saveCurrentConversation({ silent: true });
+    clearActiveChatState();
+    hideConversationReview();
+  }
+
   let shouldWaitForOpeningAudio = false;
   chatAutoSpeakCheckbox.checked = true;
 
@@ -5373,23 +5645,21 @@ async function startCallMode() {
   setChatStatus("Call mode started. Preparing the opening...");
   updateCallFocusLayout();
 
-  if (chatHistory.length === 0) {
-    shouldWaitForOpeningAudio = Boolean(await startChat({
-      fromCall: true,
-      forceSpeakOpening: true,
-      onOpeningSpoken: () => {
-        if (!isCallModeActive) {
-          return;
-        }
-
-        isCallReplying = false;
-        stopCallBargeInMonitor();
-        interruptCallBtn.classList.add("hidden");
-        setChatStatus("Your turn. Speak naturally, then pause.");
-        restartCallListening(300);
+  shouldWaitForOpeningAudio = Boolean(await startChat({
+    fromCall: true,
+    forceSpeakOpening: true,
+    onOpeningSpoken: () => {
+      if (!isCallModeActive) {
+        return;
       }
-    }));
-  }
+
+      isCallReplying = false;
+      stopCallBargeInMonitor();
+      interruptCallBtn.classList.add("hidden");
+      setChatStatus("Your turn. Speak naturally, then pause.");
+      restartCallListening(300);
+    }
+  }));
 
   if (shouldWaitForOpeningAudio) {
     setChatStatus("Call mode started. Speak naturally after the coach finishes.");
@@ -6241,9 +6511,9 @@ function renderChatMessages() {
 
 // This helper builds a simple coach reply based on topic and keywords.
 function buildCoachReply(userMessage) {
-  const topic = chatTopicSelect.value;
+  const topic = getSelectedChatTopic();
   const tone = chatToneSelect.value;
-  const promptGroup = chatPrompts[topic][tone];
+  const promptGroup = chatPrompts[chatTopicSelect.value][tone];
   const lowerMessage = userMessage.toLowerCase();
 
   if (lowerMessage.includes("hello") || lowerMessage.includes("hola") || lowerMessage.includes("hi")) {
@@ -6285,7 +6555,7 @@ function buildCoachReply(userMessage) {
 
 // This helper creates a more natural offline opening for the selected chat setup.
 function buildLocalChatOpening() {
-  const topic = chatTopicSelect.value;
+  const topic = getSelectedChatTopic();
   const tone = chatToneSelect.value;
   const scenario = chatScenarioSelect.value;
   const informal = tone === "informal";
@@ -6329,7 +6599,7 @@ async function buildAiChatOpening(options = {}) {
     mode: "chat-opening",
     targetLanguage,
     callMode: fromCall,
-    topic: chatTopicSelect.value,
+    topic: getSelectedChatTopic(),
     tone: chatToneSelect.value,
     scenario: chatScenarioSelect.value,
     scenarioInstruction: getChatScenarioInstruction(),
@@ -6442,7 +6712,9 @@ function saveCurrentConversation(options = {}) {
     id: activeConversationId,
     targetLanguage: conversationLanguage,
     title,
-    topic: chatTopicSelect.value,
+      topic: getSelectedChatTopic(),
+      baseTopic: chatTopicSelect.value,
+      debateTopic: debateTopicInput?.value.trim() || "",
     tone: chatToneSelect.value,
     scenario: chatScenarioSelect.value,
     personality: chatPersonalitySelect.value,
@@ -6492,8 +6764,8 @@ function loadSavedConversation(conversationId) {
   chatHistory = conversation.messages.map((message) => ({ ...message }));
   lastCoachReply = getLastCoachReplyFromHistory(chatHistory);
 
-  if (conversation.topic) {
-    chatTopicSelect.value = conversation.topic;
+  if (conversation.baseTopic || conversation.topic) {
+    chatTopicSelect.value = conversation.baseTopic || conversation.topic;
   }
 
   if (conversation.tone) {
@@ -6503,6 +6775,12 @@ function loadSavedConversation(conversationId) {
   if (conversation.scenario) {
     chatScenarioSelect.value = conversation.scenario;
   }
+
+  if (debateTopicInput) {
+    debateTopicInput.value = conversation.debateTopic || (conversation.scenario === "debate" ? conversation.topic || "" : "");
+  }
+
+  updateDebateTopicVisibility();
 
   if (conversation.personality) {
     chatPersonalitySelect.value = conversation.personality;
@@ -6538,7 +6816,7 @@ async function buildAiChatReply(userMessage, options = {}) {
     mode: "chat",
     targetLanguage,
     callMode: fromCall,
-    topic: chatTopicSelect.value,
+    topic: getSelectedChatTopic(),
     tone: chatToneSelect.value,
     scenario: chatScenarioSelect.value,
     scenarioInstruction: getChatScenarioInstruction(),
@@ -7040,22 +7318,39 @@ async function fetchConversationAudioBlob(turns) {
 }
 
 // This helper creates one playable MP3 from several smaller backend requests.
-async function fetchChunkedConversationAudioBlob(turns, statusCallback = null, chunkSize = 10) {
+async function fetchChunkedConversationAudioBlob(turns, statusCallback = null, chunkSize = 10, cacheScope = "conversation") {
+  const fullCacheKey = createConversationAudioCacheKey(turns, `${cacheScope}-full`);
+  const cachedFullBlob = await getCachedAudioBlobByKey(fullCacheKey);
+
+  if (cachedFullBlob) {
+    return cachedFullBlob;
+  }
+
   const chunks = [];
 
   for (let index = 0; index < turns.length; index += chunkSize) {
     const chunkTurns = turns.slice(index, index + chunkSize);
     const chunkNumber = Math.floor(index / chunkSize) + 1;
     const totalChunks = Math.ceil(turns.length / chunkSize);
+    const chunkCacheKey = createConversationAudioCacheKey(chunkTurns, `${cacheScope}-chunk-${chunkNumber}`);
 
     if (typeof statusCallback === "function") {
       statusCallback(chunkNumber, totalChunks);
     }
 
-    chunks.push(await fetchConversationAudioBlob(chunkTurns));
+    let chunkBlob = await getCachedAudioBlobByKey(chunkCacheKey);
+
+    if (!chunkBlob) {
+      chunkBlob = await fetchConversationAudioBlob(chunkTurns);
+      await cacheAudioBlobByKey(chunkCacheKey, chunkBlob);
+    }
+
+    chunks.push(chunkBlob);
   }
 
-  return new Blob(chunks, { type: "audio/mpeg" });
+  const fullBlob = new Blob(chunks, { type: "audio/mpeg" });
+  await cacheAudioBlobByKey(fullCacheKey, fullBlob);
+  return fullBlob;
 }
 
 // This function downloads the full corrected conversation as one MP3.
@@ -7076,7 +7371,7 @@ async function downloadCorrectedConversationMp3s() {
   try {
     const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
       chatStatus.textContent = `Preparing full conversation audio part ${chunkNumber} of ${totalChunks}...`;
-    });
+    }, 10, "chat");
     showConversationMp3Ready(audioBlob, filename, turns);
     downloadAudioBlob(audioBlob, filename);
     chatStatus.textContent = `Full conversation MP3 ready. If your phone did not download it automatically, use Save MP3.`;
@@ -7294,7 +7589,7 @@ async function downloadDialogueMp3() {
   try {
     const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
       dialogueStatus.textContent = `Preparing dialogue audio part ${chunkNumber} of ${totalChunks}...`;
-    });
+    }, 10, "dialogue");
     const filename = `${slugifyFilename(currentDialogue.title || currentDialogue.topic || "dialogue")}.mp3`;
     const objectUrl = showDialogueMp3Ready(audioBlob, filename);
     dialoguePlayback.isPlaying = true;
@@ -7388,7 +7683,7 @@ async function playDialogueMedia() {
   try {
     const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
       dialogueStatus.textContent = `Preparing dialogue audio part ${chunkNumber} of ${totalChunks}...`;
-    });
+    }, 10, "dialogue");
     const filename = `${slugifyFilename(currentDialogue.title || currentDialogue.topic || "dialogue")}.mp3`;
     dialoguePlayback.audioUrl = showDialogueMp3Ready(audioBlob, filename);
     dialogueAudioPlayer.src = dialoguePlayback.audioUrl;
@@ -7544,7 +7839,7 @@ async function loadFullConversationMedia(turns, label = "Full conversation", fro
   try {
     const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
       chatStatus.textContent = `Preparing conversation audio part ${chunkNumber} of ${totalChunks}...`;
-    });
+    }, 10, "conversation-playlist");
     fullConversationPlayback.audioUrl = URL.createObjectURL(audioBlob);
     fullConversationAudioPlayer.src = fullConversationPlayback.audioUrl;
     applyMediaPlayerOptions(fullConversationAudioPlayer, conversationSpeedSelect, conversationLoopBtn);
@@ -8001,6 +8296,10 @@ function extractJsonText(rawText) {
 // This helper creates a small stable key for cached Spanish audio.
 function createSpanishAudioCacheKey(text, voiceChoice = getSelectedSpanishVoice()) {
   const cacheText = `${targetLanguage}:${voiceChoice || "primary"}:${text}`;
+  return createAudioCacheKeyFromText("sentence", cacheText);
+}
+
+function createAudioCacheKeyFromText(scope, cacheText) {
   let hash = 0;
 
   for (let index = 0; index < cacheText.length; index += 1) {
@@ -8008,7 +8307,16 @@ function createSpanishAudioCacheKey(text, voiceChoice = getSelectedSpanishVoice(
     hash |= 0;
   }
 
-  return `audio_${SPANISH_AUDIO_CACHE_VERSION}_${Math.abs(hash)}_${cacheText.length}`;
+  return `audio_${SPANISH_AUDIO_CACHE_VERSION}_${scope}_${Math.abs(hash)}_${cacheText.length}`;
+}
+
+function createConversationAudioCacheKey(turns, scope = "conversation") {
+  const text = turns
+    .map((turn) => String(turn.spanish || turn.text || "").trim())
+    .filter(Boolean)
+    .join("\n");
+  const cacheText = `${targetLanguage}:${getSelectedSpanishVoice() || "primary"}:${text}`;
+  return createAudioCacheKeyFromText(scope, cacheText);
 }
 
 // This helper opens a tiny browser database for saved Spanish audio files.
@@ -8040,7 +8348,7 @@ function openSpanishAudioDb() {
 }
 
 // This helper gets a saved Spanish audio blob from the browser cache.
-async function getCachedSpanishAudioBlob(text) {
+async function getCachedAudioBlobByKey(cacheKey) {
   const db = await openSpanishAudioDb();
 
   if (!db) {
@@ -8050,7 +8358,7 @@ async function getCachedSpanishAudioBlob(text) {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction("audio", "readonly");
     const store = transaction.objectStore("audio");
-    const request = store.get(createSpanishAudioCacheKey(text));
+    const request = store.get(cacheKey);
 
     request.onsuccess = () => {
       resolve(request.result || null);
@@ -8062,8 +8370,11 @@ async function getCachedSpanishAudioBlob(text) {
   });
 }
 
-// This helper saves a Spanish audio blob locally so replays do not need a new request.
-async function cacheSpanishAudioBlob(text, blob) {
+async function getCachedSpanishAudioBlob(text) {
+  return getCachedAudioBlobByKey(createSpanishAudioCacheKey(text));
+}
+
+async function cacheAudioBlobByKey(cacheKey, blob) {
   const db = await openSpanishAudioDb();
 
   if (!db) {
@@ -8073,11 +8384,16 @@ async function cacheSpanishAudioBlob(text, blob) {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction("audio", "readwrite");
     const store = transaction.objectStore("audio");
-    const request = store.put(blob, createSpanishAudioCacheKey(text));
+    const request = store.put(blob, cacheKey);
 
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
   });
+}
+
+// This helper saves a Spanish audio blob locally so replays do not need a new request.
+async function cacheSpanishAudioBlob(text, blob) {
+  return cacheAudioBlobByKey(createSpanishAudioCacheKey(text), blob);
 }
 
 // This helper sets up one reusable audio player for Spanish playback.
@@ -8293,6 +8609,7 @@ async function playProgressiveSpanishAudio(text, titleText = "Spanish sentence",
 
   const sourceBuffer = mediaSource.addSourceBuffer("audio/mpeg");
   const reader = response.body.getReader();
+  const streamedChunks = [];
 
   currentSpanishStreamReader = reader;
 
@@ -8324,6 +8641,7 @@ async function playProgressiveSpanishAudio(text, titleText = "Spanish sentence",
       break;
     }
 
+    streamedChunks.push(value);
     await appendChunk(value);
 
     if (!playbackStarted) {
@@ -8338,6 +8656,12 @@ async function playProgressiveSpanishAudio(text, titleText = "Spanish sentence",
 
   if (mediaSource.readyState === "open") {
     mediaSource.endOfStream();
+  }
+
+  if (streamedChunks.length) {
+    cacheSpanishAudioBlob(text, new Blob(streamedChunks, { type: "audio/mpeg" })).catch(() => {
+      // Audio caching is a convenience; playback has already succeeded.
+    });
   }
 }
 
@@ -8382,6 +8706,20 @@ async function playSpanishAudio(text, titleText = "Spanish sentence", callback =
 
   try {
     const shouldUseProgressiveAudio = Boolean(callback) && options.progressive !== false;
+    const cachedAudioBlob = await getCachedSpanishAudioBlob(text);
+
+    if (cachedAudioBlob) {
+      if (playbackId !== spanishAudioPlaybackId) {
+        return;
+      }
+
+      currentSpanishAudioUrl = URL.createObjectURL(cachedAudioBlob);
+      player.src = currentSpanishAudioUrl;
+      updateSpanishMediaSession(titleText);
+      await player.play();
+      updateNowPlaying(titleText, "Playing cached audio");
+      return;
+    }
 
     if (shouldUseProgressiveAudio) {
       try {
@@ -8399,7 +8737,8 @@ async function playSpanishAudio(text, titleText = "Spanish sentence", callback =
       }
     }
 
-    const audioBlob = await getSpanishAudioBlob(text);
+    const audioBlob = await fetchSpanishAudioBlob(text);
+    await cacheSpanishAudioBlob(text, audioBlob);
 
     if (playbackId !== spanishAudioPlaybackId) {
       return;
@@ -9949,7 +10288,7 @@ async function downloadBatchMp3() {
     const turns = currentBatchSentences.map((sentence) => ({ spanish: sentence.spanish }));
     const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
       batchStatus.textContent = `Preparing audio part ${chunkNumber} of ${totalChunks}...`;
-    });
+    }, 10, "batch");
     const title = slugifyFilename(`${difficultySelect.value}-${topicSelect.value}-sentence-batch`);
     const filename = `${title}.mp3`;
 
@@ -11553,7 +11892,7 @@ async function downloadSelectedPlaylistMp3() {
     const turns = playlist.sentences.map((sentence) => ({ spanish: sentence.spanish }));
     const audioBlob = await fetchChunkedConversationAudioBlob(turns, (chunkNumber, totalChunks) => {
       radioStatus.textContent = `Preparing playlist audio part ${chunkNumber} of ${totalChunks}...`;
-    });
+    }, 10, "playlist");
     const filename = slugifyFilename(`${getTargetLanguageProfile().label}-${playlist.name}-playlist`);
     const fullFilename = `${filename}.mp3`;
 
@@ -12203,24 +12542,101 @@ function deleteSavedWord(wordId) {
   }
 }
 
-function showWordDetail(wordId) {
-  const wordCard = savedWords.map(withWordSchedule).find((item) => item.id === wordId);
+async function fetchWordDetailsForCard(wordCard) {
+  const example = {
+    spanish: wordCard.exampleSpanish || wordCard.word,
+    english: wordCard.exampleEnglish || ""
+  };
+  const cacheKey = getWordDetailCacheKey(wordCard.normalisedWord || normaliseWord(wordCard.word), example);
+
+  if (aiWordDetailCache[cacheKey]) {
+    return aiWordDetailCache[cacheKey];
+  }
+
+  const data = await callAiLanguageCoach({
+    mode: "word-details",
+    targetLanguage,
+    word: wordCard.word,
+    spanish: example.spanish,
+    english: example.english
+  });
+  const detail = data.detail || data.wordDetail || {};
+  const normalisedDetail = {
+    word: detail.word || wordCard.word,
+    contextMeaning: detail.contextMeaning || wordCard.meaning || "",
+    definitions: Array.isArray(detail.definitions) ? detail.definitions : [],
+    grammar: detail.grammar && typeof detail.grammar === "object" ? detail.grammar : null,
+    examples: Array.isArray(detail.examples) ? detail.examples : []
+  };
+
+  aiWordDetailCache[cacheKey] = normalisedDetail;
+  saveAiWordDetailCache();
+  return normalisedDetail;
+}
+
+function updateSavedWordDetails(wordId, detail) {
+  savedWords = savedWords.map((item) => {
+    const scheduledItem = withWordSchedule(item);
+
+    if (scheduledItem.id !== wordId) {
+      return scheduledItem;
+    }
+
+    return {
+      ...scheduledItem,
+      meaning: scheduledItem.meaning || detail.contextMeaning || "",
+      contextMeaning: detail.contextMeaning || scheduledItem.contextMeaning || scheduledItem.meaning,
+      definitions: Array.isArray(detail.definitions) ? detail.definitions : scheduledItem.definitions,
+      grammar: detail.grammar || scheduledItem.grammar
+    };
+  });
+  saveSavedWords();
+}
+
+function renderSavedWordDetailContent(wordCard) {
+  wordDetailTitle.textContent = wordCard.word;
+  wordDetailMeaning.textContent = "";
+  renderClickedWordDetails(wordDetailMeaning, {
+    contextMeaning: wordCard.contextMeaning || wordCard.meaning || "",
+    definitions: wordCard.definitions || [],
+    grammar: wordCard.grammar || null,
+    examples: []
+  }, wordCard.meaning || "");
+  setHoverableTargetText(wordDetailExample, wordCard.exampleSpanish || "", {
+    spanish: wordCard.exampleSpanish || "",
+    english: wordCard.exampleEnglish || ""
+  }, "word-detail");
+  wordDetailHistory.textContent = `Saved ${formatReviewDate(wordCard.savedAt || wordCard.createdAt)} | Next review: ${isWordDue(wordCard) ? "due now" : formatReviewDate(wordCard.nextReviewAt)} | Reviews: ${Number(wordCard.correct || 0) + Number(wordCard.wrong || 0)} | Ease: ${Number(wordCard.easeFactor || 2.5).toFixed(2)}`;
+}
+
+async function showWordDetail(wordId) {
+  let wordCard = savedWords.map(withWordSchedule).find((item) => item.id === wordId);
 
   if (!wordCard || !wordDetailPanel) {
     return;
   }
 
   activeWordDetailId = wordId;
-  wordDetailTitle.textContent = wordCard.word;
-  wordDetailMeaning.textContent = wordCard.meaning || "Meaning not saved yet.";
-  setHoverableTargetText(wordDetailExample, wordCard.exampleSpanish || "", {
-    spanish: wordCard.exampleSpanish || "",
-    english: wordCard.exampleEnglish || ""
-  }, "word-detail");
-  wordDetailHistory.textContent = `Saved ${formatReviewDate(wordCard.savedAt || wordCard.createdAt)} | Next review: ${isWordDue(wordCard) ? "due now" : formatReviewDate(wordCard.nextReviewAt)} | Reviews: ${Number(wordCard.correct || 0) + Number(wordCard.wrong || 0)} | Ease: ${Number(wordCard.easeFactor || 2.5).toFixed(2)}`;
+  renderSavedWordDetailContent(wordCard);
   wordDetailExamplesList.innerHTML = "";
   wordDetailPanel.classList.remove("hidden");
   wordDetailPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  if (!wordCard.definitions?.length && !wordCard.grammar) {
+    wordDetailExamplesList.innerHTML = '<li class="recall-item"><p class="sentence-meta">Loading dictionary details...</p></li>';
+
+    try {
+      const detail = await fetchWordDetailsForCard(wordCard);
+      updateSavedWordDetails(wordId, detail);
+      wordCard = savedWords.map(withWordSchedule).find((item) => item.id === wordId) || wordCard;
+      renderSavedWordDetailContent(wordCard);
+      wordDetailExamplesList.innerHTML = "";
+      renderSavedWords();
+    } catch (error) {
+      wordDetailExamplesList.innerHTML = "";
+      showStatusMessage(`Could not load extra word details. ${formatAiErrorMessage(error.message)}`);
+    }
+  }
 }
 
 function hideWordDetail() {
@@ -12269,6 +12685,73 @@ function renderWordDetailExampleItems(examples) {
       item.appendChild(translation);
     }
     item.appendChild(playButton);
+    wordDetailExamplesList.appendChild(item);
+  });
+}
+
+function renderWordContextReviewItems(wordCard, examples) {
+  if (!wordDetailExamplesList) {
+    return;
+  }
+
+  wordDetailExamplesList.innerHTML = "";
+  examples.slice(0, 3).forEach((example, index) => {
+    const targetText = typeof example === "string" ? example : example.spanish || example.target || "";
+    const translationText = typeof example === "string" ? "" : example.english || example.translation || "";
+    const item = document.createElement("li");
+    const prompt = document.createElement("p");
+    const sentence = document.createElement("h4");
+    const answer = document.createElement("p");
+    const actions = document.createElement("div");
+    const revealButton = document.createElement("button");
+    const rememberedButton = document.createElement("button");
+    const missedButton = document.createElement("button");
+    const playButton = document.createElement("button");
+
+    if (!targetText) {
+      return;
+    }
+
+    item.className = "recall-item word-context-review-item";
+    prompt.className = "sentence-meta";
+    answer.className = "sentence-meta hidden";
+    actions.className = "actions";
+    prompt.textContent = `What does "${wordCard.word}" mean in this sentence?`;
+    setHoverableTargetText(sentence, targetText, {
+      spanish: targetText,
+      english: translationText
+    }, "word-context-review");
+    answer.textContent = `${wordCard.meaning || wordCard.contextMeaning || "Meaning not saved yet."}${translationText ? ` | ${translationText}` : ""}`;
+
+    revealButton.className = "secondary-btn";
+    rememberedButton.className = "secondary-btn";
+    missedButton.className = "secondary-btn";
+    playButton.className = "secondary-btn";
+    revealButton.type = "button";
+    rememberedButton.type = "button";
+    missedButton.type = "button";
+    playButton.type = "button";
+    revealButton.textContent = "Reveal meaning";
+    rememberedButton.textContent = "I knew it";
+    missedButton.textContent = "I missed it";
+    playButton.textContent = "Play";
+
+    revealButton.addEventListener("click", () => {
+      answer.classList.remove("hidden");
+      revealButton.disabled = true;
+    });
+    rememberedButton.addEventListener("click", () => markWordReview(wordCard.id, 4));
+    missedButton.addEventListener("click", () => markWordReview(wordCard.id, 0));
+    playButton.addEventListener("click", () => playSpanishAudio(targetText, `Context review ${index + 1}`));
+
+    actions.appendChild(revealButton);
+    actions.appendChild(rememberedButton);
+    actions.appendChild(missedButton);
+    actions.appendChild(playButton);
+    item.appendChild(prompt);
+    item.appendChild(sentence);
+    item.appendChild(answer);
+    item.appendChild(actions);
     wordDetailExamplesList.appendChild(item);
   });
 }
@@ -12345,6 +12828,47 @@ async function generateWordDetailExamples() {
     if (wordDetailExamplesBtn) {
       wordDetailExamplesBtn.disabled = false;
       wordDetailExamplesBtn.textContent = "Generate 5 examples";
+    }
+  }
+}
+
+async function generateWordContextReview() {
+  const wordCard = savedWords.map(withWordSchedule).find((item) => item.id === activeWordDetailId);
+
+  if (!wordCard || !wordDetailExamplesList) {
+    return;
+  }
+
+  const topic = wordCard.topic || topicSelect?.value || "daily life";
+  wordDetailExamplesList.innerHTML = '<li class="recall-item"><p class="sentence-meta">Building context review...</p></li>';
+
+  if (wordDetailReviewBtn) {
+    wordDetailReviewBtn.disabled = true;
+    wordDetailReviewBtn.textContent = "Building...";
+  }
+
+  try {
+    const data = await callAiLanguageCoach({
+      mode: "word-examples",
+      targetLanguage,
+      word: wordCard.word,
+      meaning: wordCard.meaning || wordCard.contextMeaning || "",
+      example: wordCard.exampleSpanish || "",
+      topic,
+      count: 3
+    });
+    const examples = Array.isArray(data.examples) ? data.examples : [];
+    if (!examples.length) {
+      throw new Error("No context examples returned.");
+    }
+    renderWordContextReviewItems(wordCard, examples);
+  } catch (error) {
+    renderWordContextReviewItems(wordCard, getFallbackWordDetailExamples(wordCard, topic).slice(0, 3));
+    showStatusMessage(`AI context review was unavailable, so built-in examples were used. ${formatAiErrorMessage(error.message)}`);
+  } finally {
+    if (wordDetailReviewBtn) {
+      wordDetailReviewBtn.disabled = false;
+      wordDetailReviewBtn.textContent = "Review in context";
     }
   }
 }
@@ -12579,6 +13103,7 @@ function renderSavedWords() {
       const listItem = document.createElement("li");
       const title = document.createElement("h4");
       const meaning = document.createElement("p");
+      const grammar = document.createElement("div");
       const example = document.createElement("p");
       const exampleEnglish = document.createElement("p");
       const schedule = document.createElement("p");
@@ -12596,6 +13121,13 @@ function renderSavedWords() {
       listItem.className = "recall-item word-recall-item";
       title.textContent = wordCard.word;
       meaning.textContent = wordCard.meaning || "Meaning not saved yet. Click the word again after its hint loads to update it.";
+      grammar.className = "word-card-grammar";
+      getWordGrammarFacts(wordCard.grammar).slice(0, 4).forEach(([label, value]) => {
+        const chip = document.createElement("span");
+        chip.className = "word-grammar-chip";
+        chip.textContent = `${label}: ${value}`;
+        grammar.appendChild(chip);
+      });
       example.className = "word-example";
       setHoverableTargetText(example, wordCard.exampleSpanish || "", {
         spanish: wordCard.exampleSpanish || "",
@@ -12644,6 +13176,9 @@ function renderSavedWords() {
 
       listItem.appendChild(title);
       listItem.appendChild(meaning);
+      if (grammar.childElementCount) {
+        listItem.appendChild(grammar);
+      }
       if (wordCard.exampleSpanish) {
         listItem.appendChild(example);
       }
@@ -13012,6 +13547,9 @@ if (wordDetailPlayBtn) {
 if (wordDetailExamplesBtn) {
   wordDetailExamplesBtn.addEventListener("click", generateWordDetailExamples);
 }
+if (wordDetailReviewBtn) {
+  wordDetailReviewBtn.addEventListener("click", generateWordContextReview);
+}
 mobileBottomNavButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const pageId = button.dataset.mobileNavPage;
@@ -13344,6 +13882,24 @@ chatInput.addEventListener("keydown", (event) => {
 chatInput.addEventListener("input", () => {
   localStorage.setItem(getChatStorageKey("spanishSentenceChatDraft"), chatInput.value || "");
 });
+if (chatScenarioSelect) {
+  chatScenarioSelect.addEventListener("change", () => {
+    updateDebateTopicVisibility();
+    if (chatScenarioSelect.value === "debate") {
+      debateTopicInput?.focus();
+    }
+  });
+}
+if (debateTopicInput) {
+  debateTopicInput.addEventListener("input", () => {
+    if (chatScenarioSelect?.value === "debate" && chatStatus) {
+      const topic = debateTopicInput.value.trim();
+      chatStatus.textContent = topic
+        ? `Debate topic set to: ${topic}. Press Start chat or Start call.`
+        : "Type a debate topic, then press Start chat or Start call.";
+    }
+  });
+}
 
 // These functions run as soon as the page loads.
 loadVoices();
@@ -13353,6 +13909,7 @@ applySpanishVoicePreference();
 applyAppDisplayMode();
 applyFirstRunSetupVisibility();
 applyCallPausePreference();
+updateDebateTopicVisibility();
 if (chatInput) {
   chatInput.value = getStoredChatValue("spanishSentenceChatDraft") || "";
 }
@@ -13390,7 +13947,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=50").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=58").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
