@@ -672,10 +672,10 @@ async function handleWordDetailsMode(apiKey, model, requestBody) {
   }
 
   const prompt = `
-Create a learner-friendly mini dictionary entry for this ${language.label} word.
+Create a learner-friendly mini dictionary entry for this ${language.label} word or phrase.
 
 Target language: ${language.natural}
-Word: ${word}
+Word or phrase: ${word}
 
 Sentence where the learner clicked it:
 ${requestBody.spanish}
@@ -684,12 +684,13 @@ Full ${language.translationLabel} translation of that sentence:
 ${requestBody.english || ""}
 
 Rules:
-- The "contextMeaning" must explain what the word means in this exact sentence.
-- Then include the main common definitions/usages of the word, not only the sentence meaning.
+- The "contextMeaning" must explain what the word or phrase means in this exact sentence.
+- Then include the main common definitions/usages of the word or phrase, not only the sentence meaning.
 - Put the sentence meaning first if it is one of the definitions.
 - Include 2 to 6 definitions where useful. Do not invent rare meanings.
 - Include 3 short natural example sentences in ${language.label}, each with a ${language.translationLabel} translation.
 - Include grammar details when useful: verbs should include infinitive/tense/person, nouns should include gender/plural where the language has them, and all words should include register/usage notes when helpful.
+- If this is a phrase, explain it as a phrase and include a phrase-level usage note instead of forcing single-word grammar.
 - If the selected target language is not Spanish, do not use Spanish in the target-language examples.
 - Keep explanations concise and clear for a learner.
 - Return JSON only.

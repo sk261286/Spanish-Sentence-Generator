@@ -1908,6 +1908,7 @@ let playlistMp3ObjectUrl = "";
 let dialogueMp3ObjectUrl = "";
 let wordHintRequestId = 0;
 let activeWordActionPanel = null;
+let activePhraseActionPanel = null;
 let aiWordHintCache = JSON.parse(localStorage.getItem("spanishSentenceAiWordHints")) || {};
 let aiWordDetailCache = JSON.parse(localStorage.getItem("languageCoachAiWordDetails")) || {};
 let chatTimerInterval = null;
@@ -2840,6 +2841,92 @@ function saveWordFromElement(wordElement, source = "sentence") {
   return true;
 }
 
+function getPhraseExampleFromSelection(container, selectedText) {
+  const firstWord = container?.querySelector?.(".spanish-word");
+
+  if (firstWord?.dataset?.example) {
+    return {
+      spanish: firstWord.dataset.example,
+      english: firstWord.dataset.exampleEnglish || ""
+    };
+  }
+
+  const containerText = container?.innerText || container?.textContent || selectedText;
+  return {
+    spanish: containerText.trim() || selectedText,
+    english: ""
+  };
+}
+
+async function savePhraseFromSelection(phraseText, example, source = "phrase", button = null) {
+  const cleanPhrase = phraseText.trim().replace(/^[.,!?¿¡;:\s]+|[.,!?¿¡;:\s]+$/g, "");
+  const normalisedPhrase = normaliseWord(cleanPhrase);
+
+  if (!cleanPhrase || !normalisedPhrase) {
+    return false;
+  }
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Saving...";
+  }
+
+  let detail = null;
+
+  try {
+    detail = await fetchWordDetailsForCard(withWordSchedule({
+      targetLanguage,
+      word: cleanPhrase,
+      normalisedWord: normalisedPhrase,
+      meaning: "",
+      exampleSpanish: example.spanish || cleanPhrase,
+      exampleEnglish: example.english || "",
+      source
+    }));
+  } catch (error) {
+    detail = null;
+  }
+
+  const existingIndex = savedWords.findIndex((item) => {
+    const scheduledItem = withWordSchedule(item);
+    return scheduledItem.targetLanguage === targetLanguage && scheduledItem.normalisedWord === normalisedPhrase;
+  });
+  const phraseCard = withWordSchedule({
+    targetLanguage,
+    word: cleanPhrase,
+    normalisedWord: normalisedPhrase,
+    meaning: detail?.contextMeaning || "",
+    contextMeaning: detail?.contextMeaning || "",
+    definitions: detail?.definitions || [],
+    grammar: detail?.grammar || { partOfSpeech: "phrase", register: "neutral", usageNote: "Saved phrase" },
+    exampleSpanish: example.spanish || cleanPhrase,
+    exampleEnglish: example.english || "",
+    source
+  });
+
+  if (existingIndex >= 0) {
+    savedWords[existingIndex] = {
+      ...withWordSchedule(savedWords[existingIndex]),
+      ...phraseCard,
+      id: withWordSchedule(savedWords[existingIndex]).id,
+      createdAt: withWordSchedule(savedWords[existingIndex]).createdAt
+    };
+    showStatusMessage(`Updated saved phrase: ${cleanPhrase}.`);
+  } else {
+    savedWords.push(phraseCard);
+    showStatusMessage(`Saved phrase: ${cleanPhrase}.`);
+  }
+
+  saveSavedWords();
+  renderSavedWords();
+
+  if (button) {
+    button.textContent = "Saved";
+  }
+
+  return true;
+}
+
 function isPlaceholderWordHint(hint) {
   return !hint || hint === "Hint coming soon" || hint.endsWith("hint not added yet") || hint.startsWith("Loading ");
 }
@@ -3048,6 +3135,60 @@ function closeWordActionPanel() {
   document.body.classList.remove("word-panel-open");
 }
 
+function closePhraseActionPanel() {
+  if (activePhraseActionPanel) {
+    activePhraseActionPanel.remove();
+    activePhraseActionPanel = null;
+  }
+}
+
+function showPhraseActionPanel(phraseText, example, source, rect) {
+  closePhraseActionPanel();
+
+  const cleanPhrase = phraseText.trim().replace(/^[.,!?¿¡;:\s]+|[.,!?¿¡;:\s]+$/g, "");
+
+  if (!cleanPhrase || cleanPhrase.split(/\s+/).length < 2) {
+    return;
+  }
+
+  const panel = document.createElement("div");
+  const title = document.createElement("p");
+  const saveButton = document.createElement("button");
+  const closeButton = document.createElement("button");
+
+  panel.className = "phrase-action-panel";
+  title.className = "phrase-action-title";
+  saveButton.className = "secondary-btn phrase-action-save";
+  closeButton.className = "word-action-close";
+  saveButton.type = "button";
+  closeButton.type = "button";
+  title.textContent = cleanPhrase;
+  saveButton.textContent = "Save phrase";
+  closeButton.textContent = "Close";
+
+  saveButton.addEventListener("click", async () => {
+    await savePhraseFromSelection(cleanPhrase, example, source, saveButton);
+    setTimeout(closePhraseActionPanel, 500);
+  });
+  closeButton.addEventListener("click", closePhraseActionPanel);
+
+  panel.appendChild(title);
+  panel.appendChild(saveButton);
+  panel.appendChild(closeButton);
+  document.body.appendChild(panel);
+  activePhraseActionPanel = panel;
+
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+  const top = Math.max(12, (rect?.top || 0) - panel.offsetHeight - 12);
+  const left = Math.min(
+    viewportWidth - panel.offsetWidth - 12,
+    Math.max(12, (rect?.left || viewportWidth / 2) + ((rect?.width || 0) / 2) - (panel.offsetWidth / 2))
+  );
+
+  panel.style.top = `${top}px`;
+  panel.style.left = `${left}px`;
+}
+
 function showWordActionPanel(wordElement, source = "sentence") {
   const rawWord = wordElement?.textContent?.trim() || "";
   const cleanWord = normaliseWord(rawWord);
@@ -3115,6 +3256,9 @@ function showWordActionPanel(wordElement, source = "sentence") {
 
 document.addEventListener("click", (event) => {
   if (!activeWordActionPanel) {
+    if (activePhraseActionPanel && !event.target.closest(".phrase-action-panel")) {
+      closePhraseActionPanel();
+    }
     return;
   }
 
@@ -3123,6 +3267,62 @@ document.addEventListener("click", (event) => {
   }
 
   closeWordActionPanel();
+});
+
+function getSelectablePhraseContainer(node) {
+  const element = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+
+  if (!element?.closest) {
+    return null;
+  }
+
+  return element.closest(".chat-text, .batch-spanish, #spanish-sentence, #custom-spanish-output, .word-example, .dialogue-phrases, .video-line-text, .recall-item h4, .playlist-sentence-text");
+}
+
+function maybeShowSelectedPhraseAction() {
+  const selection = window.getSelection?.();
+
+  if (!selection || selection.isCollapsed || !selection.rangeCount) {
+    return;
+  }
+
+  const phraseText = selection.toString().trim().replace(/\s+/g, " ");
+
+  if (!phraseText || phraseText.split(/\s+/).length < 2 || phraseText.length > 140) {
+    return;
+  }
+
+  const range = selection.getRangeAt(0);
+  const startContainer = getSelectablePhraseContainer(range.startContainer);
+  const endContainer = getSelectablePhraseContainer(range.endContainer);
+
+  if (!startContainer || startContainer !== endContainer) {
+    return;
+  }
+
+  const example = getPhraseExampleFromSelection(startContainer, phraseText);
+  const source = startContainer.closest(".chat-text") ? "chat-phrase"
+    : startContainer.closest(".batch-spanish") ? "batch-phrase"
+      : startContainer.closest("#custom-spanish-output") ? "translator-phrase"
+        : startContainer.closest(".dialogue-phrases") ? "dialogue-phrase"
+          : "phrase";
+  const rect = range.getBoundingClientRect();
+
+  showPhraseActionPanel(phraseText, example, source, rect);
+}
+
+document.addEventListener("mouseup", () => {
+  setTimeout(maybeShowSelectedPhraseAction, 40);
+});
+
+document.addEventListener("touchend", () => {
+  setTimeout(maybeShowSelectedPhraseAction, 180);
+});
+
+document.addEventListener("keyup", (event) => {
+  if (event.key === "Shift" || event.key.startsWith("Arrow")) {
+    setTimeout(maybeShowSelectedPhraseAction, 40);
+  }
 });
 
 // This helper updates the visible chat timer.
@@ -13947,7 +14147,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=58").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=59").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
