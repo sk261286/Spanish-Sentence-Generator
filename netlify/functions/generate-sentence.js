@@ -286,6 +286,12 @@ Rules:
 - Keep verb phrases, pronouns, and time expressions in a natural order for ${language.label}.
 - Do not make the sentence awkward just to show off grammar.
 - Use specific everyday details, but avoid overloading the sentence with too many clauses.
+- The sentence must describe one believable everyday situation.
+- Every clause must logically connect to the others.
+- Do not combine unrelated events just to make the sentence longer or more advanced.
+- If one event causes another, the cause and effect must make real-world sense.
+- Natural native shorthand is good when it is genuinely common, such as everyday colloquial words or clipped phrases.
+- Avoid odd compressed shorthand that a native speaker might understand but would probably not choose as the natural default.
 - IMPORTANT: the JSON key names are legacy names. The "spanish" field must contain the target-language sentence in ${language.label}. The "english" field must contain the ${language.translationLabel} translation.
 - For English mode, the "spanish" field MUST be English, and the "english" field MUST be Spanish.
 - Return one natural ${language.translationLabel} translation in the "english" legacy field.
@@ -297,9 +303,11 @@ ${recentSentenceText}
 - If a recent sentence mentions a similar situation, choose a completely different situation within the same topic.
 - Prefer a different opening word and a different main verb from the most recent examples.
 - Perform a quality-check step after generating:
-  Check the ${language.label} sentence for invented words, unnatural phrasing, stiff word order, wrong-region vocabulary, or anything a native speaker would probably not say.
+  Check the ${language.label} sentence for invented words, unnatural phrasing, stiff word order, wrong-region vocabulary, unrelated clauses, weak cause-and-effect, or anything a native speaker would probably not say.
+  Ask silently: "Would a real person actually say this because these events belong together?"
   If found, rewrite it into ${language.natural} before returning it.
 - Silently choose the most natural final version. Do not show drafts or explain the check.
+- The ${language.translationLabel} translation must match the exact final sentence meaning. Do not invent or smooth over a different situation.
 - Do not include any explanation.
 - Reply with JSON only.
 
