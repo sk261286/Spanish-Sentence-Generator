@@ -179,6 +179,23 @@ function validateTargetLanguage(sentence, language, targetLanguage) {
 
 async function callOpenAi(apiKey, model, userPrompt) {
   let openAiResponse;
+  const requestBody = {
+    model,
+    input: [
+      {
+        role: "system",
+        content: SYSTEM_PROMPT
+      },
+      {
+        role: "user",
+        content: userPrompt
+      }
+    ]
+  };
+
+  if (!String(model || "").startsWith("gpt-5.5")) {
+    requestBody.temperature = 0.7;
+  }
 
   try {
     openAiResponse = await fetch("https://api.openai.com/v1/responses", {
@@ -187,20 +204,7 @@ async function callOpenAi(apiKey, model, userPrompt) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model,
-        temperature: 0.7,
-        input: [
-          {
-            role: "system",
-            content: SYSTEM_PROMPT
-          },
-          {
-            role: "user",
-            content: userPrompt
-          }
-        ]
-      })
+      body: JSON.stringify(requestBody)
     });
   } catch (networkError) {
     console.error("OpenAI network request failed:", networkError.message);
@@ -277,9 +281,14 @@ Rules:
 - ${topicInstruction}
 - ${toneInstruction}
 - Focus: ${focusInstruction}
+- It must sound like something a native speaker from the requested region would actually say in everyday life.
+- Prefer common spoken phrasing over literary, textbook, overly formal, or translated-sounding wording.
+- Keep verb phrases, pronouns, and time expressions in a natural order for ${language.label}.
+- Do not make the sentence awkward just to show off grammar.
+- Use specific everyday details, but avoid overloading the sentence with too many clauses.
 - IMPORTANT: the JSON key names are legacy names. The "spanish" field must contain the target-language sentence in ${language.label}. The "english" field must contain the ${language.translationLabel} translation.
 - For English mode, the "spanish" field MUST be English, and the "english" field MUST be Spanish.
-- Return one ${language.translationLabel} translation in the "english" legacy field.
+- Return one natural ${language.translationLabel} translation in the "english" legacy field.
 - Return 1 to 3 grammarTags explaining the main skill being practised, such as "Past tense", "Question", "Opinion", "Subjunctive", "Idiom", "Connector", "Reflexive verb", or "Future plans".
 - Avoid repeating these recent sentences, their wording, and their grammar pattern:
 ${recentSentenceText}
@@ -288,8 +297,9 @@ ${recentSentenceText}
 - If a recent sentence mentions a similar situation, choose a completely different situation within the same topic.
 - Prefer a different opening word and a different main verb from the most recent examples.
 - Perform a quality-check step after generating:
-  Check the ${language.label} sentence for invented words, unnatural phrasing, or wrong-region vocabulary.
+  Check the ${language.label} sentence for invented words, unnatural phrasing, stiff word order, wrong-region vocabulary, or anything a native speaker would probably not say.
   If found, rewrite it into ${language.natural} before returning it.
+- Silently choose the most natural final version. Do not show drafts or explain the check.
 - Do not include any explanation.
 - Reply with JSON only.
 
@@ -370,7 +380,7 @@ async function handler(event) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_GENERATION_MODEL || "gpt-5.5";
+  const model = process.env.OPENAI_GENERATION_MODEL || "gpt-5.4-mini";
 
   if (!apiKey) {
     return {

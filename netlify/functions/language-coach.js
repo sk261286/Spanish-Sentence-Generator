@@ -90,7 +90,7 @@ function hasWrongLanguageMarkers(text, language) {
 
 function getModelForMode(mode, isCallMode = false) {
   const defaultModel = process.env.OPENAI_MODEL || "gpt-4.1-mini";
-  const generationModel = process.env.OPENAI_GENERATION_MODEL || "gpt-5.5";
+  const generationModel = process.env.OPENAI_GENERATION_MODEL || "gpt-5.4-mini";
   const conversationModel = process.env.OPENAI_CONVERSATION_MODEL || process.env.OPENAI_REVIEW_MODEL || defaultModel;
   const callModel = process.env.OPENAI_CALL_MODEL || defaultModel;
 
@@ -98,7 +98,7 @@ function getModelForMode(mode, isCallMode = false) {
     return callModel;
   }
 
-  if (mode === "chat" || mode === "chat-opening" || mode === "custom" || mode === "conversation-review" || mode === "conversation-review-final" || mode === "conversation-repair") {
+  if (mode === "chat" || mode === "chat-opening" || mode === "custom" || mode === "sentence-explain" || mode === "conversation-review" || mode === "conversation-review-final" || mode === "conversation-repair") {
     return conversationModel;
   }
 
@@ -249,6 +249,23 @@ function truncateForPrompt(text, maxLength = 700) {
 
 async function callOpenAi(apiKey, model, userPrompt) {
   let openAiResponse;
+  const requestBody = {
+    model,
+    input: [
+      {
+        role: "system",
+        content: SYSTEM_PROMPT
+      },
+      {
+        role: "user",
+        content: userPrompt
+      }
+    ]
+  };
+
+  if (!String(model || "").startsWith("gpt-5.5")) {
+    requestBody.temperature = 0.65;
+  }
 
   try {
     openAiResponse = await fetch("https://api.openai.com/v1/responses", {
@@ -257,20 +274,7 @@ async function callOpenAi(apiKey, model, userPrompt) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model,
-        temperature: 0.65,
-        input: [
-          {
-            role: "system",
-            content: SYSTEM_PROMPT
-          },
-          {
-            role: "user",
-            content: userPrompt
-          }
-        ]
-      })
+      body: JSON.stringify(requestBody)
     });
   } catch (networkError) {
     console.error("OpenAI network request failed:", networkError.message);
