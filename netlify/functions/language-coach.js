@@ -90,7 +90,7 @@ function hasWrongLanguageMarkers(text, language) {
 
 function getModelForMode(mode, isCallMode = false) {
   const defaultModel = process.env.OPENAI_MODEL || "gpt-4.1-mini";
-  const generationModel = process.env.OPENAI_GENERATION_MODEL || defaultModel;
+  const generationModel = process.env.OPENAI_GENERATION_MODEL || "gpt-5.5";
   const conversationModel = process.env.OPENAI_CONVERSATION_MODEL || process.env.OPENAI_REVIEW_MODEL || defaultModel;
   const callModel = process.env.OPENAI_CALL_MODEL || defaultModel;
 
@@ -741,6 +741,81 @@ Use this JSON shape:
   };
 }
 
+async function handleSentenceExplainMode(apiKey, model, requestBody) {
+  const language = getLanguageProfile(requestBody.targetLanguage);
+  const targetText = String(requestBody.spanish || "").trim();
+  const translationText = String(requestBody.english || "").trim();
+
+  if (!targetText) {
+    return { explanation: null };
+  }
+
+  const prompt = `
+Give a detailed but friendly explanation of this generated ${language.label} sentence.
+
+Target language: ${language.natural}
+Sentence:
+${targetText}
+
+Existing ${language.translationLabel} translation:
+${translationText || "None provided."}
+
+Rules:
+- Explain in ${language.explanationLabel}.
+- Make it useful for a learner who wants to sound natural, not just translate word by word.
+- Include a clear meaning, a natural ${language.translationLabel} version, and a phrase-by-phrase breakdown.
+- Highlight the most interesting native phrase, grammar pattern, idiom, or wording choice.
+- If there is a phrase with a non-literal meaning, explain the literal idea and the natural meaning.
+- Add 2 or 3 similar natural examples in ${language.label}, each with a ${language.translationLabel} translation.
+- Mention any regional usage note if helpful, especially for ${language.place}.
+- Be warm, memorable, and human. A short playful image is fine if it genuinely helps.
+- Do not use Spanish unless the selected target language is Spanish.
+- Reply with JSON only.
+
+Use this JSON shape:
+{
+  "explanation": {
+    "means": "plain ${language.translationLabel} meaning",
+    "naturalVersion": "natural ${language.translationLabel} version",
+    "breakdown": [
+      {
+        "chunk": "short ${language.label} chunk",
+        "meaning": "${language.translationLabel} meaning",
+        "note": "short learner note, blank if not needed"
+      }
+    ],
+    "bestBit": {
+      "phrase": "most useful phrase or pattern",
+      "literal": "literal idea if useful, blank if not",
+      "naturalMeaning": "natural learner-friendly explanation",
+      "note": "why this phrase or pattern is useful"
+    },
+    "examples": [
+      {
+        "target": "similar natural ${language.label} example",
+        "english": "${language.translationLabel} translation"
+      }
+    ],
+    "usageNote": "short regional or grammar note"
+  }
+}
+`.trim();
+
+  const result = await callOpenAi(apiKey, model, prompt);
+  const explanation = result.explanation || result;
+
+  return {
+    explanation: {
+      means: explanation.means || "",
+      naturalVersion: explanation.naturalVersion || "",
+      breakdown: Array.isArray(explanation.breakdown) ? explanation.breakdown.slice(0, 12) : [],
+      bestBit: explanation.bestBit && typeof explanation.bestBit === "object" ? explanation.bestBit : null,
+      examples: Array.isArray(explanation.examples) ? explanation.examples.slice(0, 4) : [],
+      usageNote: explanation.usageNote || ""
+    }
+  };
+}
+
 async function handleConversationReviewMode(apiKey, model, requestBody) {
   const language = getLanguageProfile(requestBody.targetLanguage);
   const historyText = Array.isArray(requestBody.history)
@@ -1104,6 +1179,8 @@ async function handler(event) {
       result = await handleWordHintsMode(apiKey, model, requestBody);
     } else if (requestBody.mode === "word-details") {
       result = await handleWordDetailsMode(apiKey, model, requestBody);
+    } else if (requestBody.mode === "sentence-explain") {
+      result = await handleSentenceExplainMode(apiKey, model, requestBody);
       } else if (requestBody.mode === "conversation-review") {
         result = await handleConversationReviewMode(apiKey, model, requestBody);
       } else if (requestBody.mode === "conversation-review-final") {

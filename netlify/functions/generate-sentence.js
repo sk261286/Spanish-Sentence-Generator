@@ -370,7 +370,7 @@ async function handler(event) {
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_GENERATION_MODEL || "gpt-5.4-mini";
+  const model = process.env.OPENAI_GENERATION_MODEL || "gpt-5.5";
 
   if (!apiKey) {
     return {

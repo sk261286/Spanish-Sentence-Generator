@@ -1578,6 +1578,8 @@ const tooEasyBtn = document.getElementById("too-easy-btn");
 const levelRightBtn = document.getElementById("level-right-btn");
 const tooHardBtn = document.getElementById("too-hard-btn");
 const addGeneratorToPlaylistBtn = document.getElementById("add-generator-to-playlist-btn");
+const explainCurrentSentenceBtn = document.getElementById("explain-current-sentence-btn");
+const sentenceExplanationPanel = document.getElementById("sentence-explanation-panel");
 const toggleTranslationBtn = document.getElementById("toggle-translation-btn");
 const copySentenceBtn = document.getElementById("copy-sentence-btn");
 const saveBtn = document.getElementById("save-btn");
@@ -1911,6 +1913,7 @@ let activeWordActionPanel = null;
 let activePhraseActionPanel = null;
 let aiWordHintCache = JSON.parse(localStorage.getItem("spanishSentenceAiWordHints")) || {};
 let aiWordDetailCache = JSON.parse(localStorage.getItem("languageCoachAiWordDetails")) || {};
+let aiSentenceExplanationCache = JSON.parse(localStorage.getItem("languageCoachSentenceExplanations")) || {};
 let chatTimerInterval = null;
 let fullConversationPlayback = {
   isPlaying: false,
@@ -2937,12 +2940,207 @@ function saveAiWordDetailCache() {
   localStorage.setItem("languageCoachAiWordDetails", JSON.stringify(aiWordDetailCache));
 }
 
+function saveAiSentenceExplanationCache() {
+  const cacheEntries = Object.entries(aiSentenceExplanationCache).slice(-80);
+  aiSentenceExplanationCache = Object.fromEntries(cacheEntries);
+  localStorage.setItem("languageCoachSentenceExplanations", JSON.stringify(aiSentenceExplanationCache));
+}
+
+function getSentenceExplanationCacheKey(sentence) {
+  return [
+    targetLanguage,
+    normaliseSentenceForSimilarity(sentence?.spanish || ""),
+    normaliseSentenceForSimilarity(sentence?.english || "")
+  ].join(":");
+}
+
 function getWordDetailCacheKey(cleanWord, example) {
   return [
     targetLanguage,
     cleanWord,
     normaliseSentenceForSimilarity(example?.spanish || "")
   ].join(":");
+}
+
+function appendSentenceExplanationSection(parent, titleText, bodyText) {
+  if (!bodyText) {
+    return;
+  }
+
+  const section = document.createElement("div");
+  const title = document.createElement("p");
+  const body = document.createElement("p");
+
+  section.className = "sentence-explanation-section";
+  title.className = "sentence-explanation-title";
+  body.className = "sentence-explanation-body";
+  title.textContent = titleText;
+  body.textContent = bodyText;
+
+  section.appendChild(title);
+  section.appendChild(body);
+  parent.appendChild(section);
+}
+
+function renderSentenceExplanation(panel, sentence, explanation) {
+  const language = getTargetLanguageProfile();
+  const breakdown = Array.isArray(explanation?.breakdown) ? explanation.breakdown : [];
+  const examples = Array.isArray(explanation?.examples) ? explanation.examples : [];
+  const bestBit = explanation?.bestBit || null;
+
+  panel.innerHTML = "";
+  panel.classList.remove("hidden");
+
+  const header = document.createElement("div");
+  const heading = document.createElement("h3");
+  const closeButton = document.createElement("button");
+  header.className = "sentence-explanation-header";
+  heading.textContent = "Sentence explanation";
+  closeButton.className = "secondary-btn compact-btn";
+  closeButton.type = "button";
+  closeButton.textContent = "Hide";
+  closeButton.addEventListener("click", () => panel.classList.add("hidden"));
+  header.appendChild(heading);
+  header.appendChild(closeButton);
+  panel.appendChild(header);
+
+  const original = document.createElement("p");
+  original.className = "sentence-explanation-original";
+  original.textContent = sentence.spanish || "";
+  panel.appendChild(original);
+
+  appendSentenceExplanationSection(panel, "Means", explanation?.means || sentence.english || "");
+  appendSentenceExplanationSection(panel, `Natural ${language.translationLabel} version`, explanation?.naturalVersion || "");
+
+  if (breakdown.length) {
+    const section = document.createElement("div");
+    const title = document.createElement("p");
+    const list = document.createElement("div");
+    section.className = "sentence-explanation-section";
+    title.className = "sentence-explanation-title";
+    list.className = "sentence-breakdown-list";
+    title.textContent = "Breakdown";
+
+    breakdown.forEach((item) => {
+      const row = document.createElement("div");
+      const chunk = document.createElement("strong");
+      const meaning = document.createElement("span");
+      const note = document.createElement("small");
+      row.className = "sentence-breakdown-row";
+      chunk.textContent = item.chunk || "";
+      meaning.textContent = item.meaning || "";
+      note.textContent = item.note || "";
+      row.appendChild(chunk);
+      row.appendChild(meaning);
+      if (note.textContent) {
+        row.appendChild(note);
+      }
+      list.appendChild(row);
+    });
+
+    section.appendChild(title);
+    section.appendChild(list);
+    panel.appendChild(section);
+  }
+
+  if (bestBit && (bestBit.phrase || bestBit.naturalMeaning || bestBit.note)) {
+    const section = document.createElement("div");
+    const title = document.createElement("p");
+    const phrase = document.createElement("strong");
+    const literal = document.createElement("p");
+    const natural = document.createElement("p");
+    const note = document.createElement("p");
+    section.className = "sentence-best-bit";
+    title.className = "sentence-explanation-title";
+    title.textContent = "Best bit";
+    phrase.textContent = bestBit.phrase || "Useful pattern";
+    literal.textContent = bestBit.literal ? `Literal idea: ${bestBit.literal}` : "";
+    natural.textContent = bestBit.naturalMeaning || "";
+    note.textContent = bestBit.note || "";
+    section.appendChild(title);
+    section.appendChild(phrase);
+    if (literal.textContent) {
+      section.appendChild(literal);
+    }
+    if (natural.textContent) {
+      section.appendChild(natural);
+    }
+    if (note.textContent) {
+      section.appendChild(note);
+    }
+    panel.appendChild(section);
+  }
+
+  if (examples.length) {
+    const section = document.createElement("div");
+    const title = document.createElement("p");
+    const list = document.createElement("ul");
+    section.className = "sentence-explanation-section";
+    title.className = "sentence-explanation-title";
+    list.className = "sentence-example-list";
+    title.textContent = "Similar examples";
+
+    examples.forEach((item) => {
+      const listItem = document.createElement("li");
+      const target = document.createElement("strong");
+      const translation = document.createElement("span");
+      target.textContent = item.target || item.spanish || "";
+      translation.textContent = item.english || item.translation || "";
+      listItem.appendChild(target);
+      if (translation.textContent) {
+        listItem.appendChild(translation);
+      }
+      list.appendChild(listItem);
+    });
+
+    section.appendChild(title);
+    section.appendChild(list);
+    panel.appendChild(section);
+  }
+
+  appendSentenceExplanationSection(panel, "Usage note", explanation?.usageNote || "");
+}
+
+async function explainGeneratedSentence(sentence = currentSentence, panel = sentenceExplanationPanel, statusTarget = "current") {
+  if (!sentence?.spanish) {
+    alert("Generate a sentence first.");
+    return;
+  }
+
+  if (!panel) {
+    return;
+  }
+
+  const cacheKey = getSentenceExplanationCacheKey(sentence);
+
+  if (aiSentenceExplanationCache[cacheKey]) {
+    renderSentenceExplanation(panel, sentence, aiSentenceExplanationCache[cacheKey]);
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    return;
+  }
+
+  panel.classList.remove("hidden");
+  panel.innerHTML = '<p class="sentence-meta">Explaining the sentence...</p>';
+
+  try {
+    const responseData = await callAiLanguageCoach({
+      mode: "sentence-explain",
+      targetLanguage,
+      spanish: sentence.spanish,
+      english: sentence.english || ""
+    });
+    const explanation = responseData.explanation || {};
+    aiSentenceExplanationCache[cacheKey] = explanation;
+    saveAiSentenceExplanationCache();
+    renderSentenceExplanation(panel, sentence, explanation);
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  } catch (error) {
+    panel.innerHTML = "";
+    const message = document.createElement("p");
+    message.className = "sentence-meta";
+    message.textContent = `Could not explain the ${statusTarget} sentence. ${formatAiErrorMessage(error.message)}`;
+    panel.appendChild(message);
+  }
 }
 
 function renderWordDetailList(parent, titleText, items, renderItem) {
@@ -6318,6 +6516,11 @@ async function improveMissingWordHintsWithAi(sentence, requestId) {
 function setCurrentSentence(sentence, sourceLabel) {
   currentSentence = withCurrentLanguage(sentence);
   lastGeneratedSpanish = currentSentence.spanish;
+
+  if (sentenceExplanationPanel) {
+    sentenceExplanationPanel.classList.add("hidden");
+    sentenceExplanationPanel.innerHTML = "";
+  }
 
   renderSpanishSentence(currentSentence.spanish);
   wordHintRequestId += 1;
@@ -10166,6 +10369,8 @@ function renderBatchSentences() {
     const actions = document.createElement("div");
     const playButton = document.createElement("button");
     const playlistButton = document.createElement("button");
+    const explainButton = document.createElement("button");
+    const explanationPanel = document.createElement("div");
 
     row.className = "batch-row";
     number.className = "batch-number";
@@ -10174,12 +10379,15 @@ function renderBatchSentences() {
     actions.className = "batch-actions";
     playButton.className = "secondary-btn batch-action-btn";
     playlistButton.className = "secondary-btn batch-action-btn";
+    explainButton.className = "secondary-btn batch-action-btn";
+    explanationPanel.className = "sentence-explanation-panel batch-explanation-panel hidden";
 
     number.textContent = String(index + 1);
     setHoverableTargetText(spanish, sentence.spanish, sentence, "batch");
     english.textContent = sentence.english;
     playButton.textContent = "Play";
     playlistButton.textContent = "Playlist";
+    explainButton.textContent = "Explain";
 
     playButton.addEventListener("click", () => {
       playSpanishAudio(sentence.spanish, `Batch sentence ${index + 1}`);
@@ -10192,12 +10400,19 @@ function renderBatchSentences() {
       });
     });
 
+    explainButton.addEventListener("click", () => {
+      explainGeneratedSentence(sentence, explanationPanel, `batch ${index + 1}`);
+      batchStatus.textContent = `Explaining sentence ${index + 1}...`;
+    });
+
     row.appendChild(number);
     row.appendChild(spanish);
     row.appendChild(english);
     actions.appendChild(playButton);
     actions.appendChild(playlistButton);
+    actions.appendChild(explainButton);
     row.appendChild(actions);
+    row.appendChild(explanationPanel);
     batchList.appendChild(row);
   });
 
@@ -13548,6 +13763,12 @@ addGeneratorToPlaylistBtn.addEventListener("click", () => {
   choosePlaylistForSentence(currentSentence);
 });
 
+if (explainCurrentSentenceBtn) {
+  explainCurrentSentenceBtn.addEventListener("click", () => {
+    explainGeneratedSentence(currentSentence, sentenceExplanationPanel, "current");
+  });
+}
+
 toggleTranslationBtn.addEventListener("click", () => {
   toggleTranslation();
   showStatusMessage(translationVisible ? "Translation revealed." : "Translation hidden.");
@@ -14147,7 +14368,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=59").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=60").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });

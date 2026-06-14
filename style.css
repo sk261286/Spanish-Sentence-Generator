@@ -2230,6 +2230,107 @@ body.dark-mode .score-summary {
   white-space: nowrap;
 }
 
+.sentence-explanation-panel {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.batch-explanation-panel {
+  grid-column: 2 / -1;
+  margin-top: 0;
+}
+
+.sentence-explanation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.sentence-explanation-header h3,
+.sentence-explanation-section p,
+.sentence-best-bit p,
+.sentence-example-list {
+  margin: 0;
+}
+
+.sentence-explanation-original {
+  margin: 0 0 14px;
+  font-size: 1.08rem;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.sentence-explanation-section,
+.sentence-best-bit {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.sentence-explanation-title {
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sentence-explanation-body {
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.sentence-breakdown-list {
+  display: grid;
+  gap: 8px;
+}
+
+.sentence-breakdown-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.38fr) minmax(0, 1fr);
+  gap: 8px 14px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.sentence-breakdown-row small {
+  grid-column: 2;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.sentence-best-bit {
+  padding: 14px;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  border-radius: var(--radius);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.sentence-best-bit strong,
+.sentence-example-list strong {
+  display: block;
+}
+
+.sentence-example-list {
+  display: grid;
+  gap: 10px;
+  padding-left: 18px;
+}
+
+.sentence-example-list span {
+  display: block;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
 .favourites-list {
   list-style: none;
   margin: 0;
@@ -2917,6 +3018,23 @@ body.dark-mode .tag {
   .dialogue-line,
   .favourite-item {
     grid-template-columns: 1fr;
+  }
+
+  .batch-explanation-panel {
+    grid-column: 1;
+  }
+
+  .sentence-explanation-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sentence-breakdown-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sentence-breakdown-row small {
+    grid-column: 1;
   }
 
   .call-focus-panel {
