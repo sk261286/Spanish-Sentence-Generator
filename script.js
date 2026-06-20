@@ -10229,6 +10229,40 @@ async function generateAiSentence(options = {}) {
   return sentence;
 }
 
+async function generateAiSentenceWithRetries(options = {}, maxAttempts = 4) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await generateAiSentence({
+        ...options,
+        recentSentences: [
+          currentSentence?.spanish,
+          ...recentGeneratedSentences,
+          ...currentBatchSentences.map((sentence) => sentence.spanish)
+        ]
+      });
+    } catch (error) {
+      lastError = error;
+      const canRetry = error.message.includes("too similar") || error.message.includes("instead of English");
+
+      if (!canRetry || attempt === maxAttempts) {
+        throw error;
+      }
+
+      if (batchStatus) {
+        batchStatus.textContent = error.message.includes("too similar")
+          ? `The AI repeated itself, so asking again for a fresher sentence (${attempt + 1}/${maxAttempts})...`
+          : `The AI used the wrong language, so asking again (${attempt + 1}/${maxAttempts})...`;
+      }
+
+      await wait(350);
+    }
+  }
+
+  throw lastError || new Error("The AI could not generate a sentence.");
+}
+
 // This helper contains the built-in sentence generation path.
 function generateLocalSentence(filteredSentences) {
   if (favouritesOnlyCheckbox?.checked) {
@@ -10594,7 +10628,7 @@ async function generateSentenceBatch() {
       if (shouldUseAiForBatch) {
         try {
           const batchPlan = getBatchGenerationPlan(index);
-          nextSentence = await generateAiSentence(batchPlan);
+          nextSentence = await generateAiSentenceWithRetries(batchPlan);
         } catch (error) {
           throw new Error(`${formatAiErrorMessage(error.message)} No built-in fallback was used because AI batch mode is on.`);
         }
