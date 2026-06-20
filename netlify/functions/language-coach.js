@@ -522,6 +522,35 @@ Rules:
     hasBannedWords(reply.spanish || "") ||
     hasBannedWords(reply.correctionSpanish || "")
   )) {
+    const bannedRepairPrompt = `
+Rewrite this response so it uses only natural Spain Spanish.
+
+The previous response used banned, wrong-region, invented, or unnatural wording.
+
+Learner message:
+${requestBody.userMessage}
+
+Bad response JSON:
+${JSON.stringify(reply)}
+
+Rules:
+- Keep the same JSON shape.
+- "spanish" must be the real conversational reply, not just the correction.
+- "correctionSpanish" must be a more natural Spain-Spanish version of the learner's message.
+- Use natural Spain Spanish only.
+- Do not use Latin American vocabulary such as carro, computadora, manejar, parquear, parqueadero, or celular.
+- Do not use Spanglish or invented hybrid verbs.
+- Keep the call-mode reply spoken-friendly and natural.
+- Reply with JSON only.
+`.trim();
+
+    reply = await callOpenAi(apiKey, model, bannedRepairPrompt);
+  }
+
+  if (language.bannedCheck && (
+    hasBannedWords(reply.spanish || "") ||
+    hasBannedWords(reply.correctionSpanish || "")
+  )) {
     throw new Error("The AI returned banned wording.");
   }
 

@@ -1543,7 +1543,6 @@ const customGeneratorTopicsList = document.getElementById("custom-generator-topi
 const toneSelect = document.getElementById("tone");
 const grammarFocusSelect = document.getElementById("grammar-focus");
 const favouritesOnlyCheckbox = document.getElementById("favourites-only");
-const aiModeCheckbox = document.getElementById("ai-mode");
 const sentenceDisplayModeSelect = document.getElementById("sentence-display-mode");
 const aiModeNote = document.getElementById("ai-mode-note");
 const generateBtn = document.getElementById("generate-btn");
@@ -1888,7 +1887,7 @@ let chatMediaStream = null;
 let chatAudioChunks = [];
 let deferredInstallPrompt = null;
 let installHintShown = false;
-let aiModeEnabled = JSON.parse(localStorage.getItem("spanishSentenceAiMode")) || false;
+let aiModeEnabled = true;
 let darkModeEnabled = JSON.parse(localStorage.getItem("spanishSentenceDarkMode")) || false;
 let sentenceDisplayMode = localStorage.getItem("spanishSentenceDisplayMode") || "show-translation";
 let targetLanguage = localStorage.getItem("spanishSentenceTargetLanguage") || "spanish";
@@ -6473,7 +6472,7 @@ function getWordHintCacheKey(sentence) {
 
 // This helper asks AI for contextual word hints only when the local dictionary misses words.
 async function improveMissingWordHintsWithAi(sentence, requestId) {
-  if (!sentence || !(aiModeEnabled || targetLanguage !== "spanish")) {
+  if (!sentence) {
     return;
   }
 
@@ -6557,7 +6556,7 @@ function buildOfflineCustomSentence() {
   const englishInput = customEnglishInput.value.trim();
 
   if (targetLanguage !== "spanish") {
-    customStatus.textContent = `${getTargetLanguageProfile().label} custom translation needs the AI translator so it stays in the right language. Turn on the AI sentence engine and try again.`;
+    customStatus.textContent = `${getTargetLanguageProfile().label} custom translation needs the AI translator so it stays in the right language.`;
     return null;
   }
 
@@ -10125,8 +10124,50 @@ function validateAiSentenceLanguage(sentence) {
   }
 }
 
-async function generateAiSentence() {
+function getBatchGenerationPlan(index) {
+  const selectedFocus = grammarFocusSelect.value;
+  const mixedPlan = [
+    { focus: "past", grammarGoal: "Use simple completed past for a one-off finished event. In Spanish, prefer preterite/pretérito indefinido, such as fui, hice, compré, llegué, vi." },
+    { focus: "past", grammarGoal: "Use recent past or present perfect naturally. In Spanish from Spain, present perfect is fine for hoy, esta semana, or a recent result." },
+    { focus: "mixed", grammarGoal: "Use present tense for a current habit or routine that is not about reading, walking, coffee, phones, TV, or switching off. Avoid using suelo unless it is clearly the most natural choice." },
+    { focus: "future", grammarGoal: "Use one natural near-future plan. Choose only one domain: appointment, booking, small errand, or practical arrangement. Do not mechanically combine several domains." },
+    { focus: "mixed", grammarGoal: "Use a direct everyday statement about exactly one of these: a household fix, an admin task, a payment, a receipt, opening times, or a booking. Do not make it a question. Avoid using both factura and recibo unless the difference is clear." },
+    { focus: "questions", grammarGoal: "Use a natural spoken question that asks about the listener, a shared plan, or information the listener may know." },
+    { focus: "opinions", grammarGoal: "Use a natural opinion, preference, or contrast." },
+    { focus: "mixed", grammarGoal: "Use a natural sentence about a small problem and its result, using a fresh object and location. Do not make it a question." },
+    { focus: "subjunctive", grammarGoal: "Use a useful subjunctive trigger in a practical everyday situation, such as a reminder, favour, appointment, or plan." },
+    { focus: "idioms", grammarGoal: "Use one clear learner-friendly idiomatic expression that appears in the sentence itself. Avoid venir de lujo, venir de perlas, and desconectar if they appeared recently." }
+  ];
+  const pastPlan = [
+    { focus: "past", grammarGoal: "Use simple completed past for a one-off finished event. In Spanish, prefer preterite/pretérito indefinido, such as fui, hice, compré, llegué, vi." },
+    { focus: "past", grammarGoal: "Use a recent past event with present perfect only where it sounds natural in Spain." },
+    { focus: "past", grammarGoal: "Use imperfect for background, habit, ongoing state, or description in the past." },
+    { focus: "past", grammarGoal: "Use a past cause-and-effect sentence with clear logic and no unrelated events." }
+  ];
+
+  if (selectedFocus === "mixed") {
+    return mixedPlan[index % mixedPlan.length];
+  }
+
+  if (selectedFocus === "past") {
+    return pastPlan[index % pastPlan.length];
+  }
+
+  return {
+    focus: selectedFocus,
+    grammarGoal: ""
+  };
+}
+
+async function generateAiSentence(options = {}) {
   let response;
+  const requestedFocus = options.focus || grammarFocusSelect.value;
+  const requestedRecentSentences = Array.isArray(options.recentSentences)
+    ? options.recentSentences
+    : [
+        currentSentence?.spanish,
+        ...recentGeneratedSentences
+      ];
 
   try {
     response = await fetch("/api/generate-sentence", {
@@ -10138,12 +10179,10 @@ async function generateAiSentence() {
         difficulty: difficultySelect.value,
         topic: topicSelect.value,
         tone: toneSelect.value,
-        focus: grammarFocusSelect.value,
+        focus: requestedFocus,
+        grammarGoal: options.grammarGoal || "",
         targetLanguage,
-        recentSentences: [
-          currentSentence?.spanish,
-          ...recentGeneratedSentences
-        ].filter(Boolean).slice(-14)
+        recentSentences: requestedRecentSentences.filter(Boolean).slice(-14)
       })
     });
   } catch (error) {
@@ -10173,7 +10212,7 @@ async function generateAiSentence() {
     difficulty: data.sentence.difficulty || difficultySelect.value,
     topic: data.sentence.topic || topicSelect.value,
     tone: data.sentence.tone || toneSelect.value,
-    focus: data.sentence.focus || grammarFocusSelect.value,
+    focus: data.sentence.focus || requestedFocus,
     grammarTags: Array.isArray(data.sentence.grammarTags) ? data.sentence.grammarTags : [],
     spanish: data.sentence.spanish.trim(),
     english: data.sentence.english.trim(),
@@ -10235,17 +10274,7 @@ async function generateSentence() {
     let remainingCooldown = Math.max(0, Math.ceil((aiCooldownUntil - Date.now()) / 1000));
 
     if (remainingCooldown > 2) {
-      if (targetLanguage !== "spanish") {
-        showStatusMessage(`AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)} before generating another ${getTargetLanguageProfile().label} sentence.`);
-        return;
-      }
-
-      nextSentence = generateLocalSentence(filteredSentences);
-      setCurrentSentence(nextSentence, nextSentence.generated ? "Generated" : "Example");
-      if (nextSentence.generated) {
-        rememberGeneratedSentence(nextSentence.spanish);
-      }
-      showStatusMessage(`AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)} before asking AI again. The built-in generator was used for now.`);
+      showStatusMessage(`AI cooldown is active. Please wait ${formatSecondsLabel(remainingCooldown)} before generating another ${getTargetLanguageProfile().label} sentence.`);
       return;
     }
 
@@ -10258,19 +10287,7 @@ async function generateSentence() {
     }
 
     if (remainingCooldown > 0) {
-      if (targetLanguage !== "spanish") {
-        showStatusMessage(`AI cooldown is still active. Please try another ${getTargetLanguageProfile().label} sentence in a moment.`);
-        generateBtn.disabled = false;
-        generateBtn.textContent = "Generate Sentence";
-        return;
-      }
-
-      nextSentence = generateLocalSentence(filteredSentences);
-      setCurrentSentence(nextSentence, nextSentence.generated ? "Generated" : "Example");
-      if (nextSentence.generated) {
-        rememberGeneratedSentence(nextSentence.spanish);
-      }
-      showStatusMessage(`AI cooldown is still active. The built-in generator was used for now.`);
+      showStatusMessage(`AI cooldown is still active. Please try another ${getTargetLanguageProfile().label} sentence in a moment.`);
       generateBtn.disabled = false;
       generateBtn.textContent = "Generate Sentence";
       return;
@@ -10293,13 +10310,8 @@ async function generateSentence() {
         }
       }
     } catch (error) {
-      if (targetLanguage === "spanish") {
-        nextSentence = generateLocalSentence(filteredSentences);
-        showStatusMessage(`${formatAiErrorMessage(error.message)} The built-in generator was used instead.`);
-      } else {
-        showStatusMessage(`${formatAiErrorMessage(error.message)} ${getTargetLanguageProfile().label} sentences need AI, so the Spanish built-in generator was not used.`);
-        return;
-      }
+      showStatusMessage(`${formatAiErrorMessage(error.message)} No built-in fallback was used because AI sentence mode is on.`);
+      return;
     } finally {
       generateBtn.disabled = false;
       generateBtn.textContent = "Generate Sentence";
@@ -10558,6 +10570,7 @@ function addBatchToPlaylist() {
 async function generateSentenceBatch() {
   const filteredSentences = getFilteredSentences();
   const requestedCount = Math.min(30, Math.max(1, Number(batchCountSelect.value) || 10));
+  const shouldUseAiForBatch = (aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox?.checked;
 
   if (filteredSentences.length === 0 && favouritesOnlyCheckbox?.checked) {
     currentBatchSentences = [];
@@ -10570,21 +10583,20 @@ async function generateSentenceBatch() {
   generateBatchBtn.textContent = "Generating...";
   currentBatchSentences = [];
   renderBatchSentences();
-  batchStatus.textContent = `Generating ${requestedCount} sentences...`;
+  batchStatus.textContent = shouldUseAiForBatch
+    ? `Generating ${requestedCount} AI sentences...`
+    : `Loading ${requestedCount} saved/example sentences...`;
 
   try {
     for (let index = 0; index < requestedCount; index += 1) {
       let nextSentence;
 
-      if ((aiModeEnabled || targetLanguage !== "spanish") && !favouritesOnlyCheckbox?.checked) {
+      if (shouldUseAiForBatch) {
         try {
-          nextSentence = await generateAiSentence();
+          const batchPlan = getBatchGenerationPlan(index);
+          nextSentence = await generateAiSentence(batchPlan);
         } catch (error) {
-          if (targetLanguage !== "spanish") {
-            throw new Error(`${formatAiErrorMessage(error.message)} ${getTargetLanguageProfile().label} batches need AI, so the Spanish built-in generator was not used.`);
-          }
-
-          nextSentence = generateLocalSentence(filteredSentences);
+          throw new Error(`${formatAiErrorMessage(error.message)} No built-in fallback was used because AI batch mode is on.`);
         }
       } else {
         nextSentence = generateLocalSentence(filteredSentences);
@@ -10599,7 +10611,9 @@ async function generateSentenceBatch() {
       if (batchSentence.generated || batchSentence.ai) {
         rememberGeneratedSentence(batchSentence.spanish);
       }
-      batchStatus.textContent = `Generated ${currentBatchSentences.length} of ${requestedCount} sentences...`;
+      batchStatus.textContent = shouldUseAiForBatch
+        ? `Generated ${currentBatchSentences.length} of ${requestedCount} AI sentences...`
+        : `Loaded ${currentBatchSentences.length} of ${requestedCount} saved/example sentences...`;
     }
 
     const lastSentence = currentBatchSentences[currentBatchSentences.length - 1];
@@ -10612,7 +10626,8 @@ async function generateSentenceBatch() {
     renderBatchSentences();
     const savedBatch = saveGeneratedBatch(currentBatchSentences);
     if (savedBatch) {
-      batchStatus.textContent = `${currentBatchSentences.length} sentences ready and auto-saved as "${savedBatch.title}".`;
+      const qualityNote = shouldUseAiForBatch ? "" : " Saved/example sentences were used.";
+      batchStatus.textContent = `${currentBatchSentences.length} sentences ready and auto-saved as "${savedBatch.title}".${qualityNote}`;
       showStatusMessage("Generated batch saved with its own radio playlist.");
     }
   } catch (error) {
@@ -11249,11 +11264,6 @@ function formatAiErrorMessage(errorMessage) {
   return `AI is unavailable right now. ${errorMessage}`;
 }
 
-// This function saves whether AI mode is turned on.
-function saveAiModePreference() {
-  localStorage.setItem("spanishSentenceAiMode", JSON.stringify(aiModeEnabled));
-}
-
 // This function saves the preferred new-sentence display mode.
 function saveSentenceDisplayPreference() {
   localStorage.setItem("spanishSentenceDisplayMode", sentenceDisplayMode);
@@ -11261,21 +11271,23 @@ function saveSentenceDisplayPreference() {
 
 // This helper updates the short AI note under the controls.
 function updateAiModeNote() {
+  if (!aiModeNote) {
+    return;
+  }
+
   if (favouritesOnlyCheckbox?.checked) {
-    aiModeNote.textContent = "AI mode does not change favourite-only practice. That mode still uses your saved sentences.";
+    aiModeNote.textContent = "Favourite-only practice uses your saved sentences.";
     return;
   }
 
   const profile = getTargetLanguageProfile();
 
   if (targetLanguage !== "spanish") {
-    aiModeNote.textContent = `${profile.label} mode uses the AI sentence engine for generation, chat, custom translation, and dialogues.`;
+    aiModeNote.textContent = `${profile.label} mode uses AI for generation, chat, custom translation, and dialogues.`;
     return;
   }
 
-  aiModeNote.textContent = aiModeEnabled
-    ? "AI mode is on. The app will ask the Netlify backend for a fresh sentence, then fall back to the built-in generator if needed."
-    : "AI mode is off. The app is using the built-in sentence generator.";
+  aiModeNote.textContent = "AI is always on for higher-quality generated sentences.";
 }
 
 // This function updates the score text.
@@ -14270,12 +14282,6 @@ if (favouritesOnlyCheckbox) {
     updateAiModeNote();
   });
 }
-aiModeCheckbox.addEventListener("change", () => {
-  aiModeEnabled = aiModeCheckbox.checked;
-  saveAiModePreference();
-  updateAiModeNote();
-  showStatusMessage(aiModeEnabled ? "AI sentence engine turned on." : "AI sentence engine turned off.");
-});
 sentenceDisplayModeSelect.addEventListener("change", () => {
   sentenceDisplayMode = sentenceDisplayModeSelect.value;
   saveSentenceDisplayPreference();
@@ -14368,7 +14374,7 @@ if ("serviceWorker" in navigator) {
       return;
     }
 
-    navigator.serviceWorker.register("service-worker.js?v=60").catch(() => {
+    navigator.serviceWorker.register("service-worker.js?v=70").catch(() => {
       console.warn("Service worker registration failed.");
     });
   });
@@ -14417,7 +14423,6 @@ if (chatStartedAt) {
 }
 renderQuizScore();
 updateQuizControls();
-aiModeCheckbox.checked = aiModeEnabled;
 sentenceDisplayModeSelect.value = sentenceDisplayMode;
 updateAiModeNote();
 showPage(activePageId);

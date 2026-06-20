@@ -1,4 +1,4 @@
-const CACHE_NAME = "language-coach-v60";
+const CACHE_NAME = "language-coach-v70";
 const APP_FILES = [
   "./",
   "./index.html",
